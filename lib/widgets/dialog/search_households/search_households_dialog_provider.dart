@@ -6,7 +6,7 @@ part 'search_households_dialog_provider.g.dart';
 
 @riverpod
 class SearchHouseHolds extends _$SearchHouseHolds {
-  final _householdSearcher = HitsSearcherSingleton().householdSearcher;
+  final _householdSearcher = HouseholdSearcher.instance.householdSearcher;
 
   @override
   List<HouseHold> build() {

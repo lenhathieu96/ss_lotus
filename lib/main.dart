@@ -7,6 +7,7 @@ import 'package:ss_lotus/routes/go_router_provider.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:ss_lotus/themes/colors.dart';
 import 'package:ss_lotus/utils/constants.dart';
+import 'package:ss_lotus/utils/searcher.dart';
 import 'package:toastification/toastification.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -21,6 +22,8 @@ void main() async {
   await FirebaseAppCheck.instance
       .activate(webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'));
   await initializeDateFormatting();
+  HouseholdSearcher.init(
+      dotenv.env['ALGOLIA_API_KEY'] ?? "", dotenv.env['ALGOLIA_APP_ID'] ?? "");
   runApp(const ProviderScope(
     child: MyApp(),
   ));

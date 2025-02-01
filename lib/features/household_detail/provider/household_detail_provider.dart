@@ -29,7 +29,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
 
   final _houseHoldPaths = algolia.FilterGroupID('houseHoldPath');
   final algolia.FilterState _filterState = algolia.FilterState();
-  final _householdSearcher = HitsSearcherSingleton().householdSearcher;
+  final _householdSearcher = HouseholdSearcher.instance.householdSearcher;
 
   @override
   HouseholdDetailState build() {
