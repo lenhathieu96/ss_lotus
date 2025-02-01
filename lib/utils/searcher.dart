@@ -1,4 +1,5 @@
 import 'package:algolia_helper_flutter/algolia_helper_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class HitsSearcherSingleton {
   static final HitsSearcherSingleton _instance =
@@ -10,8 +11,8 @@ class HitsSearcherSingleton {
 
   HitsSearcherSingleton._internal()
       : _householdSearcher = HitsSearcher(
-          applicationID: 'TMHHDJJ8E0',
-          apiKey: '12c2ef492e2549bac78756caaf90f6fd',
+          applicationID: dotenv.env['ALGOLIA_APP_ID'] ?? "",
+          apiKey: dotenv.env['ALGOLIA_API_KEY'] ?? "",
           indexName: 'tdhp',
         );
 

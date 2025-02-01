@@ -127,7 +127,9 @@ flutter:
           weight: 700
         - asset: assets/fonts/NotoSerif-ExtraBold.ttf
           weight: 800
-    
+    - family: OleoScript
+      fonts:
+        - asset: assets/fonts/OleoScript-Bold.ttf
         
   
   # For details regarding fonts from package dependencies,

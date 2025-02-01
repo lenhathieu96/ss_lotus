@@ -44,10 +44,25 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                             width: 60,
                             height: 60,
                           ),
-                          Text(
-                            'SSLotus',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 32.0),
+                          ShaderMask(
+                            shaderCallback: (bounds) {
+                              return LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.pallet.purple40
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ).createShader(bounds);
+                            },
+                            child: Text(
+                              'SSLotus',
+                              style: TextStyle(
+                                fontFamily: "OleoScript",
+                                fontSize: 32.0,
+                                color: Colors.white,
+                              ),
+                            ),
                           )
                         ],
                       ),
