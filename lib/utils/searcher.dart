@@ -6,8 +6,8 @@ class HouseholdSearcher {
   // Private constructor to prevent direct instantiation
   HouseholdSearcher._internal(String apiKey, String appId)
       : _householdSearcher = HitsSearcher(
-          applicationID: appId,
-          apiKey: apiKey,
+          applicationID: "TMHHDJJ8E0",
+          apiKey: "12c2ef492e2549bac78756caaf90f6fd",
           indexName: 'tdhp',
         );
 
