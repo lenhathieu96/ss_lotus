@@ -48,7 +48,9 @@ dependencies:
   toastification: ^2.3.0
   formz: ^0.8.0
   flutter_svg: ^2.0.17
+  flutter_dotenv: ^5.2.1
   algolia_helper_flutter: ^1.2.0
+
   firebase_core: ^3.10.1
   cloud_firestore: ^5.6.2
   firebase_app_check: ^0.3.2+1
@@ -84,6 +86,7 @@ flutter:
   assets:
     - assets/images/
     - assets/svgs/
+    - .env
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
