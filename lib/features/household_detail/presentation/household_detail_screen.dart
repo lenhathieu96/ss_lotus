@@ -36,7 +36,7 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                       spacing: COMMON_SPACING,
                       children: [
                         SvgPicture.asset(
-                          "/svgs/logo.svg",
+                          "assets/svgs/logo.svg",
                           width: 60,
                           height: 60,
                         ),
