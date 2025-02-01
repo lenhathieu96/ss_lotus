@@ -10,7 +10,6 @@ class HitsSearcherSingleton {
 
   HitsSearcherSingleton._internal()
       : _householdSearcher = HitsSearcher(
-          debounce: Duration(seconds: 1),
           applicationID: 'TMHHDJJ8E0',
           apiKey: '12c2ef492e2549bac78756caaf90f6fd',
           indexName: 'tdhp',

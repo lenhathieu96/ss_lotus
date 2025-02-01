@@ -4,12 +4,15 @@ import 'package:ss_lotus/entities/household.dart';
 import 'package:ss_lotus/entities/user_group.dart';
 import 'package:ss_lotus/themes/colors.dart';
 import 'package:ss_lotus/utils/constants.dart';
+import 'package:ss_lotus/utils/debounce.dart';
 
 import 'search_households_dialog_provider.dart';
 
 class SearchHouseholdsDialog extends ConsumerStatefulWidget {
   final void Function(HouseHold household) onSelectHousehold;
-  const SearchHouseholdsDialog({super.key, required this.onSelectHousehold});
+  final void Function()? onAddNewFamily;
+  const SearchHouseholdsDialog(
+      {super.key, required this.onSelectHousehold, this.onAddNewFamily});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -19,6 +22,7 @@ class SearchHouseholdsDialog extends ConsumerStatefulWidget {
 class _SearchHouseholdsDialogState
     extends ConsumerState<SearchHouseholdsDialog> {
   late TextEditingController searchController;
+  Debouncer debouncer = Debouncer(delay: Duration(seconds: 1));
 
   @override
   void initState() {
@@ -70,7 +74,10 @@ class _SearchHouseholdsDialogState
                         hintText: "Nhập mã số - địa chỉ - họ tên",
                         backgroundColor: WidgetStatePropertyAll(Colors.white),
                         elevation: WidgetStatePropertyAll(0),
-                        onChanged: searchedHouseholdsNotifier.searchHouseHolds,
+                        onChanged: (text) {
+                          debouncer(() => searchedHouseholdsNotifier
+                              .searchHouseHolds(text));
+                        },
                         onSubmitted:
                             searchedHouseholdsNotifier.searchHouseHolds,
                         padding: WidgetStatePropertyAll(
@@ -89,16 +96,24 @@ class _SearchHouseholdsDialogState
                                     Icons.close_rounded,
                                     color: AppColors.border,
                                   )),
-                              Container(
-                                decoration: BoxDecoration(
-                                    border: Border(
-                                        left: BorderSide(
-                                            width: 1,
-                                            color: AppColors.border))),
-                                child: TextButton(
-                                    onPressed: () {},
-                                    child: Text("Tạo gia đình mới")),
-                              ),
+                              if (widget.onAddNewFamily != null)
+                                Container(
+                                  decoration: BoxDecoration(
+                                      border: Border(
+                                          left: BorderSide(
+                                              width: 1,
+                                              color: AppColors.border))),
+                                  child: TextButton(
+                                      style: TextButton.styleFrom(
+                                          overlayColor: Colors.transparent,
+                                          foregroundColor:
+                                              AppColors.pallet.blue30),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        widget.onAddNewFamily!();
+                                      },
+                                      child: Text("Tạo gia đình mới")),
+                                ),
                             ],
                           )
                         ],
@@ -142,6 +157,12 @@ class _SearchHouseholdsDialogState
                                         mouseCursor: SystemMouseCursors.click,
                                         child: Container(
                                           padding: COMMON_EDGE_INSETS_PADDING,
+                                          margin: COMMON_EDGE_INSETS_PADDING,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.pallet.gray20,
+                                            borderRadius: BorderRadius.circular(
+                                                COMMON_BORDER_RADIUS),
+                                          ),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -175,6 +196,7 @@ class _SearchHouseholdsDialogState
                                                 return Container(
                                                   width: double.infinity,
                                                   decoration: BoxDecoration(
+                                                      color: AppColors.white,
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               COMMON_BORDER_RADIUS),

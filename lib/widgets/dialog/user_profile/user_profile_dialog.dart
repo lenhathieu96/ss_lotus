@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ss_lotus/entities/user.dart';
+import 'package:ss_lotus/themes/colors.dart';
 import 'package:ss_lotus/utils/constants.dart';
 import 'package:ss_lotus/widgets/dialog/user_profile/user_profile_dialog_provider.dart';
 
@@ -17,49 +18,56 @@ class UserProfileDialog extends ConsumerWidget {
     final formNotifier = ref.read(userProfileFormProvider(user).notifier);
 
     return Dialog(
-      child: Container(
-          width: MediaQuery.of(context).size.width * 0.4,
-          height: MediaQuery.of(context).size.height * 0.4,
-          padding: COMMON_EDGE_INSETS_PADDING,
-          child: Column(
-            spacing: COMMON_SPACING * 4,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('Thông tin phật tử'),
-              TextFormField(
-                initialValue: formState.name.value,
-                decoration: InputDecoration(
-                  labelText: 'Tên',
-                  errorText:
-                      formState.name.isNotValid ? formState.name.error : null,
+      child: IntrinsicHeight(
+        child: Container(
+            width: MediaQuery.of(context).size.width * 0.4,
+            padding: COMMON_EDGE_INSETS_PADDING,
+            child: Column(
+              spacing: COMMON_SPACING * 4,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Thông tin phật tử',
+                    style:
+                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                TextFormField(
+                  initialValue: formState.name.value,
+                  decoration: InputDecoration(
+                    labelText: 'Tên',
+                    errorText:
+                        formState.name.isNotValid ? formState.name.error : null,
+                  ),
+                  onChanged: (value) => formNotifier.updateName(value),
                 ),
-                onChanged: (value) => formNotifier.updateName(value),
-              ),
-              TextFormField(
-                initialValue: formState.christineName.value,
-                decoration: InputDecoration(
-                  labelText: 'Pháp danh',
-                  errorText: formState.christineName.isNotValid
-                      ? formState.christineName.error
-                      : null,
+                TextFormField(
+                  initialValue: formState.christineName.value,
+                  decoration: InputDecoration(
+                    labelText: 'Pháp danh',
+                    errorText: formState.christineName.isNotValid
+                        ? formState.christineName.error
+                        : null,
+                  ),
+                  onChanged: (value) => formNotifier.updateChristineName(value),
                 ),
-                onChanged: (value) => formNotifier.updateChristineName(value),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  label: Text(user == null ? "Thêm mới" : "Cập nhập"),
-                  onPressed: () {
-                    onProfileUpdated(User(
-                        fullName: formState.name.value.toUpperCase(),
-                        christineName:
-                            formState.christineName.value.toUpperCase()));
-                    Navigator.of(context).pop();
-                  },
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                        backgroundColor: user == null
+                            ? AppColors.pallet.blue30
+                            : AppColors.pallet.blue50),
+                    label: Text(user == null ? "Thêm mới" : "Cập nhập"),
+                    onPressed: () {
+                      onProfileUpdated(User(
+                          fullName: formState.name.value.toUpperCase(),
+                          christineName:
+                              formState.christineName.value.toUpperCase()));
+                      Navigator.of(context).pop();
+                    },
+                  ),
                 ),
-              ),
-            ],
-          )),
+              ],
+            )),
+      ),
     );
   }
 }

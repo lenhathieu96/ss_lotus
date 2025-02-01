@@ -2,6 +2,7 @@ import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
 import 'package:ss_lotus/entities/user.dart';
 import 'package:ss_lotus/entities/user_group.dart';
+import 'package:ss_lotus/themes/colors.dart';
 import 'package:ss_lotus/utils/constants.dart';
 
 class FamiliesList extends StatelessWidget {
@@ -33,9 +34,10 @@ class FamiliesList extends StatelessWidget {
   Widget build(BuildContext context) {
     List<DragAndDropList> dragAndDropLists = families.map((family) {
       return DragAndDropList(
+        contentsWhenEmpty: Text("Chưa có thành viên nào"),
         canDrag: false,
         decoration: BoxDecoration(
-            color: Colors.black12,
+            color: AppColors.pallet.gray20,
             borderRadius:
                 BorderRadius.all(Radius.circular(COMMON_BORDER_RADIUS))),
         header: Padding(
@@ -63,7 +65,9 @@ class FamiliesList extends StatelessWidget {
                 spacing: COMMON_SPACING,
                 children: [
                   FilledButton.icon(
-                    icon: Icon(Icons.person),
+                    style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.pallet.blue30),
+                    icon: Icon(Icons.person_add),
                     label: const Text('Thêm thành viên'),
                     onPressed: () {
                       onUpdateUserProfile(context, family.id, null, null);
@@ -72,6 +76,8 @@ class FamiliesList extends StatelessWidget {
                   families.length == 1
                       ? Container()
                       : FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                              backgroundColor: AppColors.pallet.yellow50),
                           icon: Icon(Icons.splitscreen),
                           label: const Text('Tách hộ mới'),
                           onPressed: () {
@@ -149,15 +155,19 @@ class FamiliesList extends StatelessWidget {
                       ],
                     ),
                   ),
-                  subtitle: RichText(
-                    text: TextSpan(children: [
-                      TextSpan(
-                          text: 'Pháp danh: ', style: TextStyle(fontSize: 16)),
-                      TextSpan(
-                          text: user.christineName,
-                          style: TextStyle(fontSize: 16)),
-                    ]),
-                  ),
+                  subtitle: user.christineName != null &&
+                          user.christineName!.isNotEmpty
+                      ? RichText(
+                          text: TextSpan(children: [
+                            TextSpan(
+                                text: 'Pháp danh: ',
+                                style: TextStyle(fontSize: 16)),
+                            TextSpan(
+                                text: user.christineName,
+                                style: TextStyle(fontSize: 16)),
+                          ]),
+                        )
+                      : null,
                 ),
               ),
             ),

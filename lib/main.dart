@@ -78,8 +78,9 @@ class MyApp extends ConsumerWidget {
             style: ButtonStyle(
                 textStyle: WidgetStatePropertyAll(
                   TextStyle(
-                    fontSize: 16.0, // Adjust the font size as needed
-                  ),
+                      fontSize: 16.0,
+                      fontFamily: "Mulish" // Adjust the font size as needed
+                      ),
                 ),
                 overlayColor: WidgetStatePropertyAll(Colors.transparent),
                 padding: WidgetStatePropertyAll(

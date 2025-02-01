@@ -25,6 +25,7 @@ part 'household_detail_provider.g.dart';
 @riverpod
 class HouseHoldDetail extends _$HouseHoldDetail {
   late final HouseHoldDetailRepositoryProtocol _repository;
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _houseHoldPaths = algolia.FilterGroupID('houseHoldPath');
   final algolia.FilterState _filterState = algolia.FilterState();
@@ -39,17 +40,25 @@ class HouseHoldDetail extends _$HouseHoldDetail {
 
   void _addNewFamily(String address) {
     final currentHouseHold = state.household;
+    int timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    final UserGroup draftFamily =
+        UserGroup(id: timestamp, address: address, members: []);
+    late final HouseHold updatedHousehold;
+
     if (currentHouseHold == null) {
-      return;
+      updatedHousehold = HouseHold(
+        id: timestamp,
+        families: [draftFamily],
+      );
+    } else {
+      final List<UserGroup> updatedFamilies = [
+        ...currentHouseHold.families,
+        draftFamily
+      ];
+      updatedHousehold = currentHouseHold.copyWith(families: updatedFamilies);
     }
-    // state = state.copyWith(
-    //   household: currentHouseHold.copyWith(
-    //     families: [
-    //       ...currentHouseHold.families,
-    //       UserGroup(id: -1, address: address, members: [], houseHoldPath: ""),
-    //     ],
-    //   ),
-    // );
+
+    state = state.copyWith(printable: false, household: updatedHousehold);
   }
 
   void _splitFamily(int familyId) async {
@@ -291,7 +300,11 @@ class HouseHoldDetail extends _$HouseHoldDetail {
     }
   }
 
-  void showUpdateUserProfileDialog(
+  void onClearHousehold() {
+    state = state.copyWith(household: null);
+  }
+
+  void openUpdateUserProfileDialog(
       BuildContext context, int familyId, User? defaultUser, int? userIndex) {
     showDialog(
         context: context,
@@ -304,7 +317,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
             }));
   }
 
-  void showRemoveUserConfirmDialog(
+  void openRemoveUserConfirmDialog(
       BuildContext context, int familyId, int userIndex) {
     showDialog(
         context: context,
@@ -315,7 +328,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
             ));
   }
 
-  void showSplitFamilyConfirmDialog(BuildContext context, int familyId) {
+  void openSplitFamilyConfirmDialog(BuildContext context, int familyId) {
     showDialog(
         context: context,
         builder: (context) => ConfirmationDialog(
@@ -325,7 +338,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
             ));
   }
 
-  void showAddNewFamilyDialog(
+  void openAddNewFamilyDialog(
       BuildContext context, int? familyId, String? defaultAddress) {
     showDialog(
         context: context,
@@ -339,7 +352,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
             ));
   }
 
-  void showAppointmentRegistrationDialog(
+  void openAppointmentRegistrationDialog(
       BuildContext context, Appointment? defaultAppointment) {
     showDialog(
         context: context,
@@ -349,7 +362,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
                 _updateAppointment(updatedAppointment)));
   }
 
-  void showCombineFamilyConfirmDialog(
+  void openCombineFamilyConfirmDialog(
       BuildContext context, HouseHold selectedHousehold) {
     showDialog(
         context: context,
@@ -360,13 +373,18 @@ class HouseHoldDetail extends _$HouseHoldDetail {
             ));
   }
 
-  void showSearchHouseholdsDialog(BuildContext context, bool isCombineFamily) {
+  void openSearchHouseholdsDialog(BuildContext context, bool isCombineFamily) {
     showDialog(
       context: context,
       builder: (context) => SearchHouseholdsDialog(
+        onAddNewFamily: isCombineFamily == true
+            ? () {
+                openAddNewFamilyDialog(context, null, null);
+              }
+            : null,
         onSelectHousehold: isCombineFamily == true
             ? (selectedHousehold) {
-                showCombineFamilyConfirmDialog(context, selectedHousehold);
+                openCombineFamilyConfirmDialog(context, selectedHousehold);
               }
             : _selectHousehold,
       ),

@@ -17,96 +17,136 @@ class HouseHoldDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final houseHoldDetail = ref.watch(houseHoldDetailProvider);
     final houseHoldNotifier = ref.read(houseHoldDetailProvider.notifier);
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
     return Title(
       title: "Hộ gia đình",
       color: Colors.black,
       child: Scaffold(
+        key: scaffoldKey,
         backgroundColor: Colors.transparent,
         body: Container(
           color: Colors.white,
           width: double.infinity,
           child: Column(
             children: [
-              Row(
-                children: [
-                  Flexible(
-                    flex: 1,
-                    child: Row(
-                      spacing: COMMON_SPACING,
-                      children: [
-                        SvgPicture.asset(
-                          "assets/svgs/logo.svg",
-                          width: 60,
-                          height: 60,
-                        ),
-                        Text('SSLotus')
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                      flex: 3,
-                      child: InkWell(
-                        onTap: () {
-                          houseHoldNotifier.showSearchHouseholdsDialog(
-                              context, false);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.border),
-                              borderRadius:
-                                  BorderRadius.circular(COMMON_BORDER_RADIUS)),
-                          child: ListTile(
-                            leading: Icon(
-                              Icons.search,
-                              color: AppColors.border,
-                            ),
-                            title: Text(
-                              'Tìm kiếm',
-                              style: TextStyle(
-                                  fontSize: 16, color: AppColors.border),
-                            ),
+              Padding(
+                padding: COMMON_EDGE_INSETS_PADDING,
+                child: Row(
+                  children: [
+                    Flexible(
+                      flex: 2,
+                      child: Row(
+                        spacing: COMMON_SPACING,
+                        children: [
+                          SvgPicture.asset(
+                            "assets/svgs/logo.svg",
+                            width: 60,
+                            height: 60,
                           ),
-                        ),
-                      )),
-                  Flexible(flex: 1, child: SizedBox())
-                ],
+                          Text(
+                            'SSLotus',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 32.0),
+                          )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                        flex: 4,
+                        child: Row(
+                          spacing: COMMON_PADDING,
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                  style: OutlinedButton.styleFrom(
+                                      overlayColor: AppColors.white,
+                                      alignment: Alignment.centerLeft,
+                                      side:
+                                          BorderSide(color: AppColors.border)),
+                                  onPressed: () {
+                                    houseHoldNotifier
+                                        .openSearchHouseholdsDialog(
+                                            context, false);
+                                  },
+                                  icon: Icon(
+                                    Icons.search,
+                                    color: AppColors.border,
+                                  ),
+                                  label: Text(
+                                    'Tìm kiếm',
+                                    style: TextStyle(
+                                        fontSize: 16, color: AppColors.border),
+                                  )),
+                            ),
+                            FilledButton.icon(
+                                style: FilledButton.styleFrom(
+                                    backgroundColor: AppColors.pallet.blue30),
+                                onPressed: () {
+                                  houseHoldNotifier.openAddNewFamilyDialog(
+                                      context, null, null);
+                                },
+                                icon: Icon(Icons.add),
+                                label: Text(
+                                  'Tạo gia đình mới',
+                                  style: TextStyle(fontSize: 16),
+                                )),
+                          ],
+                        )),
+                    Flexible(flex: 1, child: SizedBox())
+                  ],
+                ),
               ),
-              houseHoldDetail.household == null
-                  ? Container()
-                  : Expanded(
-                      child: Column(
+              Expanded(
+                child: houseHoldDetail.household == null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          spacing: COMMON_SPACING,
+                          children: [
+                            Text(
+                              "Chưa có hộ nào được chọn",
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Column(
                         children: [
                           HouseHoldDetailHeader(
                             familyQuantity:
                                 houseHoldDetail.household!.families.length,
                             appointment: houseHoldDetail.household!.appointment,
                             onCombineFamily:
-                                houseHoldNotifier.showSearchHouseholdsDialog,
+                                houseHoldNotifier.openSearchHouseholdsDialog,
                             onRegisterAppointment: houseHoldNotifier
-                                .showAppointmentRegistrationDialog,
+                                .openAppointmentRegistrationDialog,
+                            onClearHouseHold:
+                                houseHoldNotifier.onClearHousehold,
                           ),
                           Expanded(
                             child: FamiliesList(
                               families: houseHoldDetail.household!.families,
                               onEditAddress:
-                                  houseHoldNotifier.showAddNewFamilyDialog,
+                                  houseHoldNotifier.openAddNewFamilyDialog,
                               onSplitFamily: houseHoldNotifier
-                                  .showSplitFamilyConfirmDialog,
+                                  .openSplitFamilyConfirmDialog,
                               onMoveUser: houseHoldNotifier.moveFamilyMember,
                               onUpdateUserProfile:
-                                  houseHoldNotifier.showUpdateUserProfileDialog,
+                                  houseHoldNotifier.openUpdateUserProfileDialog,
                               onRemoveUser:
-                                  houseHoldNotifier.showRemoveUserConfirmDialog,
+                                  houseHoldNotifier.openRemoveUserConfirmDialog,
                             ),
                           ),
                           HouseHoldDetailFooter(
                               printable: houseHoldDetail.printable,
+                              currentHouseHold: houseHoldDetail.household,
                               onSaveChanges: houseHoldNotifier.onSaveChanges,
                               onPrint: houseHoldNotifier.onPrint)
                         ],
                       ),
-                    ),
+              ),
             ],
           ),
         ),

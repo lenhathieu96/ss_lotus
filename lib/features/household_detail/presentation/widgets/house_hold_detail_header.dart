@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:ss_lotus/entities/appointment.dart';
+import 'package:ss_lotus/themes/colors.dart';
 import 'package:ss_lotus/utils/constants.dart';
 import 'package:ss_lotus/utils/utils.dart';
 
 class HouseHoldDetailHeader extends StatelessWidget {
   final int familyQuantity;
   final Appointment? appointment;
+  final void Function() onClearHouseHold;
   final void Function(BuildContext context, bool isCombineFamily)
       onCombineFamily;
   final void Function(BuildContext context, Appointment? appointment)
@@ -16,6 +18,7 @@ class HouseHoldDetailHeader extends StatelessWidget {
       required this.familyQuantity,
       required this.onCombineFamily,
       required this.onRegisterAppointment,
+      required this.onClearHouseHold,
       this.appointment});
 
   @override
@@ -32,6 +35,8 @@ class HouseHoldDetailHeader extends StatelessWidget {
             spacing: COMMON_SPACING,
             children: [
               FilledButton.icon(
+                style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.pallet.yellow50),
                 icon: Icon(Icons.group_add),
                 label: Text("Gộp gia đình"),
                 onPressed: () {
@@ -56,6 +61,8 @@ class HouseHoldDetailHeader extends StatelessWidget {
                         onRegisterAppointment(context, appointment);
                       })
                   : FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.pallet.purple30),
                       icon: Icon(Icons.calendar_month),
                       label: Text("Đăng ký lịch"),
                       onPressed: () {
@@ -64,13 +71,33 @@ class HouseHoldDetailHeader extends StatelessWidget {
                     ),
             ],
           ),
-          RichText(
-              text: TextSpan(children: [
-            TextSpan(text: "Số hộ: ", style: TextStyle(fontSize: 16)),
-            TextSpan(
-                text: familyQuantity.toString(),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
-          ]))
+          Row(
+            spacing: COMMON_PADDING,
+            children: [
+              RichText(
+                  text: TextSpan(children: [
+                TextSpan(text: "Số hộ: ", style: TextStyle(fontSize: 16)),
+                TextSpan(
+                    text: familyQuantity.toString(),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
+              ])),
+              IconButton(
+                style: IconButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(COMMON_BORDER_RADIUS))),
+                onPressed: () {
+                  onClearHouseHold();
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 20.0,
+                ),
+              )
+            ],
+          )
         ],
       ),
     );
