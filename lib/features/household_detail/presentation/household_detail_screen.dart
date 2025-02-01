@@ -120,9 +120,15 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           spacing: COMMON_SPACING,
                           children: [
+                            Icon(
+                              Icons.group_off,
+                              color: AppColors.border,
+                              size: 60.0,
+                            ),
                             Text(
                               "Chưa có hộ nào được chọn",
-                              style: TextStyle(fontSize: 16.0),
+                              style: TextStyle(
+                                  fontSize: 16.0, color: AppColors.border),
                             ),
                           ],
                         ),
