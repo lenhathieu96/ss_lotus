@@ -21,9 +21,10 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   if (kReleaseMode) {
-    await FirebaseAppCheck.instance.activate(
-        webProvider: ReCaptchaV3Provider(
-            String.fromEnvironment('FIREBASE_APP_CHECK_SITE_KEY')));
+    String siteKey =
+        const String.fromEnvironment('FIREBASE_APP_CHECK_SITE_KEY');
+    await FirebaseAppCheck.instance
+        .activate(webProvider: ReCaptchaV3Provider(siteKey));
   }
 
   await initializeDateFormatting();
