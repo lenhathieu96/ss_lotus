@@ -35,7 +35,7 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
   @override
   Future updateHouseHoldDetailChanged(
       HouseHold updatedHouseHold, HouseHold? unusedHouseHold) async {
-    householdRef
+    await householdRef
         .doc(updatedHouseHold.id.toString())
         .set(updatedHouseHold.toJson());
   }

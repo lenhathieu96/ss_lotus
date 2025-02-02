@@ -296,7 +296,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
       Utils.showToast("Cập nhập thành công", ToastStatus.success);
       state = state.copyWith(printable: true, unusedHouseHold: null);
     } catch (e) {
-      debugPrint("Error on save changed: ${e.toString()}");
+      print("Error on save changed: ${e.toString()}");
     }
   }
 
