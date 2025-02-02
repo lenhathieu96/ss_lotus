@@ -23,7 +23,7 @@ void main() async {
   if (kReleaseMode) {
     await FirebaseAppCheck.instance.activate(
         webProvider: ReCaptchaV3Provider(
-            dotenv.get('FIREBASE_APP_CHECK_SITE_KEY', fallback: "")));
+            String.fromEnvironment('FIREBASE_APP_CHECK_SITE_KEY')));
   }
 
   await initializeDateFormatting();
