@@ -13,8 +13,8 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
       pageFormat: PdfPageFormat.a5,
       margin: pw.EdgeInsets.only(
           top: COMMON_PADDING,
-          right: COMMON_PADDING,
-          left: COMMON_PADDING,
+          right: COMMON_SPACING,
+          left: COMMON_SPACING,
           bottom: 2 * COMMON_PADDING),
       header: (context) {
         if (context.pageNumber > 1) {
@@ -39,10 +39,12 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                     text: Utils.getPeriodTitle(houseHold.appointment?.period),
                     style: pw.TextStyle(font: pageBoldFont, fontSize: 14)),
                 pw.TextSpan(
-                    text: " | ",
+                    text: appointmentDate != null ? " | " : "",
                     style: pw.TextStyle(font: pageFont, fontSize: 14)),
                 pw.TextSpan(
-                    text: "Mồng ${appointmentDate?.day.toString()}",
+                    text: appointmentDate != null
+                        ? "Mồng ${appointmentDate.day.toString()}"
+                        : "",
                     style: pw.TextStyle(font: pageBoldFont, fontSize: 14)),
               ])),
               pw.SizedBox(height: COMMON_SPACING / 2),
