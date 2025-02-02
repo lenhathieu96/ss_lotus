@@ -20,9 +20,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await FirebaseAppCheck.instance.activate(
-      webProvider:
-          ReCaptchaV3Provider('6LcuO8oqAAAAALBxVOSRt7kmxdo81QyMH1b39puE'));
 
   await initializeDateFormatting();
   HouseholdSearcher.init("", "");
