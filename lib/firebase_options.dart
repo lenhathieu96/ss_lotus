@@ -54,12 +54,12 @@ class DefaultFirebaseOptions {
   }
 
   static FirebaseOptions web = FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_API_KEY'] ?? "",
-    appId: dotenv.env['FIREBASE_APP_ID'] ?? "",
-    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? "",
-    projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? "",
-    authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN'] ?? "",
-    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'] ?? "",
-    measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID'] ?? "",
+    apiKey: "AIzaSyD9Ao8bHYHo9dJrKU-sH0vu0kWnMuLyp9g",
+    appId: "1:582903712261:web:a8d268e28f709b5a79ea6c",
+    messagingSenderId: "582903712261",
+    projectId: "otus-63127",
+    authDomain: "otus-63127.firebaseapp.com",
+    storageBucket: "otus-63127.firebasestorage.app",
+    measurementId: "G-KBTYQXECEP",
   );
 }
