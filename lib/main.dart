@@ -20,17 +20,17 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  if (kReleaseMode) {
-    String siteKey =
-        const String.fromEnvironment('FIREBASE_APP_CHECK_SITE_KEY');
-    await FirebaseAppCheck.instance.activate(
-        webProvider:
-            ReCaptchaV3Provider('6LcuO8oqAAAAALBxVOSRt7kmxdo81QyMH1b39puE'));
-  }
+
+  String algoliaApiKey = kDebugMode
+      ? dotenv.get('ALGOLIA_API_KEY', fallback: "")
+      : const String.fromEnvironment('ALGOLIA_API_KEY');
+
+  String algoliaAppId = kDebugMode
+      ? dotenv.get('ALGOLIA_APP_ID', fallback: "")
+      : const String.fromEnvironment('ALGOLIA_APP_ID');
 
   await initializeDateFormatting();
-  HouseholdSearcher.init(
-      dotenv.env['ALGOLIA_API_KEY'] ?? "", dotenv.env['ALGOLIA_APP_ID'] ?? "");
+  HouseholdSearcher.init(algoliaApiKey, algoliaAppId);
   runApp(const ProviderScope(
     child: MyApp(),
   ));
