@@ -29,6 +29,7 @@ jobs:
           echo "FIREBASE_MEASUREMENT_ID=${{ secrets.FIREBASE_MEASUREMENT_ID }}" >> .env
           echo "ALGOLIA_API_KEY=${{ secrets.ALGOLIA_API_KEY }}" >> .env
           echo "ALGOLIA_APP_ID=${{ secrets.ALGOLIA_APP_ID }}" >> .env
+          echo "FIREBASE_APP_CHECK_SITE_KEY=${{ secrets.FIREBASE_APP_CHECK_SITE_KEY }}" >> .env
       - run: flutter build web --release
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
