@@ -12,9 +12,9 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
   return pw.MultiPage(
       pageFormat: PdfPageFormat.a5,
       margin: pw.EdgeInsets.only(
-          top: COMMON_PADDING,
-          right: COMMON_SPACING,
-          left: COMMON_SPACING,
+          top: COMMON_SPACING,
+          right: 1.5 * COMMON_PADDING,
+          left: 1.5 * COMMON_PADDING,
           bottom: 2 * COMMON_PADDING),
       header: (context) {
         if (context.pageNumber > 1) {
@@ -22,13 +22,13 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
         }
         return pw
             .Row(crossAxisAlignment: pw.CrossAxisAlignment.center, children: [
-          pw.Image(logo, width: 60, height: 60),
+          pw.Image(logo, width: 50, height: 50),
           pw.Spacer(flex: 1),
           pw.Center(
               child: pw.Text("CẦU AN",
                   style: pw.TextStyle(
                     font: pageBoldFont,
-                    fontSize: 20,
+                    fontSize: 18,
                   ))),
           pw.Spacer(flex: 1),
           pw.Column(
@@ -37,15 +37,15 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                   text: pw.TextSpan(children: [
                 pw.TextSpan(
                     text: Utils.getPeriodTitle(houseHold.appointment?.period),
-                    style: pw.TextStyle(font: pageBoldFont, fontSize: 14)),
+                    style: pw.TextStyle(font: pageBoldFont, fontSize: 10)),
                 pw.TextSpan(
                     text: appointmentDate != null ? " | " : "",
-                    style: pw.TextStyle(font: pageFont, fontSize: 14)),
+                    style: pw.TextStyle(font: pageFont, fontSize: 10)),
                 pw.TextSpan(
                     text: appointmentDate != null
                         ? "Mồng ${appointmentDate.day.toString()}"
                         : "",
-                    style: pw.TextStyle(font: pageBoldFont, fontSize: 14)),
+                    style: pw.TextStyle(font: pageBoldFont, fontSize: 10)),
               ])),
               pw.SizedBox(height: COMMON_SPACING / 2),
               pw.Container(
@@ -57,11 +57,11 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                       mainAxisAlignment: pw.MainAxisAlignment.center,
                       children: [
                         pw.Text("Mã số",
-                            style: pw.TextStyle(font: pageFont, fontSize: 12)),
+                            style: pw.TextStyle(font: pageFont, fontSize: 10)),
                         pw.Text(houseHold.id.toString(),
                             style: pw.TextStyle(
                               font: pageBoldFont,
-                              fontSize: 14,
+                              fontSize: 10,
                             ))
                       ]))
             ],
@@ -75,7 +75,7 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
             pw.Text("Trang tiếp theo",
                 style: pw.TextStyle(
                   font: pageBoldFont,
-                  fontSize: 12,
+                  fontSize: 10,
                 ))
           ]);
         }
@@ -93,7 +93,7 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                 child: pw.Text(family.address,
                     style: pw.TextStyle(
                       font: pageBoldFont,
-                      fontSize: 14,
+                      fontSize: 12,
                     ),
                     textAlign: pw.TextAlign.center),
               ),
@@ -106,7 +106,7 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                       padding: const pw.EdgeInsets.all(COMMON_SPACING),
                       child: pw.Text(
                         'STT',
-                        style: pw.TextStyle(font: pageFont),
+                        style: pw.TextStyle(font: pageFont, fontSize: 12),
                       ),
                     )),
                 pw.Flexible(
@@ -117,7 +117,7 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                       padding: const pw.EdgeInsets.all(COMMON_SPACING),
                       child: pw.Text(
                         'Họ và tên',
-                        style: pw.TextStyle(font: pageFont),
+                        style: pw.TextStyle(font: pageFont, fontSize: 12),
                       ),
                     )),
                 pw.Flexible(
@@ -128,7 +128,7 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                       padding: const pw.EdgeInsets.all(COMMON_SPACING),
                       child: pw.Text(
                         'Pháp danh',
-                        style: pw.TextStyle(font: pageFont),
+                        style: pw.TextStyle(font: pageFont, fontSize: 12),
                       ),
                     )),
               ]),
@@ -139,37 +139,37 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                   pw.Flexible(
                       flex: 1,
                       child: pw.Container(
-                        height: 50,
+                        height: 44,
                         decoration: pw.BoxDecoration(border: pw.Border.all()),
                         alignment: pw.Alignment.center,
                         padding: const pw.EdgeInsets.all(COMMON_SPACING),
                         child: pw.Text(
                           "${index + 1}",
-                          style: pw.TextStyle(font: pageBoldFont, fontSize: 14),
+                          style: pw.TextStyle(font: pageBoldFont, fontSize: 12),
                         ),
                       )),
                   pw.Flexible(
                       flex: 3,
                       child: pw.Container(
-                        height: 50,
+                        height: 44,
                         decoration: pw.BoxDecoration(border: pw.Border.all()),
                         alignment: pw.Alignment.centerLeft,
                         padding: const pw.EdgeInsets.all(COMMON_SPACING),
                         child: pw.Text(
                           member.fullName,
-                          style: pw.TextStyle(font: pageBoldFont, fontSize: 14),
+                          style: pw.TextStyle(font: pageBoldFont, fontSize: 12),
                         ),
                       )),
                   pw.Flexible(
                     flex: 2,
                     child: pw.Container(
-                      height: 50,
+                      height: 44,
                       decoration: pw.BoxDecoration(border: pw.Border.all()),
                       alignment: pw.Alignment.centerLeft,
                       padding: const pw.EdgeInsets.all(COMMON_SPACING),
                       child: pw.Text(
                         member.christineName ?? "",
-                        style: pw.TextStyle(font: pageBoldFont, fontSize: 14),
+                        style: pw.TextStyle(font: pageBoldFont, fontSize: 12),
                       ),
                     ),
                   )

@@ -19,7 +19,7 @@ class FamiliesList extends StatelessWidget {
       onRemoveUser;
   final void Function(BuildContext context, int familyId,
       User? defaultUserProfile, int? userIndex) onUpdateUserProfile;
-  final void Function(BuildContext context, int familyId) onSplitFamily;
+  final void Function(BuildContext context, int familyId)? onSplitFamily;
 
   const FamiliesList(
       {super.key,
@@ -95,9 +95,11 @@ class FamiliesList extends StatelessWidget {
                               backgroundColor: AppColors.pallet.yellow50),
                           icon: Icon(Icons.splitscreen),
                           label: const Text('Tách hộ mới'),
-                          onPressed: () {
-                            onSplitFamily(context, family.id);
-                          },
+                          onPressed: onSplitFamily != null
+                              ? () {
+                                  onSplitFamily!(context, family.id);
+                                }
+                              : null,
                         ),
                 ],
               ),
@@ -176,10 +178,12 @@ class FamiliesList extends StatelessWidget {
                           text: TextSpan(children: [
                             TextSpan(
                                 text: 'Pháp danh: ',
-                                style: TextStyle(fontSize: 16)),
+                                style: TextStyle(
+                                    fontSize: 16, fontFamily: "Mulish")),
                             TextSpan(
                                 text: user.christineName,
-                                style: TextStyle(fontSize: 16)),
+                                style: TextStyle(
+                                    fontSize: 16, fontFamily: "Mulish")),
                           ]),
                         )
                       : null,

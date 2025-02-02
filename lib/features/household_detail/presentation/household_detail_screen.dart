@@ -98,10 +98,13 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                             FilledButton.icon(
                                 style: FilledButton.styleFrom(
                                     backgroundColor: AppColors.pallet.blue30),
-                                onPressed: () {
-                                  houseHoldNotifier.openAddNewFamilyDialog(
-                                      context, null, null);
-                                },
+                                onPressed: houseHoldDetail.household != null
+                                    ? null
+                                    : () {
+                                        houseHoldNotifier
+                                            .openAddNewFamilyDialog(
+                                                context, null, null);
+                                      },
                                 icon: Icon(Icons.add),
                                 label: Text(
                                   'Tạo gia đình mới',
@@ -134,39 +137,49 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                           ],
                         ),
                       )
-                    : Column(
-                        children: [
-                          HouseHoldDetailHeader(
-                            familyQuantity:
-                                houseHoldDetail.household!.families.length,
-                            appointment: houseHoldDetail.household!.appointment,
-                            onCombineFamily:
-                                houseHoldNotifier.openSearchHouseholdsDialog,
-                            onRegisterAppointment: houseHoldNotifier
-                                .openAppointmentRegistrationDialog,
-                            onClearHouseHold:
-                                houseHoldNotifier.onClearHousehold,
-                          ),
-                          Expanded(
-                            child: FamiliesList(
-                              families: houseHoldDetail.household!.families,
-                              onEditAddress:
-                                  houseHoldNotifier.openAddNewFamilyDialog,
-                              onSplitFamily: houseHoldNotifier
-                                  .openSplitFamilyConfirmDialog,
-                              onMoveUser: houseHoldNotifier.moveFamilyMember,
-                              onUpdateUserProfile:
-                                  houseHoldNotifier.openUpdateUserProfileDialog,
-                              onRemoveUser:
-                                  houseHoldNotifier.openRemoveUserConfirmDialog,
+                    : Container(
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.circular(COMMON_BORDER_RADIUS),
+                            border: Border.all(color: AppColors.border)),
+                        child: Column(
+                          children: [
+                            HouseHoldDetailHeader(
+                              houseHoldId: houseHoldDetail.household!.id,
+                              familyQuantity:
+                                  houseHoldDetail.household!.families.length,
+                              appointment:
+                                  houseHoldDetail.household!.appointment,
+                              onCombineFamily:
+                                  houseHoldNotifier.openSearchHouseholdsDialog,
+                              onRegisterAppointment: houseHoldNotifier
+                                  .openAppointmentRegistrationDialog,
+                              onClearHouseHold:
+                                  houseHoldNotifier.onClearHousehold,
                             ),
-                          ),
-                          HouseHoldDetailFooter(
-                              printable: houseHoldDetail.printable,
-                              currentHouseHold: houseHoldDetail.household,
-                              onSaveChanges: houseHoldNotifier.onSaveChanges,
-                              onPrint: houseHoldNotifier.onPrint)
-                        ],
+                            Expanded(
+                              child: FamiliesList(
+                                families: houseHoldDetail.household!.families,
+                                onEditAddress:
+                                    houseHoldNotifier.openAddNewFamilyDialog,
+                                onSplitFamily: houseHoldDetail.printable
+                                    ? houseHoldNotifier
+                                        .openSplitFamilyConfirmDialog
+                                    : null,
+                                onMoveUser: houseHoldNotifier.moveFamilyMember,
+                                onUpdateUserProfile: houseHoldNotifier
+                                    .openUpdateUserProfileDialog,
+                                onRemoveUser: houseHoldNotifier
+                                    .openRemoveUserConfirmDialog,
+                              ),
+                            ),
+                            HouseHoldDetailFooter(
+                                printable: houseHoldDetail.printable,
+                                currentHouseHold: houseHoldDetail.household,
+                                onSaveChanges: houseHoldNotifier.onSaveChanges,
+                                onPrint: houseHoldNotifier.onPrint)
+                          ],
+                        ),
                       ),
               ),
             ],
