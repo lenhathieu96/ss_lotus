@@ -38,4 +38,18 @@ class HouseHold with _$HouseHold {
                 ))
             .toList());
   }
+
+  static HouseHold fromDeprecatedDB(Map<String, dynamic> deprecatedJson) {
+    return HouseHold(id: deprecatedJson['id'] as int, families: [
+      UserGroup(
+          id: deprecatedJson['id'] as int,
+          address: deprecatedJson['address'] as String,
+          members: (deprecatedJson['members'] as List<dynamic>)
+              .map((memberJson) => User(
+                    fullName: memberJson['fullName'] as String,
+                    christineName: memberJson['christineName']?.toString(),
+                  ))
+              .toList())
+    ]);
+  }
 }

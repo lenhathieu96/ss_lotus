@@ -48,7 +48,8 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                             shaderCallback: (bounds) {
                               return LinearGradient(
                                 colors: [
-                                  AppColors.primary,
+                                  AppColors.pallet.green20,
+                                  AppColors.pallet.green40,
                                   AppColors.pallet.purple40
                                 ],
                                 begin: Alignment.topCenter,

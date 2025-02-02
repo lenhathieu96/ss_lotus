@@ -1,4 +1,5 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,8 +20,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await FirebaseAppCheck.instance
-      .activate(webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'));
+  if (kReleaseMode) {
+    await FirebaseAppCheck.instance.activate(
+        webProvider: ReCaptchaV3Provider(
+            dotenv.env['FIREBASE_APP_CHECK_SITE_KEY'] ?? ""));
+  }
+
   await initializeDateFormatting();
   HouseholdSearcher.init(
       dotenv.env['ALGOLIA_API_KEY'] ?? "", dotenv.env['ALGOLIA_APP_ID'] ?? "");
