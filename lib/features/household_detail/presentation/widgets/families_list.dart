@@ -64,6 +64,21 @@ class FamiliesList extends StatelessWidget {
               Row(
                 spacing: COMMON_SPACING,
                 children: [
+                  RichText(
+                      text: TextSpan(children: [
+                    TextSpan(
+                        text: "Số thành viên: ",
+                        style: TextStyle(
+                          fontFamily: "Mulish",
+                          fontSize: 16,
+                        )),
+                    TextSpan(
+                        text: family.members.length.toString(),
+                        style: TextStyle(
+                            fontFamily: "Mulish",
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold))
+                  ])),
                   FilledButton.icon(
                     style: FilledButton.styleFrom(
                         backgroundColor: AppColors.pallet.blue30),
