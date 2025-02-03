@@ -12,7 +12,7 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
   return pw.MultiPage(
       pageFormat: PdfPageFormat.a5,
       margin: pw.EdgeInsets.only(
-          top: COMMON_SPACING,
+          top: COMMON_PADDING,
           right: 1.5 * COMMON_PADDING,
           left: 1.5 * COMMON_PADDING,
           bottom: 2 * COMMON_PADDING),
