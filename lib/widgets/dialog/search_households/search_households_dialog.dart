@@ -91,6 +91,7 @@ class _SearchHouseholdsDialogState
                                     searchController.clear();
                                     searchedHouseholdsNotifier
                                         .searchHouseHolds("");
+                                    Navigator.of(context).pop();
                                   },
                                   icon: Icon(
                                     Icons.close_rounded,

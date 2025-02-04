@@ -31,15 +31,19 @@ class FamilyAddressDialog extends ConsumerWidget {
                   style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                 ),
                 TextFormField(
-                  initialValue: formState.address.value,
-                  decoration: InputDecoration(
-                    labelText: 'Địa chỉ',
-                    errorText: formState.address.isNotValid
-                        ? formState.address.error
-                        : null,
-                  ),
-                  onChanged: (value) => formNotifier.updateAddress(value),
-                ),
+                    initialValue: formState.address.value,
+                    decoration: InputDecoration(
+                      labelText: 'Địa chỉ',
+                      errorText: formState.address.isNotValid
+                          ? formState.address.error
+                          : null,
+                    ),
+                    onChanged: (value) => formNotifier.updateAddress(value),
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) {
+                      onAddressUpdated(formState.address.value.toUpperCase());
+                      Navigator.of(context).pop();
+                    }),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
