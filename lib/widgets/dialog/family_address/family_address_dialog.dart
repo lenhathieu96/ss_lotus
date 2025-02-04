@@ -32,6 +32,7 @@ class FamilyAddressDialog extends ConsumerWidget {
                 ),
                 TextFormField(
                     initialValue: formState.address.value,
+                    autofocus: true,
                     decoration: InputDecoration(
                       labelText: 'Địa chỉ',
                       errorText: formState.address.isNotValid

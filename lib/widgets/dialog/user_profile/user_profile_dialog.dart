@@ -31,6 +31,7 @@ class UserProfileDialog extends ConsumerWidget {
                         TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
                 TextFormField(
                   initialValue: formState.name.value,
+                  autofocus: true,
                   decoration: InputDecoration(
                     labelText: 'Tên',
                     errorText:

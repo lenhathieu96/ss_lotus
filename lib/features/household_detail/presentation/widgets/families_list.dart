@@ -79,15 +79,6 @@ class FamiliesList extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.bold))
                   ])),
-                  FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.pallet.blue30),
-                    icon: Icon(Icons.person_add),
-                    label: const Text('Thêm thành viên'),
-                    onPressed: () {
-                      onUpdateUserProfile(context, family.id, null, null);
-                    },
-                  ),
                   families.length == 1
                       ? Container()
                       : FilledButton.icon(
@@ -102,6 +93,26 @@ class FamiliesList extends StatelessWidget {
                               : null,
                         ),
                 ],
+              ),
+            ],
+          ),
+        ),
+        footer: Padding(
+          padding: EdgeInsets.only(
+              bottom: COMMON_PADDING,
+              left: COMMON_PADDING,
+              right: COMMON_PADDING),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FilledButton.icon(
+                style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.pallet.blue30),
+                icon: Icon(Icons.person_add),
+                label: const Text('Thêm thành viên'),
+                onPressed: () {
+                  onUpdateUserProfile(context, family.id, null, null);
+                },
               ),
             ],
           ),
