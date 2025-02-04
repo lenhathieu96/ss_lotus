@@ -40,11 +40,13 @@ class UserProfileDialog extends ConsumerWidget {
                   onChanged: (value) => formNotifier.updateName(value),
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) {
-                    onProfileUpdated(User(
-                        fullName: formState.name.value.toUpperCase(),
-                        christineName:
-                            formState.christineName.value.toUpperCase()));
-                    Navigator.of(context).pop();
+                    if (formState.name.value.isNotEmpty) {
+                      onProfileUpdated(User(
+                          fullName: formState.name.value.toUpperCase(),
+                          christineName:
+                              formState.christineName.value.toUpperCase()));
+                      Navigator.of(context).pop();
+                    }
                   },
                 ),
                 TextFormField(
@@ -57,11 +59,13 @@ class UserProfileDialog extends ConsumerWidget {
                   ),
                   onChanged: (value) => formNotifier.updateChristineName(value),
                   onFieldSubmitted: (_) {
-                    onProfileUpdated(User(
-                        fullName: formState.name.value.toUpperCase(),
-                        christineName:
-                            formState.christineName.value.toUpperCase()));
-                    Navigator.of(context).pop();
+                    if (formState.name.value.isNotEmpty) {
+                      onProfileUpdated(User(
+                          fullName: formState.name.value.toUpperCase(),
+                          christineName:
+                              formState.christineName.value.toUpperCase()));
+                      Navigator.of(context).pop();
+                    }
                   },
                 ),
                 SizedBox(

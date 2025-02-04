@@ -42,8 +42,10 @@ class FamilyAddressDialog extends ConsumerWidget {
                     onChanged: (value) => formNotifier.updateAddress(value),
                     textInputAction: TextInputAction.next,
                     onFieldSubmitted: (_) {
-                      onAddressUpdated(formState.address.value.toUpperCase());
-                      Navigator.of(context).pop();
+                      if (formState.address.value.isNotEmpty) {
+                        onAddressUpdated(formState.address.value.toUpperCase());
+                        Navigator.of(context).pop();
+                      }
                     }),
                 SizedBox(
                   width: double.infinity,
