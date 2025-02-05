@@ -99,7 +99,7 @@ class HouseHoldDetailHeader extends StatelessWidget {
                         color: Colors.green,
                       ),
                       label: Text(
-                          "Đã đăng ký $period ${lunarDate != null ? "mồng ${lunarDate.day}" : ''}",
+                          "Đã đăng ký ${Utils.getAppointmentTitle(appointment, false)}",
                           style: TextStyle(color: Colors.green)),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.green),

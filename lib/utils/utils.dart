@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ss_lotus/entities/appointment.dart';
 import 'package:ss_lotus/entities/common.enum.dart';
 import 'package:ss_lotus/utils/constants.dart';
 import 'package:toastification/toastification.dart';
@@ -24,6 +25,18 @@ class Utils {
     }
 
     return Lunar(createdFromSolar: true, date: solarDate);
+  }
+
+  static String getAppointmentTitle(
+      Appointment? appointment, bool? showSeparator) {
+    final date = convertToLunarDate(appointment?.date);
+    if (appointment?.period == Period.unknown) {
+      return showSeparator == true ? "Chùa cúng" : "chùa cúng";
+    }
+    final periodTitle = getPeriodTitle(appointment?.period);
+    return showSeparator == true
+        ? "$periodTitle | Mồng ${date?.day}"
+        : "${periodTitle.toLowerCase()} mồng ${date?.day}";
   }
 
   static showToast(String title, ToastStatus status) {

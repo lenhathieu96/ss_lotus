@@ -36,14 +36,14 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
     return Dialog(
       child: IntrinsicHeight(
         child: Container(
-            width: MediaQuery.of(context).size.width * 0.4,
+            width: MediaQuery.of(context).size.width * 0.6,
             padding: COMMON_EDGE_INSETS_PADDING,
             child: Column(
               spacing: COMMON_SPACING * 4,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.6,
+                  height: MediaQuery.of(context).size.height * 0.5,
                   child: TableCalendar(
                     locale: "vi-VN",
                     focusedDay: DateTime.now(),
@@ -125,30 +125,47 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: DATE_PICKER_SIZE,
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: PERIOD_TYPES.length,
-                    separatorBuilder: (_, __) => SizedBox(width: 80),
-                    itemBuilder: (context, i) => Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: PERIOD_TYPES.map((period) {
+                    return Row(
                       children: [
                         Radio<Period>(
-                          value: PERIOD_TYPES[i],
+                          value: period,
                           groupValue: formState.period.value,
                           onChanged: formNotifier.updatePeriod,
                         ),
                         Text(
-                          Utils.getPeriodTitle(PERIOD_TYPES[i]),
+                          Utils.getPeriodTitle(period),
                         )
                       ],
-                    ),
-                  ),
+                    );
+                  }).toList(),
                 ),
+                // SizedBox(
+                //   height: DATE_PICKER_SIZE,
+                //   child: ListView.separated(
+                //     shrinkWrap: true,
+                //     scrollDirection: Axis.horizontal,
+                //     itemCount: PERIOD_TYPES.length,
+                //     separatorBuilder: (_, __) => SizedBox(width: ),
+                //     itemBuilder: (context, i) => Row(
+                //       crossAxisAlignment: CrossAxisAlignment.center,
+                //       mainAxisAlignment: MainAxisAlignment.center,
+                //       mainAxisSize: MainAxisSize.min,
+                //       children: [
+                //         Radio<Period>(
+                //           value: PERIOD_TYPES[i],
+                //           groupValue: formState.period.value,
+                //           onChanged: formNotifier.updatePeriod,
+                //         ),
+                //         Text(
+                //           Utils.getPeriodTitle(PERIOD_TYPES[i]),
+                //         )
+                //       ],
+                //     ),
+                //   ),
+                // ),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(

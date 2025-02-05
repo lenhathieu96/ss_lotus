@@ -20,53 +20,44 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
         if (context.pageNumber > 1) {
           return pw.Container();
         }
-        return pw
-            .Row(crossAxisAlignment: pw.CrossAxisAlignment.center, children: [
-          pw.Image(logo, width: 50, height: 50),
-          pw.Spacer(flex: 1),
-          pw.Center(
-              child: pw.Text("CẦU AN",
-                  style: pw.TextStyle(
-                    font: pageBoldFont,
-                    fontSize: 18,
-                  ))),
-          pw.Spacer(flex: 1),
-          pw.Column(
+        return pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.center,
             children: [
-              pw.RichText(
-                  text: pw.TextSpan(children: [
-                pw.TextSpan(
-                    text: Utils.getPeriodTitle(houseHold.appointment?.period),
-                    style: pw.TextStyle(font: pageBoldFont, fontSize: 10)),
-                pw.TextSpan(
-                    text: appointmentDate != null ? " | " : "",
-                    style: pw.TextStyle(font: pageFont, fontSize: 10)),
-                pw.TextSpan(
-                    text: appointmentDate != null
-                        ? "Mồng ${appointmentDate.day.toString()}"
-                        : "",
-                    style: pw.TextStyle(font: pageBoldFont, fontSize: 10)),
-              ])),
-              pw.SizedBox(height: COMMON_SPACING / 2),
-              pw.Container(
-                  padding: pw.EdgeInsets.symmetric(
-                      horizontal: COMMON_SPACING, vertical: COMMON_SPACING),
-                  decoration: pw.BoxDecoration(border: pw.Border.all()),
-                  child: pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.center,
-                      mainAxisAlignment: pw.MainAxisAlignment.center,
-                      children: [
-                        pw.Text("Mã số",
-                            style: pw.TextStyle(font: pageFont, fontSize: 10)),
-                        pw.Text(houseHold.id.toString(),
-                            style: pw.TextStyle(
-                              font: pageBoldFont,
-                              fontSize: 10,
-                            ))
-                      ]))
-            ],
-          )
-        ]);
+              pw.Image(logo, width: 50, height: 50),
+              pw.Spacer(flex: 1),
+              pw.Center(
+                  child: pw.Text("CẦU AN",
+                      style: pw.TextStyle(
+                        font: pageBoldFont,
+                        fontSize: 18,
+                      ))),
+              pw.Spacer(flex: 1),
+              pw.Column(
+                children: [
+                  pw.Text(
+                      Utils.getAppointmentTitle(houseHold.appointment, true),
+                      style: pw.TextStyle(font: pageBoldFont, fontSize: 10)),
+                  pw.SizedBox(height: COMMON_SPACING / 2),
+                  pw.Container(
+                      padding: pw.EdgeInsets.symmetric(
+                          horizontal: COMMON_SPACING, vertical: COMMON_SPACING),
+                      decoration: pw.BoxDecoration(border: pw.Border.all()),
+                      child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.center,
+                          mainAxisAlignment: pw.MainAxisAlignment.center,
+                          children: [
+                            pw.Text("Mã số",
+                                style:
+                                    pw.TextStyle(font: pageFont, fontSize: 10)),
+                            pw.Text(houseHold.id.toString(),
+                                style: pw.TextStyle(
+                                  font: pageBoldFont,
+                                  fontSize: 10,
+                                ))
+                          ]))
+                ],
+              )
+            ]);
       },
       footer: (context) {
         if (context.pagesCount > 1 && context.pageNumber < context.pagesCount) {
