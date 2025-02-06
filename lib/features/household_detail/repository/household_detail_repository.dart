@@ -40,9 +40,9 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
 
     if (isInitHousehold) {
       final docSnapshot = await docRef.get();
-      if (docSnapshot.exists) {
-        throw Exception("Mã số này đã tồn tại");
-      }
+      // if (docSnapshot.exists) {
+      //   throw Exception("Mã số này đã tồn tại");
+      // }
     }
     await householdRef
         .doc(updatedHouseHold.id.toString())
