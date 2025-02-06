@@ -38,16 +38,18 @@ class HouseHoldDetail extends _$HouseHoldDetail {
     return HouseholdDetailState();
   }
 
-  void _addNewFamily(String address) {
+  void _addNewFamily(String address, int? defaultHouseHoldId) {
     final currentHouseHold = state.household;
     int timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    final houseHoldId = defaultHouseHoldId ?? timestamp;
+
     final UserGroup draftFamily =
-        UserGroup(id: timestamp, address: address, members: []);
+        UserGroup(id: houseHoldId, address: address, members: []);
     late final HouseHold updatedHousehold;
 
     if (currentHouseHold == null) {
       updatedHousehold = HouseHold(
-        id: timestamp,
+        id: houseHoldId,
         families: [draftFamily],
       );
     } else {
@@ -58,7 +60,8 @@ class HouseHoldDetail extends _$HouseHoldDetail {
       updatedHousehold = currentHouseHold.copyWith(families: updatedFamilies);
     }
 
-    state = state.copyWith(printable: false, household: updatedHousehold);
+    state = state.copyWith(
+        printable: false, household: updatedHousehold, isInitHousehold: true);
   }
 
   void _splitFamily(int familyId) async {
@@ -292,11 +295,13 @@ class HouseHoldDetail extends _$HouseHoldDetail {
     if (houseHold == null) return;
     try {
       await _repository.updateHouseHoldDetailChanged(
-          houseHold, state.unusedHouseHold);
+          houseHold, state.unusedHouseHold, state.isInitHousehold);
       Utils.showToast("Cập nhập thành công", ToastStatus.success);
-      state = state.copyWith(printable: true, unusedHouseHold: null);
+      state = state.copyWith(
+          printable: true, unusedHouseHold: null, isInitHousehold: false);
     } catch (e) {
-      print("Error on save changed: ${e.toString()}");
+      Utils.showToast(
+          e.toString().replaceFirst("Exception:", ""), ToastStatus.error);
     }
   }
 
@@ -344,10 +349,10 @@ class HouseHoldDetail extends _$HouseHoldDetail {
         context: context,
         builder: (context) => FamilyAddressDialog(
               defaultAddress: defaultAddress,
-              onAddressUpdated: (address) {
+              onAddressUpdated: (address, houseHoldId) {
                 familyId != null && defaultAddress != null
                     ? _updateFamilyAddress(familyId, address)
-                    : _addNewFamily(address);
+                    : _addNewFamily(address, houseHoldId);
               },
             ));
   }

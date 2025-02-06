@@ -11,8 +11,9 @@ abstract class HouseHoldDetailRepositoryProtocol {
   Future migrateDB();
   Future splitFamily(HouseHold currentHouseHold, UserGroup splitFamily);
   Future combineFamily(HouseHold updatedHouseHold, HouseHold removedHouseHold);
-  Future updateHouseHoldDetailChanged(
-      HouseHold updatedHouseHold, HouseHold? unusedHouseHold);
+  Future updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
+      HouseHold? unusedHouseHold, bool isInitHousehold);
+  Future createHouseHold(HouseHold houseHold);
 }
 
 class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
@@ -33,8 +34,16 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
   }
 
   @override
-  Future updateHouseHoldDetailChanged(
-      HouseHold updatedHouseHold, HouseHold? unusedHouseHold) async {
+  Future updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
+      HouseHold? unusedHouseHold, bool isInitHousehold) async {
+    final docRef = householdRef.doc(updatedHouseHold.id.toString());
+
+    if (isInitHousehold) {
+      final docSnapshot = await docRef.get();
+      if (docSnapshot.exists) {
+        throw Exception("Mã số này đã tồn tại");
+      }
+    }
     await householdRef
         .doc(updatedHouseHold.id.toString())
         .set(updatedHouseHold.toJson());
@@ -101,6 +110,15 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
 
       // Update lastDoc for the next iteration
       lastDoc = documents.last;
+    }
+  }
+
+  @override
+  Future createHouseHold(HouseHold houseHold) async {
+    final docRef = householdRef.doc(houseHold.id.toString());
+    final docSnapshot = await docRef.get();
+    if (!docSnapshot.exists) {
+      await docRef.set(houseHold.toJson());
     }
   }
 }

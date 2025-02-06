@@ -11,6 +11,7 @@ class HouseholdDetailState with _$HouseholdDetailState {
     @Default(null) HouseHold? unusedHouseHold,
     @Default(null) HouseHold? household,
     @Default(true) bool printable,
+    @Default(false) bool isInitHousehold,
     @Default([]) List<UserGroup> suggestedFamilies,
   }) = _HouseholdDetailState;
 }
