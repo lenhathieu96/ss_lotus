@@ -61,7 +61,9 @@ class HouseHoldDetail extends _$HouseHoldDetail {
     }
 
     state = state.copyWith(
-        printable: false, household: updatedHousehold, isInitHousehold: true);
+        printable: false,
+        household: updatedHousehold,
+        isInitHousehold: defaultHouseHoldId != null);
   }
 
   void _splitFamily(int familyId) async {
@@ -343,11 +345,12 @@ class HouseHoldDetail extends _$HouseHoldDetail {
             ));
   }
 
-  void openAddNewFamilyDialog(
-      BuildContext context, int? familyId, String? defaultAddress) {
+  void openAddNewFamilyDialog(BuildContext context, int? familyId,
+      String? defaultAddress, bool allowInitHouseHold) {
     showDialog(
         context: context,
         builder: (context) => FamilyAddressDialog(
+              allowInitHouseHold: allowInitHouseHold,
               defaultAddress: defaultAddress,
               onAddressUpdated: (address, houseHoldId) {
                 familyId != null && defaultAddress != null
@@ -384,7 +387,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
       builder: (context) => SearchHouseholdsDialog(
         onAddNewFamily: isCombineFamily == true
             ? () {
-                openAddNewFamilyDialog(context, null, null);
+                openAddNewFamilyDialog(context, null, null, false);
               }
             : null,
         onSelectHousehold: isCombineFamily == true
@@ -404,9 +407,9 @@ class HouseHoldDetail extends _$HouseHoldDetail {
 
     final doc = pw.Document();
     final pageFont =
-        await fontFromAssetBundle('assets/fonts/NotoSerif-Regular.ttf');
+        await fontFromAssetBundle('assets/fonts/PlayfairDisplay-Regular.ttf');
     final pageBoldFont =
-        await fontFromAssetBundle('assets/fonts/NotoSerif-Bold.ttf');
+        await fontFromAssetBundle('assets/fonts/PlayfairDisplay-Bold.ttf');
     final logo = await imageFromAssetBundle('assets/images/dharmachakra.png');
 
     doc.addPage(buildPrintPage(logo, pageFont, pageBoldFont, state.household!));

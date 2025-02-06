@@ -13,8 +13,8 @@ class FamiliesList extends StatelessWidget {
     int newItemIndex,
     int newFamilyIndex,
   ) onMoveUser;
-  final void Function(BuildContext context, int familyId, String defaultAddress)
-      onEditAddress;
+  final void Function(BuildContext context, int familyId, String defaultAddress,
+      bool allowInitHousehold) onEditAddress;
   final void Function(BuildContext context, int familyId, int userIndex)
       onRemoveUser;
   final void Function(BuildContext context, int familyId,
@@ -52,7 +52,7 @@ class FamiliesList extends StatelessWidget {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   IconButton(
                     onPressed: () {
-                      onEditAddress(context, family.id, family.address);
+                      onEditAddress(context, family.id, family.address, false);
                     },
                     icon: Icon(
                       Icons.edit,

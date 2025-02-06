@@ -103,7 +103,7 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                                     : () {
                                         houseHoldNotifier
                                             .openAddNewFamilyDialog(
-                                                context, null, null);
+                                                context, null, null, true);
                                       },
                                 icon: Icon(Icons.add),
                                 label: Text(

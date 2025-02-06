@@ -6,10 +6,14 @@ import 'family_address_dialog_provider.dart';
 
 class FamilyAddressDialog extends ConsumerWidget {
   final String? defaultAddress;
+  final bool allowInitHouseHold;
   final void Function(String updatedAddress, int? houseHoldId) onAddressUpdated;
 
   const FamilyAddressDialog(
-      {super.key, required this.onAddressUpdated, this.defaultAddress});
+      {super.key,
+      required this.onAddressUpdated,
+      required this.allowInitHouseHold,
+      this.defaultAddress});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,6 +31,7 @@ class FamilyAddressDialog extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Column(
+                  spacing: COMMON_SPACING,
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
@@ -36,17 +41,20 @@ class FamilyAddressDialog extends ConsumerWidget {
                             fontSize: 18.0, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                          onPressed: () {
-                            formNotifier.toggleHasExistedId();
-                          },
-                          child: Text(
-                            "Hộ đã tồn tại mã số trước đó?",
-                            style: TextStyle(color: AppColors.pallet.blue40),
-                          )),
-                    ),
+                    allowInitHouseHold == true
+                        ? Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                                onPressed: () {
+                                  formNotifier.toggleHasExistedId();
+                                },
+                                child: Text(
+                                  "Hộ đã tồn tại mã số trước đó?",
+                                  style:
+                                      TextStyle(color: AppColors.pallet.blue40),
+                                )),
+                          )
+                        : SizedBox(),
                     TextFormField(
                         initialValue: formState.address.value,
                         autofocus: true,

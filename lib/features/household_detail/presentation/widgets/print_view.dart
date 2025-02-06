@@ -7,8 +7,6 @@ import 'package:ss_lotus/utils/utils.dart';
 
 pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
     pw.Font pageBoldFont, HouseHold houseHold) {
-  final appointmentDate = Utils.convertToLunarDate(houseHold.appointment?.date);
-
   return pw.MultiPage(
       pageFormat: PdfPageFormat.a5,
       margin: pw.EdgeInsets.only(
