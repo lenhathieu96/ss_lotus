@@ -407,9 +407,9 @@ class HouseHoldDetail extends _$HouseHoldDetail {
 
     final doc = pw.Document();
     final pageFont =
-        await fontFromAssetBundle('assets/fonts/PlayfairDisplay-Regular.ttf');
+        await fontFromAssetBundle('assets/fonts/NotoSerif-Regular.ttf');
     final pageBoldFont =
-        await fontFromAssetBundle('assets/fonts/PlayfairDisplay-Bold.ttf');
+        await fontFromAssetBundle('assets/fonts/NotoSerif-Bold.ttf');
     final logo = await imageFromAssetBundle('assets/images/dharmachakra.png');
 
     doc.addPage(buildPrintPage(logo, pageFont, pageBoldFont, state.household!));
