@@ -139,7 +139,7 @@ class _SearchHouseholdsDialogState
                               bottomRight:
                                   Radius.circular(COMMON_BORDER_RADIUS)),
                           child: Container(
-                            height: MediaQuery.of(context).size.height * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.8,
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.only(
