@@ -11,6 +11,25 @@ class AppColors {
   static final Color white = pallet.white10;
   static final Color border = pallet.gray30;
   static final Color transparent = Colors.transparent;
+
+  // Semantic - Actions
+  static final Color actionPrimary = pallet.blue30;
+  static final Color actionSecondary = pallet.blue50;
+  static final Color actionDanger = pallet.red30;
+  static final Color actionWarning = pallet.yellow50;
+  static final Color actionSuccess = pallet.green30;
+  static final Color actionSchedule = pallet.purple30;
+
+  // Semantic - Surfaces
+  static final Color surfaceBackground = pallet.gray10;
+  static final Color surfaceCard = pallet.white10;
+  static final Color surfaceCardAlt = pallet.gray20;
+  static final Color surfaceDivider = pallet.gray30;
+
+  // Semantic - Text
+  static final Color textPrimary = pallet.black40;
+  static final Color textSecondary = pallet.gray50;
+  static final Color textTertiary = pallet.gray40;
 }
 
 @immutable

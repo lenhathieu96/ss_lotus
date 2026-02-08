@@ -5,7 +5,7 @@ part 'user_group.freezed.dart';
 part 'user_group.g.dart';
 
 @freezed
-class UserGroup with _$UserGroup {
+abstract class UserGroup with _$UserGroup {
   const factory UserGroup({
     required int id,
     required String address,

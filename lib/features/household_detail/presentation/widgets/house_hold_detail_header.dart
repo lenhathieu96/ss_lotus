@@ -6,6 +6,7 @@ import 'package:ss_lotus/utils/utils.dart';
 
 class HouseHoldDetailHeader extends StatelessWidget {
   final int houseHoldId;
+  final int? oldId;
   final int familyQuantity;
   final Appointment? appointment;
   final void Function() onClearHouseHold;
@@ -17,6 +18,7 @@ class HouseHoldDetailHeader extends StatelessWidget {
   const HouseHoldDetailHeader(
       {super.key,
       required this.houseHoldId,
+      this.oldId,
       required this.familyQuantity,
       required this.onCombineFamily,
       required this.onRegisterAppointment,
@@ -39,53 +41,97 @@ class HouseHoldDetailHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              RichText(
-                  text: TextSpan(children: [
-                TextSpan(
-                    text: "Mã số: ",
-                    style: TextStyle(fontSize: 16, fontFamily: "Mulish")),
-                TextSpan(
-                    text: houseHoldId.toString(),
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "Mulish"))
-              ])),
-              RichText(
-                  text: TextSpan(children: [
-                TextSpan(
-                    text: "Số gia đình: ",
-                    style: TextStyle(fontSize: 16, fontFamily: "Mulish")),
-                TextSpan(
-                    text: familyQuantity.toString(),
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "Mulish"))
-              ])),
-              IconButton(
-                style: IconButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(COMMON_BORDER_RADIUS))),
-                onPressed: () {
-                  onClearHouseHold();
-                },
-                icon: Icon(
-                  Icons.close,
-                  color: Colors.white,
-                  size: 20.0,
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceCardAlt,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Mã số ",
+                        style: TextStyle(
+                            fontSize: 14, color: AppColors.textSecondary)),
+                    Text(houseHoldId.toString(),
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary)),
+                  ],
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceCardAlt,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Số gia đình ",
+                        style: TextStyle(
+                            fontSize: 14, color: AppColors.textSecondary)),
+                    Text(familyQuantity.toString(),
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary)),
+                  ],
+                ),
+              ),
+              if (oldId != null)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceCardAlt,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("Mã cũ ",
+                          style: TextStyle(
+                              fontSize: 14, color: AppColors.textSecondary)),
+                      Text(oldId.toString(),
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary)),
+                    ],
+                  ),
+                ),
+              Tooltip(
+                message: "Đóng",
+                child: IconButton(
+                  style: IconButton.styleFrom(
+                    shape: const CircleBorder(),
+                    side: BorderSide(
+                        color: AppColors.actionDanger.withValues(alpha: 0.3)),
+                  ),
+                  onPressed: () {
+                    onClearHouseHold();
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: AppColors.actionDanger,
+                    size: 20.0,
+                  ),
                 ),
               )
             ],
           ),
+          Divider(),
           Row(
             spacing: COMMON_SPACING,
             children: [
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.pallet.yellow50),
+                    backgroundColor: AppColors.actionWarning),
                 icon: Icon(Icons.group_add),
                 label: Text("Gộp gia đình"),
                 onPressed: () {
@@ -96,20 +142,20 @@ class HouseHoldDetailHeader extends StatelessWidget {
                   ? OutlinedButton.icon(
                       icon: Icon(
                         Icons.check,
-                        color: Colors.green,
+                        color: AppColors.actionSuccess,
                       ),
                       label: Text(
                           "Đã đăng ký ${Utils.getAppointmentTitle(appointment, false)}",
-                          style: TextStyle(color: Colors.green)),
+                          style: TextStyle(color: AppColors.actionSuccess)),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.green),
+                        side: BorderSide(color: AppColors.actionSuccess),
                       ),
                       onPressed: () {
                         onRegisterAppointment(context, appointment);
                       })
                   : FilledButton.icon(
                       style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.pallet.purple30),
+                          backgroundColor: AppColors.actionSchedule),
                       icon: Icon(Icons.calendar_month),
                       label: Text("Đăng ký lịch"),
                       onPressed: () {

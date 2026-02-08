@@ -22,21 +22,15 @@ class HouseHoldDetailFooter extends StatelessWidget {
       padding: const EdgeInsets.all(COMMON_PADDING),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            // ignore: deprecated_member_use
-            color: Colors.black.withOpacity(0.2), // Shadow color
-            offset: Offset(0, -4), // Top shadow (negative y-axis value)
-            blurRadius: 6, // Blur effect
-          ),
-        ],
+        border: Border(top: BorderSide(color: AppColors.surfaceDivider, width: 0.5)),
+        boxShadow: SHADOW_MD,
       ),
       child: Row(
         spacing: COMMON_SPACING,
         children: [
           FilledButton.icon(
             style: FilledButton.styleFrom(
-                backgroundColor: AppColors.pallet.blue50),
+                backgroundColor: AppColors.actionSecondary),
             icon: Icon(Icons.save_alt),
             label: Text("Lưu thay đổi"),
             onPressed: printable ||

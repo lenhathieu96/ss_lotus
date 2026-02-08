@@ -24,38 +24,43 @@ class FamilyAddressDialog extends ConsumerWidget {
     return Dialog(
       child: IntrinsicHeight(
         child: Container(
-            width: MediaQuery.of(context).size.width * 0.4,
-            padding: COMMON_EDGE_INSETS_PADDING,
+            width: MediaQuery.sizeOf(context).width * DIALOG_SM,
+            padding: const EdgeInsets.all(SPACE_LG),
             child: Column(
               spacing: COMMON_SPACING * 4,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Column(
-                  spacing: COMMON_SPACING,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Thông tin địa chỉ',
-                        style: TextStyle(
-                            fontSize: 18.0, fontWeight: FontWeight.bold),
-                      ),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, color: AppColors.actionPrimary, size: 22),
+                        SizedBox(width: 8),
+                        Text('Thông tin địa chỉ',
+                            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
+                      ],
                     ),
-                    allowInitHouseHold == true
-                        ? Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                                onPressed: () {
-                                  formNotifier.toggleHasExistedId();
-                                },
-                                child: Text(
-                                  "Hộ đã tồn tại mã số trước đó?",
-                                  style:
-                                      TextStyle(color: AppColors.pallet.blue40),
-                                )),
-                          )
-                        : SizedBox(),
-                    TextFormField(
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(Icons.close, color: AppColors.textTertiary),
+                    ),
+                  ],
+                ),
+                if (allowInitHouseHold == true)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                        onPressed: () {
+                          formNotifier.toggleHasExistedId();
+                        },
+                        child: Text(
+                          "Hộ đã tồn tại mã số trước đó?",
+                          style:
+                              TextStyle(color: AppColors.actionPrimary),
+                        )),
+                  ),
+                TextFormField(
                         initialValue: formState.address.value,
                         autofocus: true,
                         decoration: InputDecoration(
@@ -76,9 +81,9 @@ class FamilyAddressDialog extends ConsumerWidget {
                             Navigator.of(context).pop();
                           }
                         }),
-                  ],
-                ),
-                formState.hasExistedId == true
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 200),
+                  child: formState.hasExistedId == true
                     ? TextFormField(
                         initialValue: formState.houseHoldId.value,
                         autofocus: true,
@@ -102,13 +107,14 @@ class FamilyAddressDialog extends ConsumerWidget {
                           }
                         })
                     : SizedBox(),
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
                         backgroundColor: defaultAddress == null
-                            ? AppColors.pallet.blue30
-                            : AppColors.pallet.blue50),
+                            ? AppColors.actionPrimary
+                            : AppColors.actionSecondary),
                     label:
                         Text(defaultAddress == null ? "Thêm mới" : "Cập nhập"),
                     onPressed: () {

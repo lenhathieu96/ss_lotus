@@ -20,7 +20,7 @@ class ModalPage<T> extends Page<T> {
         enableDrag: false,
         isDismissible: false,
         constraints:
-            BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+            BoxConstraints(minWidth: MediaQuery.sizeOf(context).width),
         backgroundColor: Colors.transparent,
         builder: (context) => child,
       );

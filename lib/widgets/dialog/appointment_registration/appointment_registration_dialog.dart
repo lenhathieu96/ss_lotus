@@ -36,14 +36,33 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
     return Dialog(
       child: IntrinsicHeight(
         child: Container(
-            width: MediaQuery.of(context).size.width * 0.6,
-            padding: COMMON_EDGE_INSETS_PADDING,
+            width: MediaQuery.sizeOf(context).width * DIALOG_MD,
+            padding: const EdgeInsets.all(SPACE_LG),
             child: Column(
               spacing: COMMON_SPACING * 4,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.calendar_month, color: AppColors.actionSchedule, size: 22),
+                        const SizedBox(width: 8),
+                        Text(
+                          defaultAppointment == null ? 'Đăng ký lịch' : 'Cập nhật lịch',
+                          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(Icons.close, color: AppColors.textTertiary),
+                    ),
+                  ],
+                ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.5,
+                  height: MediaQuery.sizeOf(context).height * 0.5,
                   child: TableCalendar(
                     locale: "vi-VN",
                     focusedDay: DateTime.now(),
@@ -102,7 +121,7 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
                           width: DATE_PICKER_SIZE,
                           height: DATE_PICKER_SIZE,
                           decoration: BoxDecoration(
-                              color: Colors.blueAccent, shape: BoxShape.circle),
+                              color: AppColors.actionPrimary, shape: BoxShape.circle),
                           child: Center(
                             child: Text('${lunar?.day}',
                                 style: TextStyle(
@@ -118,27 +137,29 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
                           child: Center(
                             child: Text('${lunar?.day}',
                                 style: TextStyle(
-                                    fontSize: 14, color: Colors.blueGrey)),
+                                    fontSize: 14, color: AppColors.pallet.gray40)),
                           ),
                         );
                       },
                     ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Divider(),
+                Wrap(
+                  spacing: SPACE_SM,
                   children: PERIOD_TYPES.map((period) {
-                    return Row(
-                      children: [
-                        Radio<Period>(
-                          value: period,
-                          groupValue: formState.period.value,
-                          onChanged: formNotifier.updatePeriod,
-                        ),
-                        Text(
-                          Utils.getPeriodTitle(period),
-                        )
-                      ],
+                    final isSelected = formState.period.value == period;
+                    return ChoiceChip(
+                      label: Text(Utils.getPeriodTitle(period)),
+                      selected: isSelected,
+                      selectedColor: AppColors.actionSchedule,
+                      backgroundColor: AppColors.surfaceBackground,
+                      side: BorderSide(color: isSelected ? Colors.transparent : AppColors.surfaceDivider),
+                      labelStyle: TextStyle(
+                        color: isSelected ? Colors.white : AppColors.textPrimary,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                      onSelected: (_) => formNotifier.updatePeriod(period),
                     );
                   }).toList(),
                 ),
@@ -171,8 +192,8 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
                         backgroundColor: defaultAppointment == null
-                            ? AppColors.pallet.blue30
-                            : AppColors.pallet.blue50),
+                            ? AppColors.actionPrimary
+                            : AppColors.actionSecondary),
                     label: Text(
                         defaultAppointment == null ? "Đăng ký" : "Cập nhập"),
                     onPressed: !formState.isValid

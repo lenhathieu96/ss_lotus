@@ -1,4 +1,3 @@
-import 'package:algolia_helper_flutter/algolia_helper_flutter.dart' as algolia;
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ss_lotus/entities/appointment.dart';
@@ -6,7 +5,6 @@ import 'package:ss_lotus/entities/common.enum.dart';
 import 'package:ss_lotus/entities/household.dart';
 import 'package:ss_lotus/entities/user.dart';
 import 'package:ss_lotus/entities/user_group.dart';
-import 'package:ss_lotus/utils/searcher.dart';
 import 'package:ss_lotus/utils/utils.dart';
 import 'package:ss_lotus/widgets/dialog/appointment_registration/appointment_registration_dialog.dart';
 import 'package:ss_lotus/widgets/dialog/confirmation/confirmation_dialog.dart';
@@ -27,14 +25,9 @@ class HouseHoldDetail extends _$HouseHoldDetail {
   late final HouseHoldDetailRepositoryProtocol _repository;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final _houseHoldPaths = algolia.FilterGroupID('houseHoldPath');
-  final algolia.FilterState _filterState = algolia.FilterState();
-  final _householdSearcher = HouseholdSearcher.instance.householdSearcher;
-
   @override
   HouseholdDetailState build() {
     _repository = ref.read(houseHoldDetailRepositoryProvider);
-    _householdSearcher.connectFilterState(_filterState);
     return HouseholdDetailState();
   }
 
@@ -130,17 +123,10 @@ class HouseHoldDetail extends _$HouseHoldDetail {
   }
 
   void _selectHousehold(HouseHold selectedHousehold) async {
-    _filterState.add(
-        _houseHoldPaths, [algolia.Filter.facet("id", selectedHousehold.id)]);
-    _householdSearcher.query(selectedHousehold.id.toString());
-    final response = await _householdSearcher.responses.first;
-
-    final households = response.hits.map(HouseHold.fromHit).toList();
-    if (households.isNotEmpty) {
-      state = state.copyWith(household: households.first);
+    final household = await _repository.getHouseHoldById(selectedHousehold.id);
+    if (household != null) {
+      state = state.copyWith(household: household);
     }
-
-    _filterState.clear();
   }
 
   void _updateFamilyAddress(int familyId, String familyAddress) {
@@ -397,6 +383,10 @@ class HouseHoldDetail extends _$HouseHoldDetail {
             : _selectHousehold,
       ),
     );
+  }
+
+  void backfillSearchKeywords() async {
+    await _repository.backfillSearchKeywords();
   }
 
   //Print

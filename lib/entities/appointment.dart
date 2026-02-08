@@ -5,7 +5,7 @@ part 'appointment.freezed.dart';
 part 'appointment.g.dart';
 
 @freezed
-class Appointment with _$Appointment {
+abstract class Appointment with _$Appointment {
   const factory Appointment({
     required Period period,
     required DateTime date,

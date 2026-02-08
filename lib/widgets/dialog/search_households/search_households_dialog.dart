@@ -49,20 +49,21 @@ class _SearchHouseholdsDialogState
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(COMMON_BORDER_RADIUS)),
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.8,
+        width: MediaQuery.sizeOf(context).width * DIALOG_LG,
         child: IntrinsicHeight(
           child: Column(
             children: [
-              PhysicalModel(
-                color: Colors.white,
-                elevation: 6.0,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(COMMON_BORDER_RADIUS),
-                    topRight: Radius.circular(COMMON_BORDER_RADIUS),
-                    bottomLeft: Radius.circular(
-                        isWaitingForInput ? COMMON_BORDER_RADIUS : 0),
-                    bottomRight: Radius.circular(
-                        isWaitingForInput ? COMMON_BORDER_RADIUS : 0)),
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: SHADOW_SM,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(COMMON_BORDER_RADIUS),
+                        topRight: Radius.circular(COMMON_BORDER_RADIUS),
+                        bottomLeft: Radius.circular(
+                            isWaitingForInput ? COMMON_BORDER_RADIUS : 0),
+                        bottomRight: Radius.circular(
+                            isWaitingForInput ? COMMON_BORDER_RADIUS : 0))),
                 child: Row(
                   children: [
                     Expanded(
@@ -86,17 +87,20 @@ class _SearchHouseholdsDialogState
                           Row(
                             spacing: COMMON_SPACING,
                             children: [
-                              IconButton(
-                                  onPressed: () {
-                                    searchController.clear();
-                                    searchedHouseholdsNotifier
-                                        .searchHouseHolds("");
-                                    Navigator.of(context).pop();
-                                  },
-                                  icon: Icon(
-                                    Icons.close_rounded,
-                                    color: AppColors.border,
-                                  )),
+                              Tooltip(
+                                message: "Đóng",
+                                child: IconButton(
+                                    onPressed: () {
+                                      searchController.clear();
+                                      searchedHouseholdsNotifier
+                                          .searchHouseHolds("");
+                                      Navigator.of(context).pop();
+                                    },
+                                    icon: Icon(
+                                      Icons.close_rounded,
+                                      color: AppColors.border,
+                                    )),
+                              ),
                               if (widget.onAddNewFamily != null)
                                 Container(
                                   decoration: BoxDecoration(
@@ -131,22 +135,17 @@ class _SearchHouseholdsDialogState
                           height: 0.5,
                           color: AppColors.border,
                         ),
-                        PhysicalModel(
-                          color: Colors.white,
-                          elevation: 6.0,
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(COMMON_BORDER_RADIUS),
-                              bottomRight:
-                                  Radius.circular(COMMON_BORDER_RADIUS)),
-                          child: Container(
-                            height: MediaQuery.of(context).size.height * 0.8,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                    bottomLeft:
-                                        Radius.circular(COMMON_BORDER_RADIUS),
-                                    bottomRight:
-                                        Radius.circular(COMMON_BORDER_RADIUS))),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              boxShadow: SHADOW_SM,
+                              borderRadius: BorderRadius.only(
+                                  bottomLeft:
+                                      Radius.circular(COMMON_BORDER_RADIUS),
+                                  bottomRight:
+                                      Radius.circular(COMMON_BORDER_RADIUS))),
+                          child: SizedBox(
+                            height: MediaQuery.sizeOf(context).height * 0.6,
                             child: searchedHouseholds.isNotEmpty
                                 ? ListView.separated(
                                     itemBuilder: (_, index) => InkWell(
@@ -155,6 +154,7 @@ class _SearchHouseholdsDialogState
                                           widget.onSelectHousehold(
                                               searchedHouseholds[index]);
                                         },
+                                        hoverColor: AppColors.surfaceCardAlt,
                                         mouseCursor: SystemMouseCursors.click,
                                         child: Container(
                                           padding: COMMON_EDGE_INSETS_PADDING,
@@ -185,7 +185,37 @@ class _SearchHouseholdsDialogState
                                                         fontSize: 16.0,
                                                         fontFamily: "Mulish",
                                                         fontWeight:
-                                                            FontWeight.w600))
+                                                            FontWeight.w600)),
+                                                if (searchedHouseholds[index]
+                                                        .oldId !=
+                                                    null) ...[
+                                                  TextSpan(
+                                                      text: "  (Mã cũ: ",
+                                                      style: TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontFamily: "Mulish",
+                                                          color: AppColors
+                                                              .textSecondary)),
+                                                  TextSpan(
+                                                      text: searchedHouseholds[
+                                                              index]
+                                                          .oldId
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontFamily: "Mulish",
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: AppColors
+                                                              .textSecondary)),
+                                                  TextSpan(
+                                                      text: ")",
+                                                      style: TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontFamily: "Mulish",
+                                                          color: AppColors
+                                                              .textSecondary)),
+                                                ],
                                               ])),
                                               ...searchedHouseholds[index]
                                                   .families

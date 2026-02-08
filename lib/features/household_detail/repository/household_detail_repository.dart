@@ -14,6 +14,8 @@ abstract class HouseHoldDetailRepositoryProtocol {
   Future updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
       HouseHold? unusedHouseHold, bool isInitHousehold);
   Future createHouseHold(HouseHold houseHold);
+  Future<HouseHold?> getHouseHoldById(int id);
+  Future<void> backfillSearchKeywords();
 }
 
 class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
@@ -21,14 +23,29 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
   final CollectionReference householdRef =
       FirebaseFirestore.instance.collection("tdhp");
 
+  Map<String, dynamic> _toJsonWithKeywords(HouseHold household) {
+    final json = household.toJson();
+    json['searchKeywords'] = HouseHold.buildSearchKeywords(household);
+    return json;
+  }
+
+  @override
+  Future<HouseHold?> getHouseHoldById(int id) async {
+    final doc = await householdRef.doc(id.toString()).get();
+    if (!doc.exists) return null;
+    return HouseHold.fromJson(doc.data() as Map<String, dynamic>);
+  }
+
   @override
   Future splitFamily(HouseHold updatedHouseHold, UserGroup splitFamily) async {
     final WriteBatch batch = db.batch();
+    final splitHousehold =
+        HouseHold(id: splitFamily.id, families: [splitFamily]);
 
     batch.set(householdRef.doc(updatedHouseHold.id.toString()),
-        updatedHouseHold.toJson(), SetOptions(merge: true));
+        _toJsonWithKeywords(updatedHouseHold), SetOptions(merge: true));
     batch.set(householdRef.doc(splitFamily.id.toString()),
-        HouseHold(id: splitFamily.id, families: [splitFamily]).toJson());
+        _toJsonWithKeywords(splitHousehold));
 
     await batch.commit();
   }
@@ -46,7 +63,7 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
     }
     await householdRef
         .doc(updatedHouseHold.id.toString())
-        .set(updatedHouseHold.toJson());
+        .set(_toJsonWithKeywords(updatedHouseHold));
   }
 
   @override
@@ -55,7 +72,7 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
     final WriteBatch batch = db.batch();
 
     batch.set(householdRef.doc(updatedHouseHold.id.toString()),
-        updatedHouseHold.toJson(), SetOptions(merge: true));
+        _toJsonWithKeywords(updatedHouseHold), SetOptions(merge: true));
     batch.delete(householdRef.doc(removedHouseHold.id.toString()));
 
     await batch.commit();
@@ -70,8 +87,8 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
     while (true) {
       Query query = FirebaseFirestore.instance
           .collection("pagoda/TDHP/families")
-          .orderBy("id") // Choose a field to order by
-          .limit(batchSize); // Set the page size
+          .orderBy("id")
+          .limit(batchSize);
 
       if (lastDoc != null) {
         query = query.startAfterDocument(lastDoc);
@@ -80,18 +97,15 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
       QuerySnapshot querySnapshot = await query.get();
       List<DocumentSnapshot> documents = querySnapshot.docs;
 
-      // Stop if no documents are left to process
       if (documents.isEmpty) break;
 
-      // Convert to your model
       List<HouseHold> formattedData = documents
           .map((doc) {
             try {
-              return HouseHold.fromDeprecatedDB(
-                  doc.data() as Map<String, dynamic>);
+              return HouseHold.fromJson(doc.data() as Map<String, dynamic>);
             } catch (e) {
               debugPrint("Error parsing document ID: ${doc.id}, Error: $e");
-              return null; // Return null to skip this document
+              return null;
             }
           })
           .whereType<HouseHold>()
@@ -99,16 +113,14 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
       WriteBatch batch = db.batch();
       for (var formattedDoc in formattedData) {
         batch.set(householdRef.doc(formattedDoc.id.toString()),
-            formattedDoc.toJson(), SetOptions(merge: true));
+            _toJsonWithKeywords(formattedDoc), SetOptions(merge: true));
       }
 
       await batch.commit();
       processedCount += formattedData.length;
 
-      // Log progress
       debugPrint("Processed $processedCount documents...");
 
-      // Update lastDoc for the next iteration
       lastDoc = documents.last;
     }
   }
@@ -118,7 +130,35 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
     final docRef = householdRef.doc(houseHold.id.toString());
     final docSnapshot = await docRef.get();
     if (!docSnapshot.exists) {
-      await docRef.set(houseHold.toJson());
+      await docRef.set(_toJsonWithKeywords(houseHold));
+    }
+  }
+
+  @override
+  Future<void> backfillSearchKeywords() async {
+    int batchSize = 100;
+    DocumentSnapshot? lastDoc;
+    int processedCount = 0;
+
+    while (true) {
+      Query query = householdRef.orderBy('id').limit(batchSize);
+      if (lastDoc != null) query = query.startAfterDocument(lastDoc);
+
+      final snapshot = await query.get();
+      if (snapshot.docs.isEmpty) break;
+
+      final batch = db.batch();
+      for (final doc in snapshot.docs) {
+        final household =
+            HouseHold.fromJson(doc.data() as Map<String, dynamic>);
+        batch.update(doc.reference, {
+          'searchKeywords': HouseHold.buildSearchKeywords(household),
+        });
+      }
+      await batch.commit();
+      processedCount += snapshot.docs.length;
+      lastDoc = snapshot.docs.last;
+      debugPrint("Backfilled $processedCount documents...");
     }
   }
 }

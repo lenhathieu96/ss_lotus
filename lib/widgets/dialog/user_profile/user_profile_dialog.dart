@@ -20,15 +20,29 @@ class UserProfileDialog extends ConsumerWidget {
     return Dialog(
       child: IntrinsicHeight(
         child: Container(
-            width: MediaQuery.of(context).size.width * 0.4,
-            padding: COMMON_EDGE_INSETS_PADDING,
+            width: MediaQuery.sizeOf(context).width * DIALOG_SM,
+            padding: const EdgeInsets.all(SPACE_LG),
             child: Column(
               spacing: COMMON_SPACING * 4,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Thông tin phật tử',
-                    style:
-                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.person, color: AppColors.actionPrimary, size: 22),
+                        SizedBox(width: 8),
+                        Text('Thông tin phật tử',
+                            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(Icons.close, color: AppColors.textTertiary),
+                    ),
+                  ],
+                ),
                 TextFormField(
                   initialValue: formState.name.value,
                   autofocus: true,
@@ -73,8 +87,8 @@ class UserProfileDialog extends ConsumerWidget {
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
                         backgroundColor: user == null
-                            ? AppColors.pallet.blue30
-                            : AppColors.pallet.blue50),
+                            ? AppColors.actionPrimary
+                            : AppColors.actionSecondary),
                     label: Text(user == null ? "Thêm mới" : "Cập nhập"),
                     onPressed: () {
                       onProfileUpdated(User(

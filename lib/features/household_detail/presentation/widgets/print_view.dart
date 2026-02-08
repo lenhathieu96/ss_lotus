@@ -51,7 +51,7 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                                 style: pw.TextStyle(
                                   font: pageBoldFont,
                                   fontSize: 10,
-                                ))
+                                )),
                           ]))
                 ],
               )

@@ -37,9 +37,10 @@ class FamiliesList extends StatelessWidget {
         contentsWhenEmpty: Text("Chưa có thành viên nào"),
         canDrag: false,
         decoration: BoxDecoration(
-            color: AppColors.pallet.gray20,
+            color: AppColors.surfaceBackground,
             borderRadius:
-                BorderRadius.all(Radius.circular(COMMON_BORDER_RADIUS))),
+                BorderRadius.all(Radius.circular(COMMON_BORDER_RADIUS)),
+            boxShadow: SHADOW_SM),
         header: Padding(
           padding: COMMON_EDGE_INSETS_PADDING,
           child: Row(
@@ -50,13 +51,16 @@ class FamiliesList extends StatelessWidget {
                   Text(family.address,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  IconButton(
-                    onPressed: () {
-                      onEditAddress(context, family.id, family.address, false);
-                    },
-                    icon: Icon(
-                      Icons.edit,
-                      color: Colors.blueAccent,
+                  Tooltip(
+                    message: "Sửa địa chỉ",
+                    child: IconButton(
+                      onPressed: () {
+                        onEditAddress(context, family.id, family.address, false);
+                      },
+                      icon: Icon(
+                        Icons.edit,
+                        color: AppColors.pallet.blue30,
+                      ),
                     ),
                   )
                 ],
@@ -83,7 +87,7 @@ class FamiliesList extends StatelessWidget {
                       ? Container()
                       : FilledButton.icon(
                           style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.pallet.yellow50),
+                              backgroundColor: AppColors.actionWarning),
                           icon: Icon(Icons.splitscreen),
                           label: const Text('Tách hộ mới'),
                           onPressed: onSplitFamily != null
@@ -107,7 +111,7 @@ class FamiliesList extends StatelessWidget {
             children: [
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.pallet.blue30),
+                    backgroundColor: AppColors.actionPrimary),
                 icon: Icon(Icons.person_add),
                 label: const Text('Thêm thành viên'),
                 onPressed: () {
@@ -123,35 +127,46 @@ class FamiliesList extends StatelessWidget {
           int userIndex = entry.key;
           User user = entry.value;
 
+          final borderRadius = BorderRadius.only(
+            topLeft: userIndex == 0
+                ? Radius.circular(COMMON_BORDER_RADIUS)
+                : Radius.zero,
+            topRight: userIndex == 0
+                ? Radius.circular(COMMON_BORDER_RADIUS)
+                : Radius.zero,
+            bottomLeft: userIndex == family.members.length - 1
+                ? Radius.circular(COMMON_BORDER_RADIUS)
+                : Radius.zero,
+            bottomRight: userIndex == family.members.length - 1
+                ? Radius.circular(COMMON_BORDER_RADIUS)
+                : Radius.zero,
+          );
+
           return DragAndDropItem(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: COMMON_PADDING),
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: userIndex == family.members.length - 1
-                        ? null // No border for the last item
-                        : Border(
-                            bottom: BorderSide(
-                              color: Color.fromARGB(128, 128, 128, 128),
-                              width: 0.5, // Border width
-                            ),
-                          ),
-                    borderRadius: BorderRadius.only(
-                      topLeft: userIndex == 0
-                          ? Radius.circular(COMMON_BORDER_RADIUS)
-                          : Radius.zero,
-                      topRight: userIndex == 0
-                          ? Radius.circular(COMMON_BORDER_RADIUS)
-                          : Radius.zero,
-                      bottomLeft: userIndex == family.members.length - 1
-                          ? Radius.circular(COMMON_BORDER_RADIUS)
-                          : Radius.zero,
-                      bottomRight: userIndex == family.members.length - 1
-                          ? Radius.circular(COMMON_BORDER_RADIUS)
-                          : Radius.zero,
-                    )),
-                child: ListTile(
+              child: Material(
+                color: Colors.white,
+                borderRadius: borderRadius,
+                child: InkWell(
+                  onTap: () {
+                    onUpdateUserProfile(context, family.id, user, userIndex);
+                  },
+                  hoverColor: AppColors.surfaceCardAlt,
+                  borderRadius: borderRadius,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        border: userIndex == family.members.length - 1
+                            ? null
+                            : Border(
+                                bottom: BorderSide(
+                                  color: AppColors.surfaceDivider,
+                                  width: 0.5,
+                                ),
+                              ),
+                        borderRadius: borderRadius,
+                    ),
+                    child: ListTile(
                   title: Text(
                     user.fullName,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -161,23 +176,29 @@ class FamiliesList extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        IconButton(
-                          onPressed: () {
-                            onUpdateUserProfile(
-                                context, family.id, user, userIndex);
-                          },
-                          icon: Icon(
-                            Icons.edit,
-                            color: Colors.blueAccent,
+                        Tooltip(
+                          message: "Sửa",
+                          child: IconButton(
+                            onPressed: () {
+                              onUpdateUserProfile(
+                                  context, family.id, user, userIndex);
+                            },
+                            icon: Icon(
+                              Icons.edit,
+                              color: AppColors.actionPrimary,
+                            ),
                           ),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            onRemoveUser(context, family.id, userIndex);
-                          },
-                          icon: Icon(
-                            Icons.delete,
-                            color: Colors.redAccent,
+                        Tooltip(
+                          message: "Xóa",
+                          child: IconButton(
+                            onPressed: () {
+                              onRemoveUser(context, family.id, userIndex);
+                            },
+                            icon: Icon(
+                              Icons.delete,
+                              color: AppColors.actionDanger,
+                            ),
                           ),
                         ),
                       ],
@@ -200,6 +221,8 @@ class FamiliesList extends StatelessWidget {
                       : null,
                 ),
               ),
+                ),
+              ),
             ),
           );
         }).toList(),
@@ -217,7 +240,7 @@ class FamiliesList extends StatelessWidget {
                 const BorderRadius.all(Radius.circular(COMMON_BORDER_RADIUS)),
             boxShadow: [
               BoxShadow(
-                color: Color.fromARGB(128, 128, 128, 128),
+                color: AppColors.surfaceDivider,
                 spreadRadius: 2,
                 blurRadius: 3,
                 offset: const Offset(0, 0), // changes position of shadow

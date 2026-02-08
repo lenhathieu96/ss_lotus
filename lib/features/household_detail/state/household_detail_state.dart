@@ -6,7 +6,7 @@ import 'package:ss_lotus/entities/user_group.dart';
 part 'household_detail_state.freezed.dart';
 
 @freezed
-class HouseholdDetailState with _$HouseholdDetailState {
+abstract class HouseholdDetailState with _$HouseholdDetailState {
   const factory HouseholdDetailState({
     @Default(null) HouseHold? unusedHouseHold,
     @Default(null) HouseHold? household,

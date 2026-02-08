@@ -1,28 +1,22 @@
-import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:ss_lotus/routes/go_router_provider.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:ss_lotus/themes/colors.dart';
 import 'package:ss_lotus/utils/constants.dart';
-import 'package:ss_lotus/utils/searcher.dart';
 import 'package:toastification/toastification.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 void main() async {
-  setUrlStrategy(PathUrlStrategy());
+  usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   await initializeDateFormatting();
-  HouseholdSearcher.init("", "");
   runApp(const ProviderScope(
     child: MyApp(),
   ));
@@ -43,6 +37,23 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         fontFamily: "Mulish",
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
+        scaffoldBackgroundColor: AppColors.surfaceBackground,
+        cardTheme: CardThemeData(
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(COMMON_BORDER_RADIUS)),
+          color: AppColors.surfaceCard,
+        ),
+        dialogTheme: DialogThemeData(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SPACE_MD)),
+          backgroundColor: AppColors.surfaceCard,
+        ),
+        dividerTheme: DividerThemeData(
+          color: AppColors.surfaceDivider,
+          thickness: 0.5,
+        ),
+        tooltipTheme: TooltipThemeData(
+          textStyle: TextStyle(fontFamily: "Mulish", fontSize: 12, color: Colors.white),
+        ),
         iconTheme: const IconThemeData(
           size: 20,
         ),
@@ -94,8 +105,22 @@ class MyApp extends ConsumerWidget {
                     borderRadius:
                         BorderRadius.circular(COMMON_BORDER_RADIUS))))),
         inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: AppColors.surfaceBackground,
           border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(COMMON_BORDER_RADIUS)),
+            borderRadius: BorderRadius.circular(COMMON_BORDER_RADIUS),
+            borderSide: BorderSide(color: AppColors.surfaceDivider),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(COMMON_BORDER_RADIUS),
+            borderSide: BorderSide(color: AppColors.surfaceDivider),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(COMMON_BORDER_RADIUS),
+            borderSide: BorderSide(color: AppColors.actionPrimary, width: 1.5),
+          ),
+          labelStyle: TextStyle(color: AppColors.textTertiary),
+          hintStyle: TextStyle(color: AppColors.textTertiary),
         ),
         useMaterial3: true,
       ),

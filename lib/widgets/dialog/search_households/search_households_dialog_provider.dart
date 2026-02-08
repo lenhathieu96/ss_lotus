@@ -6,7 +6,7 @@ part 'search_households_dialog_provider.g.dart';
 
 @riverpod
 class SearchHouseHolds extends _$SearchHouseHolds {
-  final _householdSearcher = HouseholdSearcher.instance.householdSearcher;
+  final _searcher = HouseholdSearcher();
 
   @override
   List<HouseHold> build() {
@@ -15,11 +15,9 @@ class SearchHouseHolds extends _$SearchHouseHolds {
 
   Future<void> searchHouseHolds(String text) async {
     if (text.isEmpty) {
-      state = []; // Clear the list when search text is empty
+      state = [];
     } else {
-      _householdSearcher.query(text);
-      final response = await _householdSearcher.responses.first;
-      state = response.hits.map(HouseHold.fromHit).toList();
+      state = await _searcher.search(text);
     }
   }
 }
