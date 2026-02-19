@@ -22,7 +22,7 @@ class SearchHouseholdsDialog extends ConsumerStatefulWidget {
 class _SearchHouseholdsDialogState
     extends ConsumerState<SearchHouseholdsDialog> {
   late TextEditingController searchController;
-  Debouncer debouncer = Debouncer(delay: Duration(seconds: 1));
+  Debouncer debouncer = Debouncer(delay: Duration(milliseconds: 300));
 
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _SearchHouseholdsDialogState
             children: [
               Container(
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surfaceCard,
                     boxShadow: SHADOW_SM,
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(COMMON_BORDER_RADIUS),
@@ -73,7 +73,7 @@ class _SearchHouseholdsDialogState
                         overlayColor:
                             WidgetStatePropertyAll(Colors.transparent),
                         hintText: "Nhập mã số - địa chỉ - họ tên",
-                        backgroundColor: WidgetStatePropertyAll(Colors.white),
+                        backgroundColor: WidgetStatePropertyAll(AppColors.surfaceCard),
                         elevation: WidgetStatePropertyAll(0),
                         onChanged: (text) {
                           debouncer(() => searchedHouseholdsNotifier
@@ -83,6 +83,7 @@ class _SearchHouseholdsDialogState
                             searchedHouseholdsNotifier.searchHouseHolds,
                         padding: WidgetStatePropertyAll(
                             EdgeInsets.all(COMMON_SPACING)),
+                        leading: Icon(Icons.search, color: AppColors.textTertiary, size: 20),
                         trailing: [
                           Row(
                             spacing: COMMON_SPACING,
@@ -98,7 +99,7 @@ class _SearchHouseholdsDialogState
                                     },
                                     icon: Icon(
                                       Icons.close_rounded,
-                                      color: AppColors.border,
+                                      color: AppColors.textTertiary,
                                     )),
                               ),
                               if (widget.onAddNewFamily != null)
@@ -107,17 +108,17 @@ class _SearchHouseholdsDialogState
                                       border: Border(
                                           left: BorderSide(
                                               width: 1,
-                                              color: AppColors.border))),
+                                              color: AppColors.surfaceDivider))),
                                   child: TextButton(
                                       style: TextButton.styleFrom(
                                           overlayColor: Colors.transparent,
                                           foregroundColor:
-                                              AppColors.pallet.blue30),
+                                              AppColors.actionPrimary),
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                         widget.onAddNewFamily!();
                                       },
-                                      child: Text("Tạo gia đình mới")),
+                                      child: Text("Tạo gia đình mới", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14))),
                                 ),
                             ],
                           )
@@ -137,7 +138,7 @@ class _SearchHouseholdsDialogState
                         ),
                         Container(
                           decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.surfaceCard,
                               boxShadow: SHADOW_SM,
                               borderRadius: BorderRadius.only(
                                   bottomLeft:
@@ -147,161 +148,196 @@ class _SearchHouseholdsDialogState
                           child: SizedBox(
                             height: MediaQuery.sizeOf(context).height * 0.6,
                             child: searchedHouseholds.isNotEmpty
-                                ? ListView.separated(
+                                ? ListView.builder(
                                     itemBuilder: (_, index) => InkWell(
                                         onTap: () {
                                           Navigator.of(context).pop();
                                           widget.onSelectHousehold(
                                               searchedHouseholds[index]);
                                         },
-                                        hoverColor: AppColors.surfaceCardAlt,
+                                        hoverColor: Colors.transparent,
                                         mouseCursor: SystemMouseCursors.click,
                                         child: Container(
-                                          padding: COMMON_EDGE_INSETS_PADDING,
-                                          margin: COMMON_EDGE_INSETS_PADDING,
-                                          decoration: BoxDecoration(
-                                            color: AppColors.pallet.gray20,
-                                            borderRadius: BorderRadius.circular(
-                                                COMMON_BORDER_RADIUS),
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            spacing: COMMON_SPACING,
-                                            children: [
-                                              RichText(
-                                                  text: TextSpan(children: [
-                                                TextSpan(
-                                                    text: "Mã số: ",
-                                                    style: TextStyle(
-                                                        fontSize: 16.0,
-                                                        fontFamily: "Mulish")),
-                                                TextSpan(
-                                                    text: searchedHouseholds[
-                                                            index]
-                                                        .id
-                                                        .toString(),
-                                                    style: TextStyle(
-                                                        fontSize: 16.0,
-                                                        fontFamily: "Mulish",
-                                                        fontWeight:
-                                                            FontWeight.w600)),
-                                                if (searchedHouseholds[index]
-                                                        .oldId !=
-                                                    null) ...[
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: COMMON_PADDING,
+                                              vertical: COMMON_SPACING),
+                                          child: Container(
+                                            padding: EdgeInsets.all(COMMON_SPACING * 1.5),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.surfaceCardAlt,
+                                              borderRadius: BorderRadius.circular(
+                                                  COMMON_BORDER_RADIUS),
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              spacing: COMMON_SPACING,
+                                              children: [
+                                                RichText(
+                                                    text: TextSpan(children: [
                                                   TextSpan(
-                                                      text: "  (Mã cũ: ",
+                                                      text: "Mã số: ",
                                                       style: TextStyle(
                                                           fontSize: 16.0,
                                                           fontFamily: "Mulish",
-                                                          color: AppColors
-                                                              .textSecondary)),
+                                                          color: AppColors.textPrimary)),
                                                   TextSpan(
                                                       text: searchedHouseholds[
                                                               index]
-                                                          .oldId
+                                                          .id
                                                           .toString(),
                                                       style: TextStyle(
                                                           fontSize: 16.0,
                                                           fontFamily: "Mulish",
                                                           fontWeight:
                                                               FontWeight.w600,
-                                                          color: AppColors
-                                                              .textSecondary)),
-                                                  TextSpan(
-                                                      text: ")",
-                                                      style: TextStyle(
-                                                          fontSize: 16.0,
-                                                          fontFamily: "Mulish",
-                                                          color: AppColors
-                                                              .textSecondary)),
-                                                ],
-                                              ])),
-                                              ...searchedHouseholds[index]
-                                                  .families
-                                                  .asMap()
-                                                  .entries
-                                                  .map((entry) {
-                                                UserGroup family = entry.value;
-
-                                                return Container(
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                      color: AppColors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              COMMON_BORDER_RADIUS),
-                                                      border: Border.all(
-                                                          width: 0.5,
-                                                          color: AppColors
-                                                              .border)),
-                                                  padding: EdgeInsets.all(
-                                                      COMMON_SPACING),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    spacing: COMMON_SPACING,
-                                                    children: [
-                                                      RichText(
-                                                          text: TextSpan(
-                                                              children: [
-                                                            TextSpan(
-                                                                text:
-                                                                    "Địa chỉ: ",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16.0,
-                                                                    fontFamily:
-                                                                        "Mulish")),
-                                                            TextSpan(
-                                                                text: family
-                                                                    .address,
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16.0,
-                                                                    fontFamily:
-                                                                        "Mulish",
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600))
-                                                          ])),
-                                                      Text(
-                                                        family.members[0]
-                                                            .fullName,
+                                                          color: AppColors.textPrimary)),
+                                                  if (searchedHouseholds[index]
+                                                          .oldId !=
+                                                      null) ...[
+                                                    TextSpan(
+                                                        text: "  (Mã cũ: ",
                                                         style: TextStyle(
                                                             fontSize: 16.0,
+                                                            fontFamily: "Mulish",
+                                                            color: AppColors
+                                                                .textSecondary)),
+                                                    TextSpan(
+                                                        text: searchedHouseholds[
+                                                                index]
+                                                            .oldId
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                            fontSize: 16.0,
+                                                            fontFamily: "Mulish",
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .w600),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              })
-                                            ],
+                                                                FontWeight.w600,
+                                                            color: AppColors
+                                                                .textSecondary)),
+                                                    TextSpan(
+                                                        text: ")",
+                                                        style: TextStyle(
+                                                            fontSize: 16.0,
+                                                            fontFamily: "Mulish",
+                                                            color: AppColors
+                                                                .textSecondary)),
+                                                  ],
+                                                ])),
+                                                ...searchedHouseholds[index]
+                                                    .families
+                                                    .asMap()
+                                                    .entries
+                                                    .map((entry) {
+                                                  UserGroup family = entry.value;
+                                                  final hasMembers = family.members.isNotEmpty;
+                                                  final extraCount = hasMembers ? family.members.length - 1 : 0;
+
+                                                  return Container(
+                                                    decoration: BoxDecoration(
+                                                        color: AppColors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                COMMON_BORDER_RADIUS),
+                                                        border: Border.all(
+                                                            width: 0.5,
+                                                            color: AppColors
+                                                                .border)),
+                                                    padding: EdgeInsets.all(
+                                                        COMMON_SPACING),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      spacing: COMMON_SPACING,
+                                                      children: [
+                                                        RichText(
+                                                            text: TextSpan(
+                                                                children: [
+                                                              TextSpan(
+                                                                  text:
+                                                                      "Địa chỉ: ",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          16.0,
+                                                                      fontFamily:
+                                                                          "Mulish",
+                                                                      color: AppColors.textPrimary)),
+                                                              TextSpan(
+                                                                  text: family
+                                                                      .address,
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          16.0,
+                                                                      fontFamily:
+                                                                          "Mulish",
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      color: AppColors.textPrimary))
+                                                            ])),
+                                                        if (hasMembers)
+                                                          Row(
+                                                            spacing: COMMON_SPACING,
+                                                            children: [
+                                                              Text(
+                                                                family.members[0].fullName,
+                                                                style: TextStyle(
+                                                                    fontSize: 16.0,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    color: AppColors.textPrimary),
+                                                              ),
+                                                              if (extraCount > 0)
+                                                                Text(
+                                                                  "+ $extraCount thành viên khác",
+                                                                  style: TextStyle(
+                                                                      fontSize: 13.0,
+                                                                      color: AppColors.textTertiary),
+                                                                ),
+                                                            ],
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                })
+                                              ],
+                                            ),
                                           ),
                                         )),
-                                    separatorBuilder: (_, __) => Divider(
-                                      height: 0.5,
-                                      color: AppColors.border,
-                                    ),
                                     itemCount: searchedHouseholds.length,
                                   )
                                 : Center(
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
+                                      spacing: COMMON_SPACING,
                                       children: [
                                         Icon(
                                           Icons.search_off,
                                           color: AppColors.border,
-                                          size: 40.0,
+                                          size: 56.0,
                                         ),
                                         Text(
                                           "Không tìm thấy kết quả",
-                                          style: TextStyle(fontSize: 16.0),
+                                          style: TextStyle(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.textPrimary),
                                         ),
+                                        Text(
+                                          "Thử tìm với mã số, địa chỉ hoặc họ tên khác",
+                                          style: TextStyle(
+                                              fontSize: 14.0,
+                                              color: AppColors.textTertiary),
+                                        ),
+                                        if (widget.onAddNewFamily != null)
+                                          OutlinedButton.icon(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                              widget.onAddNewFamily!();
+                                            },
+                                            icon: Icon(Icons.add),
+                                            label: Text("Tạo gia đình mới"),
+                                          ),
                                       ],
                                     ),
                                   ),

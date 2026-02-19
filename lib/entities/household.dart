@@ -3,7 +3,6 @@ import 'package:ss_lotus/entities/user_group.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 import 'appointment.dart';
-import 'user.dart';
 
 part 'household.freezed.dart';
 part 'household.g.dart';
@@ -27,7 +26,8 @@ abstract class HouseHold with _$HouseHold {
       keywords.add(household.oldId!.toString());
     }
     for (final family in household.families) {
-      for (final word in unorm.nfc(family.address.toLowerCase()).split(RegExp(r'\s+'))) {
+      for (final word
+          in unorm.nfc(family.address.toLowerCase()).split(RegExp(r'\s+'))) {
         if (word.isNotEmpty) keywords.add(word);
       }
       for (final member in family.members) {

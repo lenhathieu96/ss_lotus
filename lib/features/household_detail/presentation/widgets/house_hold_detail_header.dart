@@ -27,9 +27,6 @@ class HouseHoldDetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lunarDate = Utils.convertToLunarDate(appointment?.date);
-    final period = Utils.getPeriodTitle(appointment?.period);
-
     return Padding(
       padding: const EdgeInsets.all(COMMON_PADDING),
       child: Column(
@@ -37,26 +34,30 @@ class HouseHoldDetailHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            spacing: COMMON_PADDING,
+            spacing: 10.0,
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceCardAlt,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  spacing: 6.0,
                   children: [
+                    Icon(Icons.tag, size: 16, color: AppColors.textSecondary),
                     Text("Mã số ",
                         style: TextStyle(
-                            fontSize: 14, color: AppColors.textSecondary)),
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500)),
                     Text(houseHoldId.toString(),
                         style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary)),
                   ],
@@ -64,17 +65,22 @@ class HouseHoldDetailHeader extends StatelessWidget {
               ),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceCardAlt,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  spacing: 6.0,
                   children: [
+                    Icon(Icons.family_restroom,
+                        size: 16, color: AppColors.textSecondary),
                     Text("Số gia đình ",
                         style: TextStyle(
-                            fontSize: 14, color: AppColors.textSecondary)),
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500)),
                     Text(familyQuantity.toString(),
                         style: TextStyle(
                             fontSize: 16,
@@ -86,17 +92,22 @@ class HouseHoldDetailHeader extends StatelessWidget {
               if (oldId != null)
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceCardAlt,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
+                    spacing: 6.0,
                     children: [
+                      Icon(Icons.history,
+                          size: 16, color: AppColors.textSecondary),
                       Text("Mã cũ ",
                           style: TextStyle(
-                              fontSize: 14, color: AppColors.textSecondary)),
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w500)),
                       Text(oldId.toString(),
                           style: TextStyle(
                               fontSize: 16,
@@ -105,13 +116,40 @@ class HouseHoldDetailHeader extends StatelessWidget {
                     ],
                   ),
                 ),
+              if (appointment != null)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.pallet.forestGreen.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        color: AppColors.actionSuccess.withValues(alpha: 0.3),
+                        width: 0.5),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 6.0,
+                    children: [
+                      Icon(Icons.check_circle,
+                          size: 16, color: AppColors.actionSuccess),
+                      Text("Đã đăng ký",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.actionSuccess,
+                              fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                ),
+              Spacer(),
               Tooltip(
                 message: "Đóng",
                 child: IconButton(
                   style: IconButton.styleFrom(
                     shape: const CircleBorder(),
                     side: BorderSide(
-                        color: AppColors.actionDanger.withValues(alpha: 0.3)),
+                        color: AppColors.actionDanger.withValues(alpha: 0.2),
+                        width: 1.5),
                   ),
                   onPressed: () {
                     onClearHouseHold();
@@ -119,7 +157,7 @@ class HouseHoldDetailHeader extends StatelessWidget {
                   icon: Icon(
                     Icons.close,
                     color: AppColors.actionDanger,
-                    size: 20.0,
+                    size: 18.0,
                   ),
                 ),
               )

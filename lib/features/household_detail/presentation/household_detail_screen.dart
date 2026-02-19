@@ -31,26 +31,42 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                 color: AppColors.surfaceCard,
                 boxShadow: SHADOW_SM,
               ),
-              padding: const EdgeInsets.all(COMMON_PADDING),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: COMMON_PADDING, vertical: 12.0),
               child: Row(
                 children: [
                   Flexible(
                     flex: 2,
                     child: Row(
-                      spacing: COMMON_SPACING,
+                      spacing: 8.0,
                       children: [
-                        SvgPicture.asset(
-                          "assets/svgs/logo.svg",
-                          width: 60,
-                          height: 60,
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.pallet.forestGreen
+                                    .withValues(alpha: 0.15),
+                                AppColors.pallet.warmPurple
+                                    .withValues(alpha: 0.1),
+                              ],
+                            ),
+                          ),
+                          child: SvgPicture.asset(
+                            "assets/svgs/logo.svg",
+                            width: 28,
+                            height: 28,
+                          ),
                         ),
                         ShaderMask(
                           shaderCallback: (bounds) {
                             return LinearGradient(
                               colors: [
-                                AppColors.pallet.green20,
-                                AppColors.pallet.green40,
-                                AppColors.pallet.purple40
+                                AppColors.pallet.warmGray20,
+                                AppColors.pallet.forestGreen,
+                                AppColors.pallet.warmPurple
                               ],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
@@ -60,8 +76,9 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                             'SSLotus',
                             style: TextStyle(
                               fontFamily: "OleoScript",
-                              fontSize: 32.0,
+                              fontSize: 28.0,
                               color: Colors.white,
+                              letterSpacing: -0.5,
                             ),
                           ),
                         )
@@ -74,42 +91,49 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                         spacing: COMMON_PADDING,
                         children: [
                           Expanded(
-                            child: OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                    overlayColor: AppColors.white,
-                                    alignment: Alignment.centerLeft,
-                                    side: BorderSide(color: AppColors.border)),
-                                onPressed: () {
+                            child: SizedBox(
+                              height: TOOLBAR_ELEMENT_HEIGHT,
+                              child: SearchBar(
+                                autoFocus: false,
+                                overlayColor:
+                                    WidgetStatePropertyAll(Colors.transparent),
+                                backgroundColor: WidgetStatePropertyAll(
+                                    AppColors.surfaceCardAlt),
+                                elevation: WidgetStatePropertyAll(0),
+                                hintText: "Nhập mã số - địa chỉ - họ tên",
+                                leading: Icon(
+                                  Icons.search,
+                                  color: AppColors.textTertiary,
+                                ),
+                                onTap: () {
                                   houseHoldNotifier.openSearchHouseholdsDialog(
                                       context, false);
                                 },
-                                icon: Icon(
-                                  Icons.search,
-                                  color: AppColors.border,
-                                ),
+                                onSubmitted: (_) {
+                                  houseHoldNotifier.openSearchHouseholdsDialog(
+                                      context, false);
+                                },
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: TOOLBAR_ELEMENT_HEIGHT,
+                            child: FilledButton.icon(
+                                style: FilledButton.styleFrom(
+                                    backgroundColor: AppColors.actionPrimary),
+                                onPressed: houseHoldDetail.household != null
+                                    ? null
+                                    : () {
+                                        houseHoldNotifier
+                                            .openAddNewFamilyDialog(
+                                                context, null, null, true);
+                                      },
+                                icon: Icon(Icons.add),
                                 label: Text(
-                                  'Tìm kiếm',
-                                  style: TextStyle(
-                                      fontSize: 16, color: AppColors.border),
+                                  'Tạo gia đình mới',
+                                  style: TextStyle(fontSize: 14),
                                 )),
                           ),
-                          FilledButton.icon(
-                              style: FilledButton.styleFrom(
-                                  backgroundColor: AppColors.pallet.blue30),
-                              onPressed: houseHoldDetail.household != null
-                                  ? null
-                                  : () {
-                                      houseHoldNotifier.openAddNewFamilyDialog(
-                                          context, null, null, true);
-                                    },
-                              // onPressed: () {
-                              //   houseHoldNotifier.backfillSearchKeywords();
-                              // },
-                              icon: Icon(Icons.add),
-                              label: Text(
-                                'Tạo gia đình mới',
-                                style: TextStyle(fontSize: 16),
-                              )),
                         ],
                       )),
                 ],
@@ -124,28 +148,53 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          spacing: COMMON_SPACING,
+                          spacing: SPACE_SM,
                           children: [
-                            Icon(
-                              Icons.groups_outlined,
-                              color: AppColors.textTertiary,
-                              size: 80.0,
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.pallet.forestGreen
+                                        .withValues(alpha: 0.12),
+                                    AppColors.pallet.warmPurple
+                                        .withValues(alpha: 0.08),
+                                  ],
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.groups_outlined,
+                                color: AppColors.pallet.forestGreen,
+                                size: 56.0,
+                              ),
                             ),
+                            SizedBox(height: SPACE_SM),
                             Text(
                               "Chưa có hộ nào được chọn",
                               style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textSecondary,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
                               ),
                             ),
-                            const SizedBox(height: 4),
                             Text(
-                              "Tìm kiếm hoặc tạo gia đình mới để bắt đầu",
+                              "Tìm kiếm hoặc tạo gia đình mới để bắt đầu quản lý thông tin",
                               style: TextStyle(
                                 fontSize: 14.0,
                                 color: AppColors.textTertiary,
                               ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: SPACE_MD),
+                            OutlinedButton.icon(
+                              onPressed: () {
+                                houseHoldNotifier.openSearchHouseholdsDialog(
+                                    context, false);
+                              },
+                              icon: Icon(Icons.search),
+                              label: Text('Tìm kiếm hộ gia đình'),
                             ),
                           ],
                         ),

@@ -38,13 +38,45 @@ class MyApp extends ConsumerWidget {
         fontFamily: "Mulish",
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
         scaffoldBackgroundColor: AppColors.surfaceBackground,
+        textTheme: TextTheme(
+          headlineLarge: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+          titleLarge: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+          titleMedium: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+          bodyLarge: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+            color: AppColors.textPrimary,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            color: AppColors.textSecondary,
+          ),
+          labelLarge: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textPrimary,
+          ),
+        ),
         cardTheme: CardThemeData(
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(COMMON_BORDER_RADIUS)),
           color: AppColors.surfaceCard,
         ),
         dialogTheme: DialogThemeData(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SPACE_MD)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(COMMON_BORDER_RADIUS)),
           backgroundColor: AppColors.surfaceCard,
         ),
         dividerTheme: DividerThemeData(
@@ -59,9 +91,11 @@ class MyApp extends ConsumerWidget {
         ),
         filledButtonTheme: FilledButtonThemeData(
             style: ButtonStyle(
+                foregroundColor: WidgetStatePropertyAll(Colors.white),
                 textStyle: WidgetStatePropertyAll(
                   TextStyle(
-                    fontSize: 16.0, // Adjust the font size as needed
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 padding: WidgetStatePropertyAll(
@@ -74,9 +108,11 @@ class MyApp extends ConsumerWidget {
                         BorderRadius.circular(COMMON_BORDER_RADIUS))))),
         outlinedButtonTheme: OutlinedButtonThemeData(
             style: ButtonStyle(
+                foregroundColor: WidgetStatePropertyAll(AppColors.actionPrimary),
                 textStyle: WidgetStatePropertyAll(
                   TextStyle(
-                    fontSize: 16.0, // Adjust the font size as needed
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 padding: WidgetStatePropertyAll(
@@ -89,11 +125,12 @@ class MyApp extends ConsumerWidget {
                         BorderRadius.circular(COMMON_BORDER_RADIUS))))),
         textButtonTheme: TextButtonThemeData(
             style: ButtonStyle(
+                foregroundColor: WidgetStatePropertyAll(AppColors.actionPrimary),
                 textStyle: WidgetStatePropertyAll(
                   TextStyle(
-                      fontSize: 16.0,
-                      fontFamily: "Mulish" // Adjust the font size as needed
-                      ),
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: "Mulish"),
                 ),
                 overlayColor: WidgetStatePropertyAll(Colors.transparent),
                 padding: WidgetStatePropertyAll(
@@ -106,7 +143,7 @@ class MyApp extends ConsumerWidget {
                         BorderRadius.circular(COMMON_BORDER_RADIUS))))),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: AppColors.surfaceBackground,
+          fillColor: AppColors.surfaceCardAlt,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(COMMON_BORDER_RADIUS),
             borderSide: BorderSide(color: AppColors.surfaceDivider),
@@ -119,7 +156,7 @@ class MyApp extends ConsumerWidget {
             borderRadius: BorderRadius.circular(COMMON_BORDER_RADIUS),
             borderSide: BorderSide(color: AppColors.actionPrimary, width: 1.5),
           ),
-          labelStyle: TextStyle(color: AppColors.textTertiary),
+          labelStyle: TextStyle(color: AppColors.textTertiary, fontSize: 13, fontWeight: FontWeight.w600),
           hintStyle: TextStyle(color: AppColors.textTertiary),
         ),
         useMaterial3: true,

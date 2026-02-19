@@ -30,16 +30,27 @@ class UserProfileDialog extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
+                      spacing: 10,
                       children: [
-                        Icon(Icons.person, color: AppColors.actionPrimary, size: 22),
-                        SizedBox(width: 8),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.pallet.forestGreen.withValues(alpha: 0.12),
+                          ),
+                          child: Icon(Icons.person, color: AppColors.actionPrimary, size: 18),
+                        ),
                         Text('Thông tin phật tử',
-                            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
+                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
                       ],
                     ),
                     IconButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      icon: Icon(Icons.close, color: AppColors.textTertiary),
+                      style: IconButton.styleFrom(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      icon: Icon(Icons.close, color: AppColors.textTertiary, size: 20),
                     ),
                   ],
                 ),
@@ -86,10 +97,8 @@ class UserProfileDialog extends ConsumerWidget {
                   width: double.infinity,
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
-                        backgroundColor: user == null
-                            ? AppColors.actionPrimary
-                            : AppColors.actionSecondary),
-                    label: Text(user == null ? "Thêm mới" : "Cập nhập"),
+                        backgroundColor: AppColors.actionPrimary),
+                    label: Text(user == null ? "Thêm mới" : "Cập nhập", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                     onPressed: () {
                       onProfileUpdated(User(
                           fullName: formState.name.value.toUpperCase(),

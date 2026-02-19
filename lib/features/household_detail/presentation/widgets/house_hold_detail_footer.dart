@@ -18,41 +18,57 @@ class HouseHoldDetailFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDisabledForSave = printable ||
+        (currentHouseHold != null &&
+            currentHouseHold!.families
+                .any((family) => family.members.isEmpty));
+    final isDisabledForPrint = !printable ||
+        (currentHouseHold != null &&
+            currentHouseHold!.families
+                .any((family) => family.members.isEmpty));
+
     return Container(
       padding: const EdgeInsets.all(COMMON_PADDING),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceCard,
         border: Border(top: BorderSide(color: AppColors.surfaceDivider, width: 0.5)),
-        boxShadow: SHADOW_MD,
+        boxShadow: SHADOW_SM,
       ),
       child: Row(
         spacing: COMMON_SPACING,
         children: [
-          FilledButton.icon(
-            style: FilledButton.styleFrom(
-                backgroundColor: AppColors.actionSecondary),
-            icon: Icon(Icons.save_alt),
-            label: Text("Lưu thay đổi"),
-            onPressed: printable ||
-                    (currentHouseHold != null &&
-                        currentHouseHold!.families
-                            .any((family) => family.members.isEmpty))
-                ? null
-                : () {
-                    onSaveChanges();
-                  },
+          Expanded(
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.actionPrimary,
+                padding: EdgeInsets.symmetric(horizontal: COMMON_PADDING, vertical: 12),
+              ),
+              icon: Icon(Icons.save_alt, size: 18),
+              label: Text("Lưu thay đổi", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+              onPressed: isDisabledForSave
+                  ? null
+                  : () {
+                      onSaveChanges();
+                    },
+            ),
           ),
-          FilledButton.icon(
-            icon: Icon(Icons.print),
-            label: Text("In"),
-            onPressed: !printable ||
-                    (currentHouseHold != null &&
-                        currentHouseHold!.families
-                            .any((family) => family.members.isEmpty))
-                ? null
-                : () {
-                    onPrint();
-                  },
+          Expanded(
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: AppColors.actionWarning,
+                  width: 1.5,
+                ),
+                padding: EdgeInsets.symmetric(horizontal: COMMON_PADDING, vertical: 12),
+              ),
+              icon: Icon(Icons.print, size: 18),
+              label: Text("In", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+              onPressed: isDisabledForPrint
+                  ? null
+                  : () {
+                      onPrint();
+                    },
+            ),
           ),
         ],
       ),
