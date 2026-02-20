@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ss_lotus/entities/user.dart';
 import 'package:ss_lotus/themes/colors.dart';
+import 'package:ss_lotus/widgets/app_button.dart';
+import 'package:ss_lotus/widgets/app_icon_button.dart';
 import 'package:ss_lotus/utils/constants.dart';
 import 'package:ss_lotus/widgets/dialog/user_profile/user_profile_dialog_provider.dart';
 
@@ -45,12 +47,10 @@ class UserProfileDialog extends ConsumerWidget {
                             style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
                       ],
                     ),
-                    IconButton(
+                    AppIconButton(
+                      icon: Icons.close,
+                      iconSize: 20,
                       onPressed: () => Navigator.of(context).pop(),
-                      style: IconButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      icon: Icon(Icons.close, color: AppColors.textTertiary, size: 20),
                     ),
                   ],
                 ),
@@ -95,10 +95,10 @@ class UserProfileDialog extends ConsumerWidget {
                 ),
                 SizedBox(
                   width: double.infinity,
-                  child: FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.actionPrimary),
-                    label: Text(user == null ? "Thêm mới" : "Cập nhập", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  child: AppButton(
+                    variant: AppButtonVariant.elevated,
+                    label: user == null ? 'Thêm mới' : 'Cập nhập',
+                    color: AppColors.actionPrimary,
                     onPressed: () {
                       onProfileUpdated(User(
                           fullName: formState.name.value.toUpperCase(),

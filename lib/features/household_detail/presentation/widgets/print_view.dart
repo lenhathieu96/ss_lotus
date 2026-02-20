@@ -13,7 +13,7 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
           top: COMMON_PADDING,
           right: 1.5 * COMMON_PADDING,
           left: 1.5 * COMMON_PADDING,
-          bottom: 2 * COMMON_PADDING),
+          bottom: 4 * COMMON_PADDING),
       header: (context) {
         if (context.pageNumber > 1) {
           return pw.Container();
@@ -59,14 +59,17 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
       },
       footer: (context) {
         if (context.pagesCount > 1 && context.pageNumber < context.pagesCount) {
-          return pw.Row(children: [
-            pw.Spacer(),
-            pw.Text("Trang tiếp theo",
-                style: pw.TextStyle(
-                  font: pageBoldFont,
-                  fontSize: 10,
-                ))
-          ]);
+          return pw.Padding(
+            padding: const pw.EdgeInsets.only(top: COMMON_SPACING),
+            child: pw.Row(children: [
+              pw.Spacer(),
+              pw.Text("Trang tiếp theo",
+                  style: pw.TextStyle(
+                    font: pageBoldFont,
+                    fontSize: 10,
+                  ))
+            ]),
+          );
         }
         return pw.Container();
       },

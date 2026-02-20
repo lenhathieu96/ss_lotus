@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ss_lotus/themes/colors.dart';
-
 import 'package:ss_lotus/utils/constants.dart';
+import 'package:ss_lotus/widgets/app_button.dart';
 
 import '../provider/household_detail_provider.dart';
-import 'widgets/families_list.dart';
+import 'widgets/family_list.dart';
 import 'widgets/house_hold_detail_footer.dart';
 import 'widgets/house_hold_detail_header.dart';
 
@@ -118,21 +118,18 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                           ),
                           SizedBox(
                             height: TOOLBAR_ELEMENT_HEIGHT,
-                            child: FilledButton.icon(
-                                style: FilledButton.styleFrom(
-                                    backgroundColor: AppColors.actionPrimary),
-                                onPressed: houseHoldDetail.household != null
-                                    ? null
-                                    : () {
-                                        houseHoldNotifier
-                                            .openAddNewFamilyDialog(
-                                                context, null, null, true);
-                                      },
-                                icon: Icon(Icons.add),
-                                label: Text(
-                                  'Tạo gia đình mới',
-                                  style: TextStyle(fontSize: 14),
-                                )),
+                            child: AppButton(
+                              variant: AppButtonVariant.elevated,
+                              icon: Icons.add,
+                              label: 'Tạo gia đình mới',
+                              color: AppColors.actionPrimary,
+                              onPressed: houseHoldDetail.household != null
+                                  ? null
+                                  : () {
+                                      houseHoldNotifier.openAddNewFamilyDialog(
+                                          context, null, null, true);
+                                    },
+                            ),
                           ),
                         ],
                       )),
@@ -188,13 +185,14 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(height: SPACE_MD),
-                            OutlinedButton.icon(
+                            AppButton(
+                              icon: Icons.search,
+                              label: 'Tìm kiếm hộ gia đình',
+                              color: AppColors.actionPrimary,
                               onPressed: () {
                                 houseHoldNotifier.openSearchHouseholdsDialog(
                                     context, false);
                               },
-                              icon: Icon(Icons.search),
-                              label: Text('Tìm kiếm hộ gia đình'),
                             ),
                           ],
                         ),
@@ -226,7 +224,7 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                                   houseHoldNotifier.onClearHousehold,
                             ),
                             Expanded(
-                              child: FamiliesList(
+                              child: FamilyList(
                                 families: houseHoldDetail.household!.families,
                                 onEditAddress:
                                     houseHoldNotifier.openAddNewFamilyDialog,

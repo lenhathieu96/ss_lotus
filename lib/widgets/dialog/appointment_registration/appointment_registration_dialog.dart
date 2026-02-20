@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ss_lotus/entities/appointment.dart';
 import 'package:ss_lotus/entities/common.enum.dart';
 import 'package:ss_lotus/themes/colors.dart';
+import 'package:ss_lotus/widgets/app_button.dart';
+import 'package:ss_lotus/widgets/app_icon_button.dart';
 import 'package:ss_lotus/utils/constants.dart';
 import 'package:ss_lotus/utils/utils.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -63,12 +65,10 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    IconButton(
+                    AppIconButton(
+                      icon: Icons.close,
+                      iconSize: 20,
                       onPressed: () => Navigator.of(context).pop(),
-                      style: IconButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      icon: Icon(Icons.close, color: AppColors.textTertiary, size: 20),
                     ),
                   ],
                 ),
@@ -200,13 +200,12 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
                 // ),
                 SizedBox(
                   width: double.infinity,
-                  child: FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                        backgroundColor: defaultAppointment == null
-                            ? AppColors.actionPrimary
-                            : AppColors.actionSchedule),
-                    label: Text(
-                        defaultAppointment == null ? "Đăng ký" : "Cập nhập"),
+                  child: AppButton(
+                    variant: AppButtonVariant.elevated,
+                    label: defaultAppointment == null ? 'Đăng ký' : 'Cập nhập',
+                    color: defaultAppointment == null
+                        ? AppColors.actionPrimary
+                        : AppColors.actionSchedule,
                     onPressed: !formState.isValid
                         ? null
                         : () {

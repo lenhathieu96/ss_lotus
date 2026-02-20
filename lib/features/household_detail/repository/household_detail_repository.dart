@@ -8,13 +8,13 @@ import 'package:ss_lotus/entities/user_group.dart';
 part 'household_detail_repository.g.dart';
 
 abstract class HouseHoldDetailRepositoryProtocol {
-  Future migrateDB();
   Future splitFamily(HouseHold currentHouseHold, UserGroup splitFamily);
   Future combineFamily(HouseHold updatedHouseHold, HouseHold removedHouseHold);
   Future updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
       HouseHold? unusedHouseHold, bool isInitHousehold);
   Future createHouseHold(HouseHold houseHold);
-  Future<HouseHold?> getHouseHoldById(int id);
+  Future<HouseHold?> getHouseHoldById(int id, int? oldId);
+  Future<int> getNextHouseholdId();
   Future<void> backfillSearchKeywords();
 }
 
@@ -30,8 +30,9 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
   }
 
   @override
-  Future<HouseHold?> getHouseHoldById(int id) async {
-    final doc = await householdRef.doc(id.toString()).get();
+  Future<HouseHold?> getHouseHoldById(int id, int? oldId) async {
+    int queryId = oldId ?? id;
+    final doc = await householdRef.doc(queryId.toString()).get();
     if (!doc.exists) return null;
     return HouseHold.fromJson(doc.data() as Map<String, dynamic>);
   }
@@ -79,59 +80,26 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
   }
 
   @override
-  Future migrateDB() async {
-    int batchSize = 100;
-    DocumentSnapshot? lastDoc;
-    int processedCount = 0;
-
-    while (true) {
-      Query query = FirebaseFirestore.instance
-          .collection("pagoda/TDHP/families")
-          .orderBy("id")
-          .limit(batchSize);
-
-      if (lastDoc != null) {
-        query = query.startAfterDocument(lastDoc);
-      }
-
-      QuerySnapshot querySnapshot = await query.get();
-      List<DocumentSnapshot> documents = querySnapshot.docs;
-
-      if (documents.isEmpty) break;
-
-      List<HouseHold> formattedData = documents
-          .map((doc) {
-            try {
-              return HouseHold.fromJson(doc.data() as Map<String, dynamic>);
-            } catch (e) {
-              debugPrint("Error parsing document ID: ${doc.id}, Error: $e");
-              return null;
-            }
-          })
-          .whereType<HouseHold>()
-          .toList();
-      WriteBatch batch = db.batch();
-      for (var formattedDoc in formattedData) {
-        batch.set(householdRef.doc(formattedDoc.id.toString()),
-            _toJsonWithKeywords(formattedDoc), SetOptions(merge: true));
-      }
-
-      await batch.commit();
-      processedCount += formattedData.length;
-
-      debugPrint("Processed $processedCount documents...");
-
-      lastDoc = documents.last;
-    }
-  }
-
-  @override
   Future createHouseHold(HouseHold houseHold) async {
     final docRef = householdRef.doc(houseHold.id.toString());
     final docSnapshot = await docRef.get();
     if (!docSnapshot.exists) {
       await docRef.set(_toJsonWithKeywords(houseHold));
     }
+  }
+
+  @override
+  Future<int> getNextHouseholdId() async {
+    // Counter doc is keyed by the group/collection name (e.g. "tdhp")
+    final counterRef = db.collection('counters').doc(householdRef.id);
+
+    return await db.runTransaction<int>((transaction) async {
+      final snapshot = await transaction.get(counterRef);
+      final nextId =
+          snapshot.exists ? ((snapshot.data()!['lastId'] as int) + 1) : 1;
+      transaction.set(counterRef, {'lastId': nextId}, SetOptions(merge: true));
+      return nextId;
+    });
   }
 
   @override

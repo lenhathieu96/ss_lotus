@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ss_lotus/entities/household.dart';
 import 'package:ss_lotus/themes/colors.dart';
 import 'package:ss_lotus/utils/constants.dart';
+import 'package:ss_lotus/widgets/app_button.dart';
 
 class HouseHoldDetailFooter extends StatelessWidget {
   final bool printable;
@@ -18,56 +19,44 @@ class HouseHoldDetailFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDisabledForSave = printable ||
-        (currentHouseHold != null &&
-            currentHouseHold!.families
-                .any((family) => family.members.isEmpty));
-    final isDisabledForPrint = !printable ||
-        (currentHouseHold != null &&
-            currentHouseHold!.families
-                .any((family) => family.members.isEmpty));
+    final hasEmptyFamily = currentHouseHold != null &&
+        currentHouseHold!.families.any((f) => f.members.isEmpty);
+    final isDisabledForSave = printable || hasEmptyFamily;
+    final isDisabledForPrint = !printable || hasEmptyFamily;
 
     return Container(
-      padding: const EdgeInsets.all(COMMON_PADDING),
+      padding: const EdgeInsets.symmetric(
+          horizontal: COMMON_PADDING, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.surfaceCard,
-        border: Border(top: BorderSide(color: AppColors.surfaceDivider, width: 0.5)),
-        boxShadow: SHADOW_SM,
+        border: Border(
+            top: BorderSide(color: AppColors.surfaceDivider, width: 1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: Row(
-        spacing: COMMON_SPACING,
+        spacing: 12,
         children: [
           Expanded(
-            child: FilledButton.icon(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.actionPrimary,
-                padding: EdgeInsets.symmetric(horizontal: COMMON_PADDING, vertical: 12),
-              ),
-              icon: Icon(Icons.save_alt, size: 18),
-              label: Text("Lưu thay đổi", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-              onPressed: isDisabledForSave
-                  ? null
-                  : () {
-                      onSaveChanges();
-                    },
+            child: AppButton(
+              variant: AppButtonVariant.elevated,
+              icon: Icons.save_alt,
+              label: 'Lưu thay đổi',
+              color: AppColors.actionPrimary,
+              onPressed: isDisabledForSave ? null : onSaveChanges,
             ),
           ),
           Expanded(
-            child: OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: AppColors.actionWarning,
-                  width: 1.5,
-                ),
-                padding: EdgeInsets.symmetric(horizontal: COMMON_PADDING, vertical: 12),
-              ),
-              icon: Icon(Icons.print, size: 18),
-              label: Text("In", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-              onPressed: isDisabledForPrint
-                  ? null
-                  : () {
-                      onPrint();
-                    },
+            child: AppButton(
+              icon: Icons.print,
+              label: 'In',
+              color: AppColors.actionWarning,
+              onPressed: isDisabledForPrint ? null : onPrint,
             ),
           ),
         ],

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ss_lotus/entities/household.dart';
 import 'package:ss_lotus/entities/user_group.dart';
 import 'package:ss_lotus/themes/colors.dart';
+import 'package:ss_lotus/widgets/app_button.dart';
+import 'package:ss_lotus/widgets/app_icon_button.dart';
 import 'package:ss_lotus/utils/constants.dart';
 import 'package:ss_lotus/utils/debounce.dart';
 
@@ -88,19 +90,15 @@ class _SearchHouseholdsDialogState
                           Row(
                             spacing: COMMON_SPACING,
                             children: [
-                              Tooltip(
-                                message: "Đóng",
-                                child: IconButton(
-                                    onPressed: () {
-                                      searchController.clear();
-                                      searchedHouseholdsNotifier
-                                          .searchHouseHolds("");
-                                      Navigator.of(context).pop();
-                                    },
-                                    icon: Icon(
-                                      Icons.close_rounded,
-                                      color: AppColors.textTertiary,
-                                    )),
+                              AppIconButton(
+                                icon: Icons.close_rounded,
+                                tooltip: 'Đóng',
+                                onPressed: () {
+                                  searchController.clear();
+                                  searchedHouseholdsNotifier
+                                      .searchHouseHolds("");
+                                  Navigator.of(context).pop();
+                                },
                               ),
                               if (widget.onAddNewFamily != null)
                                 Container(
@@ -330,13 +328,14 @@ class _SearchHouseholdsDialogState
                                               color: AppColors.textTertiary),
                                         ),
                                         if (widget.onAddNewFamily != null)
-                                          OutlinedButton.icon(
+                                          AppButton(
+                                            icon: Icons.add,
+                                            label: 'Tạo gia đình mới',
+                                            color: AppColors.actionPrimary,
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                               widget.onAddNewFamily!();
                                             },
-                                            icon: Icon(Icons.add),
-                                            label: Text("Tạo gia đình mới"),
                                           ),
                                       ],
                                     ),

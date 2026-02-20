@@ -43,7 +43,6 @@ dependencies:
   printing: ^5.14.2
   pdf: ^3.11.3
   vnlunar: ^1.1.1
-  drag_and_drop_lists: ^0.4.2
   intl: ^0.20.2
   toastification: ^2.3.0
   formz: ^0.8.0

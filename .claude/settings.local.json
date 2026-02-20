@@ -8,7 +8,10 @@
       "Bash(flutter analyze:*)",
       "Bash(flutter build:*)",
       "WebFetch(domain:pub.dev)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(python3:*)",
+      "Bash(wc:*)",
+      "Bash(test:*)"
     ]
   }
 }

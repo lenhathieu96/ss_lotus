@@ -3,6 +3,9 @@ import 'package:ss_lotus/entities/appointment.dart';
 import 'package:ss_lotus/themes/colors.dart';
 import 'package:ss_lotus/utils/constants.dart';
 import 'package:ss_lotus/utils/utils.dart';
+import 'package:ss_lotus/widgets/info_badge.dart';
+import 'package:ss_lotus/widgets/app_button.dart';
+import 'package:ss_lotus/widgets/app_icon_button.dart';
 
 class HouseHoldDetailHeader extends StatelessWidget {
   final int houseHoldId;
@@ -27,178 +30,85 @@ class HouseHoldDetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(COMMON_PADDING),
+    return Container(
+      padding:
+          const EdgeInsets.symmetric(horizontal: COMMON_PADDING, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceCard,
+        border: Border(
+            bottom: BorderSide(color: AppColors.surfaceDivider, width: 1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
-        spacing: COMMON_PADDING,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 10,
         children: [
+          // ── Row 1: badges + close ─────────────────────────────────────────
           Row(
-            spacing: 10.0,
+            spacing: 10,
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceCardAlt,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 6.0,
-                  children: [
-                    Icon(Icons.tag, size: 16, color: AppColors.textSecondary),
-                    Text("Mã số ",
-                        style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w500)),
-                    Text(houseHoldId.toString(),
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary)),
-                  ],
-                ),
+              InfoBadge(
+                icon: Icons.home_outlined,
+                label: 'Mã số',
+                value: houseHoldId.toString(),
+                variant: InfoBadgeVariant.green,
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceCardAlt,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 6.0,
-                  children: [
-                    Icon(Icons.family_restroom,
-                        size: 16, color: AppColors.textSecondary),
-                    Text("Số gia đình ",
-                        style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w500)),
-                    Text(familyQuantity.toString(),
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary)),
-                  ],
-                ),
+              InfoBadge(
+                icon: Icons.people_outline,
+                label: 'Số gia đình',
+                value: familyQuantity.toString(),
+                variant: InfoBadgeVariant.purple,
               ),
               if (oldId != null)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceCardAlt,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: 6.0,
-                    children: [
-                      Icon(Icons.history,
-                          size: 16, color: AppColors.textSecondary),
-                      Text("Mã cũ ",
-                          style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w500)),
-                      Text(oldId.toString(),
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary)),
-                    ],
-                  ),
+                InfoBadge(
+                  label: 'Mã cũ',
+                  value: oldId.toString(),
+                  variant: InfoBadgeVariant.gray,
                 ),
-              if (appointment != null)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.pallet.forestGreen.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        color: AppColors.actionSuccess.withValues(alpha: 0.3),
-                        width: 0.5),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: 6.0,
-                    children: [
-                      Icon(Icons.check_circle,
-                          size: 16, color: AppColors.actionSuccess),
-                      Text("Đã đăng ký",
-                          style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.actionSuccess,
-                              fontWeight: FontWeight.w500)),
-                    ],
-                  ),
-                ),
-              Spacer(),
-              Tooltip(
-                message: "Đóng",
-                child: IconButton(
-                  style: IconButton.styleFrom(
-                    shape: const CircleBorder(),
-                    side: BorderSide(
-                        color: AppColors.actionDanger.withValues(alpha: 0.2),
-                        width: 1.5),
-                  ),
-                  onPressed: () {
-                    onClearHouseHold();
-                  },
-                  icon: Icon(
-                    Icons.close,
-                    color: AppColors.actionDanger,
-                    size: 18.0,
-                  ),
-                ),
-              )
+              const Spacer(),
+              // ── Close button ───────────────────────────────────────────
+              AppIconButton(
+                icon: Icons.close,
+                iconSize: 18,
+                size: 36,
+                tooltip: 'Đóng',
+                onPressed: onClearHouseHold,
+              ),
             ],
           ),
-          Divider(),
+
+          // ── Row 2: action buttons ─────────────────────────────────────────
           Row(
-            spacing: COMMON_SPACING,
+            spacing: 10,
             children: [
-              FilledButton.icon(
-                style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.actionWarning),
-                icon: Icon(Icons.group_add),
-                label: Text("Gộp gia đình"),
-                onPressed: () {
-                  onCombineFamily(context, true);
-                },
+              AppButton(
+                color: AppColors.actionSchedule,
+                icon: Icons.merge_outlined,
+                label: 'Gộp gia đình',
+                onPressed: () => onCombineFamily(context, true),
               ),
               appointment != null
-                  ? OutlinedButton.icon(
-                      icon: Icon(
-                        Icons.check,
-                        color: AppColors.actionSuccess,
-                      ),
-                      label: Text(
-                          "Đã đăng ký ${Utils.getAppointmentTitle(appointment, false)}",
-                          style: TextStyle(color: AppColors.actionSuccess)),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: AppColors.actionSuccess),
-                      ),
-                      onPressed: () {
-                        onRegisterAppointment(context, appointment);
-                      })
-                  : FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.actionSchedule),
-                      icon: Icon(Icons.calendar_month),
-                      label: Text("Đăng ký lịch"),
-                      onPressed: () {
-                        onRegisterAppointment(context, appointment);
-                      },
+                  ? AppButton(
+                      color: AppColors.actionSuccess,
+                      icon: Icons.check,
+                      label:
+                          'Đã đăng ký ${Utils.getAppointmentTitle(appointment, false)}',
+                      onPressed: () =>
+                          onRegisterAppointment(context, appointment),
+                    )
+                  : AppButton(
+                      color: AppColors.actionSuccess,
+                      icon: Icons.calendar_month_outlined,
+                      label: 'Đăng ký cầu an',
+                      onPressed: () =>
+                          onRegisterAppointment(context, appointment),
                     ),
             ],
           ),

@@ -31,10 +31,10 @@ class HouseHoldDetail extends _$HouseHoldDetail {
     return HouseholdDetailState();
   }
 
-  void _addNewFamily(String address, int? defaultHouseHoldId) {
+  void _addNewFamily(String address, int? defaultHouseHoldId) async {
     final currentHouseHold = state.household;
-    int timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    final houseHoldId = defaultHouseHoldId ?? timestamp;
+    final houseHoldId =
+        defaultHouseHoldId ?? await _repository.getNextHouseholdId();
 
     final UserGroup draftFamily =
         UserGroup(id: houseHoldId, address: address, members: []);
@@ -123,7 +123,8 @@ class HouseHoldDetail extends _$HouseHoldDetail {
   }
 
   void _selectHousehold(HouseHold selectedHousehold) async {
-    final household = await _repository.getHouseHoldById(selectedHousehold.id);
+    final household = await _repository.getHouseHoldById(
+        selectedHousehold.id, selectedHousehold.oldId);
     if (household != null) {
       state = state.copyWith(household: household);
     }
