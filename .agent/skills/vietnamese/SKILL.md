@@ -22,7 +22,7 @@ Vietnamese localization, lunar calendar, toast messages, and text conventions fo
 | Cancel | Không |
 | Confirm | Có |
 | Add new | Thêm mới |
-| Update | Cập nhập |
+| Update | Cập nhật |
 | Delete | Xoá |
 | Split family | Tách gia đình |
 | Combine family | Gộp gia đình |
@@ -46,7 +46,7 @@ import 'package:ss_lotus/utils/utils.dart';
 import 'package:ss_lotus/entities/common.enum.dart';
 
 // Success
-Utils.showToast("Cập nhập thành công", ToastStatus.success);
+Utils.showToast("Cập nhật thành công", ToastStatus.success);
 
 // Error
 Utils.showToast("Mã số này đã tồn tại", ToastStatus.error);

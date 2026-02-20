@@ -39,12 +39,17 @@ class UserProfileDialog extends ConsumerWidget {
                           height: 32,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.pallet.forestGreen.withValues(alpha: 0.12),
+                            color: AppColors.pallet.forestGreen
+                                .withValues(alpha: 0.12),
                           ),
-                          child: Icon(Icons.person, color: AppColors.actionPrimary, size: 18),
+                          child: Icon(Icons.person,
+                              color: AppColors.actionPrimary, size: 18),
                         ),
                         Text('Thông tin phật tử',
-                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                            style: TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary)),
                       ],
                     ),
                     AppIconButton(
@@ -97,7 +102,7 @@ class UserProfileDialog extends ConsumerWidget {
                   width: double.infinity,
                   child: AppButton(
                     variant: AppButtonVariant.elevated,
-                    label: user == null ? 'Thêm mới' : 'Cập nhập',
+                    label: user == null ? 'Thêm mới' : 'Cập nhật',
                     color: AppColors.actionPrimary,
                     onPressed: () {
                       onProfileUpdated(User(

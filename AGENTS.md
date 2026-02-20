@@ -164,6 +164,6 @@ abstract class HouseHoldDetailRepositoryProtocol {
 
 ### Toast notifications
 ```dart
-Utils.showToast("Cập nhập thành công", ToastStatus.success);
+Utils.showToast("Cập nhật thành công", ToastStatus.success);
 Utils.showToast("Lỗi xảy ra", ToastStatus.error);
 ```

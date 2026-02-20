@@ -184,7 +184,7 @@ int crossAxisCount = families.length == 1 ? 1
 
 ### Show toast
 ```dart
-Utils.showToast("Cập nhập thành công", ToastStatus.success);
+Utils.showToast("Cập nhật thành công", ToastStatus.success);
 Utils.showToast("Lỗi: không tìm thấy", ToastStatus.error);
 ```
 

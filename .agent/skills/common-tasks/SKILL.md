@@ -228,7 +228,7 @@ When saving, always call `_toJsonWithKeywords(household)` to keep keywords fresh
 import 'package:ss_lotus/utils/utils.dart';
 import 'package:ss_lotus/entities/common.enum.dart';
 
-Utils.showToast("Cập nhập thành công", ToastStatus.success);
+Utils.showToast("Cập nhật thành công", ToastStatus.success);
 Utils.showToast("Mã số đã tồn tại", ToastStatus.error);
 ```
 

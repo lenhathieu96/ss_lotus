@@ -118,7 +118,7 @@ void _selectHousehold(HouseHold selectedHousehold) async {
 2. Calls `_repository.updateHouseHoldDetailChanged(household, unusedHouseHold, isInitHousehold, isNewAutoId: state.isNewAutoId)`.
 3. Repository saves the household and returns the confirmed `HouseHold` (id may differ from tentative if counter advanced concurrently).
 4. On success: `state.printable = true`, `state.household = confirmed`, `state.unusedHouseHold = null`, `state.isInitHousehold = false`, `state.isNewAutoId = false`.
-5. Shows "Cập nhập thành công" success toast.
+5. Shows "Cập nhật thành công" success toast.
 6. On error: shows error toast with the exception message.
 
 **Rules:**
@@ -184,7 +184,7 @@ A **family** (`UserGroup`) lives inside a household's `families` list. All famil
      - Updates `tdhp/{currentHouseholdId}` with the family removed.
      - Creates `tdhp/{splitFamilyId}` as a brand-new household with only the split family.
    - Sets `state.household = null` (clears the view).
-   - Shows "Cập nhập thành công" toast.
+   - Shows "Cập nhật thành công" toast.
 
 **Rules:**
 - The split family's `id` becomes the new household's `id`.
@@ -206,7 +206,7 @@ A **family** (`UserGroup`) lives inside a household's `families` list. All famil
    - Calls `_repository.combineFamily(updatedHouseHold, removedHouseHold)` — **atomic batch write**:
      - Updates `tdhp/{currentHouseholdId}` with the new family added.
      - **Deletes** `tdhp/{removedHouseholdId}`.
-   - Shows "Cập nhập thành công" toast.
+   - Shows "Cập nhật thành công" toast.
 
 **Rules:**
 - Source household for combine must have exactly 1 family.

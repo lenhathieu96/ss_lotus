@@ -20,12 +20,18 @@ class InfoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bgColor, fgColor) = switch (variant) {
-      InfoBadgeVariant.green =>
-        (AppColors.actionPrimary.withValues(alpha: 0.12), AppColors.actionPrimary),
-      InfoBadgeVariant.purple =>
-        (AppColors.actionSchedule.withValues(alpha: 0.12), AppColors.actionSchedule),
-      InfoBadgeVariant.gray =>
-        (AppColors.surfaceCardAlt, AppColors.textSecondary),
+      InfoBadgeVariant.green => (
+          AppColors.actionPrimary.withValues(alpha: 0.12),
+          AppColors.actionPrimary
+        ),
+      InfoBadgeVariant.purple => (
+          AppColors.actionSchedule.withValues(alpha: 0.12),
+          AppColors.actionSchedule
+        ),
+      InfoBadgeVariant.gray => (
+          AppColors.surfaceCardAlt,
+          AppColors.textSecondary
+        ),
     };
 
     return Container(
@@ -41,7 +47,7 @@ class InfoBadge extends StatelessWidget {
           if (icon != null) Icon(icon, size: 14, color: fgColor),
           Text.rich(
             TextSpan(
-              style: TextStyle(fontSize: 13, color: fgColor),
+              style: TextStyle(fontSize: 14, color: fgColor),
               children: [
                 TextSpan(text: value != null ? '$label: ' : label),
                 if (value != null)

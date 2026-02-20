@@ -84,7 +84,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
 
       //5: update local state and show toast message
       state = state.copyWith(printable: false, household: null);
-      Utils.showToast("Cập nhập thành công", ToastStatus.success);
+      Utils.showToast("Cập nhật thành công", ToastStatus.success);
     } catch (error) {
       debugPrint("Error on split family: ${error.toString()}");
     }
@@ -120,7 +120,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
 
     state = state.copyWith(household: updatedHouseHold);
     await _repository.combineFamily(updatedHouseHold, selectedHouseHold);
-    Utils.showToast("Cập nhập thành công", ToastStatus.success);
+    Utils.showToast("Cập nhật thành công", ToastStatus.success);
   }
 
   void _selectHousehold(HouseHold selectedHousehold) async {
@@ -287,7 +287,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
       final confirmed = await _repository.updateHouseHoldDetailChanged(
           houseHold, state.unusedHouseHold, state.isInitHousehold,
           isNewAutoId: state.isNewAutoId);
-      Utils.showToast("Cập nhập thành công", ToastStatus.success);
+      Utils.showToast("Cập nhật thành công", ToastStatus.success);
       state = state.copyWith(
           printable: true,
           household: confirmed,

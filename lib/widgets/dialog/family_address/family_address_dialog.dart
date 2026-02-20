@@ -43,12 +43,17 @@ class FamilyAddressDialog extends ConsumerWidget {
                           height: 32,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.pallet.forestGreen.withValues(alpha: 0.12),
+                            color: AppColors.pallet.forestGreen
+                                .withValues(alpha: 0.12),
                           ),
-                          child: Icon(Icons.location_on, color: AppColors.actionPrimary, size: 18),
+                          child: Icon(Icons.location_on,
+                              color: AppColors.actionPrimary, size: 18),
                         ),
                         Text('Thông tin địa chỉ',
-                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                            style: TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary)),
                       ],
                     ),
                     AppIconButton(
@@ -67,63 +72,62 @@ class FamilyAddressDialog extends ConsumerWidget {
                         },
                         child: Text(
                           "Hộ đã tồn tại mã số trước đó?",
-                          style:
-                              TextStyle(color: AppColors.actionPrimary),
+                          style: TextStyle(color: AppColors.actionPrimary),
                         )),
                   ),
                 TextFormField(
-                        initialValue: formState.address.value,
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          labelText: 'Địa chỉ',
-                          errorText: formState.address.isNotValid
-                              ? formState.address.error
-                              : null,
-                        ),
-                        onChanged: (value) => formNotifier.updateAddress(value),
-                        textInputAction: TextInputAction.next,
-                        onFieldSubmitted: (_) {
-                          if (formState.address.value.isNotEmpty) {
-                            onAddressUpdated(
-                                formState.address.value.toUpperCase(),
-                                formState.houseHoldId.value.isNotEmpty
-                                    ? int.parse(formState.houseHoldId.value)
-                                    : null);
-                            Navigator.of(context).pop();
-                          }
-                        }),
+                    initialValue: formState.address.value,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: 'Địa chỉ',
+                      errorText: formState.address.isNotValid
+                          ? formState.address.error
+                          : null,
+                    ),
+                    onChanged: (value) => formNotifier.updateAddress(value),
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) {
+                      if (formState.address.value.isNotEmpty) {
+                        onAddressUpdated(
+                            formState.address.value.toUpperCase(),
+                            formState.houseHoldId.value.isNotEmpty
+                                ? int.parse(formState.houseHoldId.value)
+                                : null);
+                        Navigator.of(context).pop();
+                      }
+                    }),
                 AnimatedSize(
                   duration: const Duration(milliseconds: 200),
                   child: formState.hasExistedId == true
-                    ? TextFormField(
-                        initialValue: formState.houseHoldId.value,
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          labelText: 'Mã số',
-                          errorText: formState.houseHoldId.isNotValid
-                              ? formState.houseHoldId.error
-                              : null,
-                        ),
-                        onChanged: (value) =>
-                            formNotifier.updateHouseholdId(value),
-                        textInputAction: TextInputAction.next,
-                        onFieldSubmitted: (_) {
-                          if (formState.houseHoldId.value.isNotEmpty) {
-                            onAddressUpdated(
-                                formState.address.value.toUpperCase(),
-                                formState.houseHoldId.value.isNotEmpty
-                                    ? int.parse(formState.houseHoldId.value)
-                                    : null);
-                            Navigator.of(context).pop();
-                          }
-                        })
-                    : SizedBox(),
+                      ? TextFormField(
+                          initialValue: formState.houseHoldId.value,
+                          autofocus: true,
+                          decoration: InputDecoration(
+                            labelText: 'Mã số',
+                            errorText: formState.houseHoldId.isNotValid
+                                ? formState.houseHoldId.error
+                                : null,
+                          ),
+                          onChanged: (value) =>
+                              formNotifier.updateHouseholdId(value),
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) {
+                            if (formState.houseHoldId.value.isNotEmpty) {
+                              onAddressUpdated(
+                                  formState.address.value.toUpperCase(),
+                                  formState.houseHoldId.value.isNotEmpty
+                                      ? int.parse(formState.houseHoldId.value)
+                                      : null);
+                              Navigator.of(context).pop();
+                            }
+                          })
+                      : SizedBox(),
                 ),
                 SizedBox(
                   width: double.infinity,
                   child: AppButton(
                     variant: AppButtonVariant.elevated,
-                    label: defaultAddress == null ? 'Thêm mới' : 'Cập nhập',
+                    label: defaultAddress == null ? 'Thêm mới' : 'Cập nhật',
                     color: AppColors.actionPrimary,
                     onPressed: () {
                       onAddressUpdated(
