@@ -86,7 +86,7 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                     ),
                   ),
                   Expanded(
-                      flex: 4,
+                      flex: 5,
                       child: Row(
                         spacing: COMMON_PADDING,
                         children: [
@@ -95,6 +95,10 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                               height: TOOLBAR_ELEMENT_HEIGHT,
                               child: SearchBar(
                                 autoFocus: false,
+                                shape: WidgetStatePropertyAll(
+                                    RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            COMMON_BORDER_RADIUS))),
                                 overlayColor:
                                     WidgetStatePropertyAll(Colors.transparent),
                                 backgroundColor: WidgetStatePropertyAll(
