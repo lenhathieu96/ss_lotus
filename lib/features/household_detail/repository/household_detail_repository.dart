@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ss_lotus/entities/household.dart';
@@ -10,12 +10,12 @@ part 'household_detail_repository.g.dart';
 abstract class HouseHoldDetailRepositoryProtocol {
   Future splitFamily(HouseHold currentHouseHold, UserGroup splitFamily);
   Future combineFamily(HouseHold updatedHouseHold, HouseHold removedHouseHold);
-  Future updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
-      HouseHold? unusedHouseHold, bool isInitHousehold);
+  Future<HouseHold> updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
+      HouseHold? unusedHouseHold, bool isInitHousehold,
+      {bool isNewAutoId = false});
   Future createHouseHold(HouseHold houseHold);
   Future<HouseHold?> getHouseHoldById(int id, int? oldId);
   Future<int> getNextHouseholdId();
-  Future<void> backfillSearchKeywords();
 }
 
 class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
@@ -31,8 +31,7 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
 
   @override
   Future<HouseHold?> getHouseHoldById(int id, int? oldId) async {
-    int queryId = oldId ?? id;
-    final doc = await householdRef.doc(queryId.toString()).get();
+    final doc = await householdRef.doc(id.toString()).get();
     if (!doc.exists) return null;
     return HouseHold.fromJson(doc.data() as Map<String, dynamic>);
   }
@@ -52,19 +51,45 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
   }
 
   @override
-  Future updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
-      HouseHold? unusedHouseHold, bool isInitHousehold) async {
-    final docRef = householdRef.doc(updatedHouseHold.id.toString());
+  Future<HouseHold> updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
+      HouseHold? unusedHouseHold, bool isInitHousehold,
+      {bool isNewAutoId = false}) async {
+    final counterRef = db.collection('counters').doc(householdRef.id);
 
+    if (isNewAutoId) {
+      late HouseHold confirmedHousehold;
+      await db.runTransaction((transaction) async {
+        final counterSnap = await transaction.get(counterRef);
+        final confirmedId = counterSnap.exists
+            ? ((counterSnap.data()!['lastId'] as int) + 1)
+            : 1;
+
+        confirmedHousehold = updatedHouseHold.id == confirmedId
+            ? updatedHouseHold
+            : updatedHouseHold.copyWith(
+                families: updatedHouseHold.families
+                    .map((f) => f.copyWith(id: confirmedId))
+                    .toList(),
+                id: confirmedId,
+              );
+
+        final docRef = householdRef.doc(confirmedId.toString());
+        transaction.set(docRef, _toJsonWithKeywords(confirmedHousehold));
+        transaction.set(
+            counterRef, {'lastId': confirmedId}, SetOptions(merge: true));
+      });
+      return confirmedHousehold;
+    }
+
+    final docRef = householdRef.doc(updatedHouseHold.id.toString());
     if (isInitHousehold) {
       final docSnapshot = await docRef.get();
       if (docSnapshot.exists) {
         throw Exception("Mã số này đã tồn tại");
       }
     }
-    await householdRef
-        .doc(updatedHouseHold.id.toString())
-        .set(_toJsonWithKeywords(updatedHouseHold));
+    await docRef.set(_toJsonWithKeywords(updatedHouseHold));
+    return updatedHouseHold;
   }
 
   @override
@@ -93,41 +118,8 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
     // Counter doc is keyed by the group/collection name (e.g. "tdhp")
     final counterRef = db.collection('counters').doc(householdRef.id);
 
-    return await db.runTransaction<int>((transaction) async {
-      final snapshot = await transaction.get(counterRef);
-      final nextId =
-          snapshot.exists ? ((snapshot.data()!['lastId'] as int) + 1) : 1;
-      transaction.set(counterRef, {'lastId': nextId}, SetOptions(merge: true));
-      return nextId;
-    });
-  }
-
-  @override
-  Future<void> backfillSearchKeywords() async {
-    int batchSize = 100;
-    DocumentSnapshot? lastDoc;
-    int processedCount = 0;
-
-    while (true) {
-      Query query = householdRef.orderBy('id').limit(batchSize);
-      if (lastDoc != null) query = query.startAfterDocument(lastDoc);
-
-      final snapshot = await query.get();
-      if (snapshot.docs.isEmpty) break;
-
-      final batch = db.batch();
-      for (final doc in snapshot.docs) {
-        final household =
-            HouseHold.fromJson(doc.data() as Map<String, dynamic>);
-        batch.update(doc.reference, {
-          'searchKeywords': HouseHold.buildSearchKeywords(household),
-        });
-      }
-      await batch.commit();
-      processedCount += snapshot.docs.length;
-      lastDoc = snapshot.docs.last;
-      debugPrint("Backfilled $processedCount documents...");
-    }
+    final snapshot = await counterRef.get();
+    return snapshot.exists ? ((snapshot.data()!['lastId'] as int) + 1) : 1;
   }
 }
 

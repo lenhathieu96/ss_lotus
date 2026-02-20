@@ -92,9 +92,10 @@ void _selectHousehold(HouseHold selectedHousehold) async {
 2. User enters address. Optionally taps "Hộ đã tồn tại mã số trước đó?" to reveal an ID field and enters a manual ID.
 3. Dialog calls `onAddressUpdated(address, houseHoldId?)`.
 4. Provider `_addNewFamily(address, houseHoldId?)`:
-   - If no manual ID → calls `_repository.getNextHouseholdId()` (atomic Firestore transaction, auto-increment counter in `counters/tdhp`).
-   - Creates a new `UserGroup` with the resolved ID and the address.
-   - Creates a new `HouseHold` with `id = resolvedId`, `families = [newFamily]`.
+   - If no manual ID → calls `_repository.getNextHouseholdId()` (**plain read** of `counters/tdhp` — returns a tentative ID for display only, does **not** write the counter).
+   - Creates a new `UserGroup` with the tentative ID and the address.
+   - Creates a new `HouseHold` with `id = tentativeId`, `families = [newFamily]`.
+   - Sets `state.isNewAutoId = true`.
 5. `state.isInitHousehold = true` when a manual ID was provided.
 6. **Not yet saved to Firestore** — only local state updated. Save happens on "Lưu thay đổi".
 
@@ -102,7 +103,7 @@ void _selectHousehold(HouseHold selectedHousehold) async {
 - Household ID is 1–4 digits (validated in `HouseHoldIdInput`).
 - Address is required and non-empty (validated in `AddressInput`).
 - When saving with `isInitHousehold = true`, the repository checks if the document already exists → throws `Exception("Mã số này đã tồn tại")` if it does.
-- Auto-incremented IDs use a Firestore transaction to prevent race conditions.
+- Auto-incremented IDs are **confirmed and committed atomically on save** (see §2.3), not at ID-fetch time. The tentative ID shown in the UI may differ from the final confirmed ID if a concurrent save advanced the counter first.
 
 ### 2.3 Save Changes (Update)
 
@@ -114,9 +115,9 @@ void _selectHousehold(HouseHold selectedHousehold) async {
 
 **Flow:**
 1. Provider calls `onSaveChanges()`.
-2. Calls `_repository.updateHouseHoldDetailChanged(household, unusedHouseHold, isInitHousehold)`.
-3. Repository writes the full household document to `tdhp/{id}` using `set()` with fresh `searchKeywords`.
-4. On success: `state.printable = true`, `state.unusedHouseHold = null`, `state.isInitHousehold = false`.
+2. Calls `_repository.updateHouseHoldDetailChanged(household, unusedHouseHold, isInitHousehold, isNewAutoId: state.isNewAutoId)`.
+3. Repository saves the household and returns the confirmed `HouseHold` (id may differ from tentative if counter advanced concurrently).
+4. On success: `state.printable = true`, `state.household = confirmed`, `state.unusedHouseHold = null`, `state.isInitHousehold = false`, `state.isNewAutoId = false`.
 5. Shows "Cập nhập thành công" success toast.
 6. On error: shows error toast with the exception message.
 
@@ -124,6 +125,7 @@ void _selectHousehold(HouseHold selectedHousehold) async {
 - Every save overwrites the full document (not a merge).
 - `searchKeywords` are always regenerated on every save.
 - If `isInitHousehold == true`, save first checks for document existence and refuses if it already exists.
+- If `isNewAutoId == true`, save runs inside a Firestore **transaction** that atomically re-reads the counter, claims the next ID, writes the household doc, and increments the counter — preventing race conditions when multiple users create households simultaneously.
 
 ### 2.4 Clear / Close Household
 

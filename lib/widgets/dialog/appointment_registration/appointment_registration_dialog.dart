@@ -132,11 +132,13 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
                           width: DATE_PICKER_SIZE,
                           height: DATE_PICKER_SIZE,
                           decoration: BoxDecoration(
-                              color: AppColors.actionPrimary, shape: BoxShape.circle),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.actionPrimary, width: 1.5),
+                          ),
                           child: Center(
                             child: Text('${lunar?.day}',
                                 style: TextStyle(
-                                    fontSize: 14, color: Colors.white)),
+                                    fontSize: 14, color: AppColors.actionPrimary, fontWeight: FontWeight.w600)),
                           ),
                         );
                       },

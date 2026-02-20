@@ -12,6 +12,7 @@ abstract class HouseholdDetailState with _$HouseholdDetailState {
     @Default(null) HouseHold? household,
     @Default(true) bool printable,
     @Default(false) bool isInitHousehold,
+    @Default(false) bool isNewAutoId,
     @Default([]) List<UserGroup> suggestedFamilies,
   }) = _HouseholdDetailState;
 }

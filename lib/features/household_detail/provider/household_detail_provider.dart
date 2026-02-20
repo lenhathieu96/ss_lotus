@@ -56,7 +56,8 @@ class HouseHoldDetail extends _$HouseHoldDetail {
     state = state.copyWith(
         printable: false,
         household: updatedHousehold,
-        isInitHousehold: defaultHouseHoldId != null);
+        isInitHousehold: defaultHouseHoldId != null,
+        isNewAutoId: defaultHouseHoldId == null);
   }
 
   void _splitFamily(int familyId) async {
@@ -283,11 +284,16 @@ class HouseHoldDetail extends _$HouseHoldDetail {
     final houseHold = state.household;
     if (houseHold == null) return;
     try {
-      await _repository.updateHouseHoldDetailChanged(
-          houseHold, state.unusedHouseHold, state.isInitHousehold);
+      final confirmed = await _repository.updateHouseHoldDetailChanged(
+          houseHold, state.unusedHouseHold, state.isInitHousehold,
+          isNewAutoId: state.isNewAutoId);
       Utils.showToast("Cập nhập thành công", ToastStatus.success);
       state = state.copyWith(
-          printable: true, unusedHouseHold: null, isInitHousehold: false);
+          printable: true,
+          household: confirmed,
+          unusedHouseHold: null,
+          isInitHousehold: false,
+          isNewAutoId: false);
     } catch (e) {
       Utils.showToast(
           e.toString().replaceFirst("Exception:", ""), ToastStatus.error);
@@ -384,10 +390,6 @@ class HouseHoldDetail extends _$HouseHoldDetail {
             : _selectHousehold,
       ),
     );
-  }
-
-  void backfillSearchKeywords() async {
-    await _repository.backfillSearchKeywords();
   }
 
   //Print
