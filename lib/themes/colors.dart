@@ -19,6 +19,8 @@ class AppColors {
   static final Color actionWarning = pallet.deepGold;
   static final Color actionSuccess = pallet.sageGreen;
   static final Color actionSchedule = pallet.warmPurple;
+  static final Color actionInfo = const Color(0xFF0EA5E9);    // sky-500
+  static final Color actionAdd = const Color(0xFF10B981);     // emerald-500
 
   // Semantic - Surfaces
   static final Color surfaceBackground = pallet.warmCream;

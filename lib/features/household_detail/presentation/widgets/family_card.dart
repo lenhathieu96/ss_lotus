@@ -123,6 +123,7 @@ class _CardHeader extends StatelessWidget {
           if (showSplitButton) ...[
             const SizedBox(width: 10),
             AppButton(
+              variant: AppButtonVariant.elevated,
               icon: Icons.splitscreen,
               label: 'Tách hộ mới',
               color: AppColors.actionWarning,
@@ -163,7 +164,7 @@ class _CardFooter extends StatelessWidget {
             icon: Icons.person_add_outlined,
             label: "Thêm thành viên",
             onPressed: () => onUpdateUserProfile(context, familyId, null, null),
-            color: AppColors.actionPrimary,
+            color: AppColors.actionAdd,
           ),
         ],
       ),

@@ -30,7 +30,7 @@ class Utils {
   static String getAppointmentTitle(
       Appointment? appointment, bool? showSeparator) {
     final date = convertToLunarDate(appointment?.date);
-    if (appointment?.period == Period.unknown) {
+    if (appointment?.period == Period.unknown || date?.day == null) {
       return showSeparator == true ? "Chùa cúng" : "chùa cúng";
     }
     final periodTitle = getPeriodTitle(appointment?.period);

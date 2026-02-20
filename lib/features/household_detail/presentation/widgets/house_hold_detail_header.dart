@@ -96,7 +96,7 @@ class HouseHoldDetailHeader extends StatelessWidget {
               ),
               appointment != null
                   ? AppButton(
-                      color: AppColors.actionSuccess,
+                      color: AppColors.actionInfo,
                       icon: Icons.check,
                       label:
                           'Đã đăng ký ${Utils.getAppointmentTitle(appointment, false)}',
@@ -104,7 +104,7 @@ class HouseHoldDetailHeader extends StatelessWidget {
                           onRegisterAppointment(context, appointment),
                     )
                   : AppButton(
-                      color: AppColors.actionSuccess,
+                      color: AppColors.actionInfo,
                       icon: Icons.calendar_month_outlined,
                       label: 'Đăng ký cầu an',
                       onPressed: () =>

@@ -55,7 +55,7 @@ class HouseHoldDetailFooter extends StatelessWidget {
             child: AppButton(
               icon: Icons.print,
               label: 'In',
-              color: AppColors.actionWarning,
+              color: AppColors.actionSchedule,
               onPressed: isDisabledForPrint ? null : onPrint,
             ),
           ),

@@ -31,15 +31,27 @@ class AppButton extends StatelessWidget {
   }
 
   Widget _buildOutlined() {
+    final disabledColor = color.withValues(alpha: 0.4);
     final style = OutlinedButton.styleFrom(
-      side: BorderSide(color: color, width: 1.5),
       padding: compact
           ? const EdgeInsets.symmetric(horizontal: 10, vertical: 6)
           : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      foregroundColor: color,
       minimumSize: compact ? Size.zero : null,
       tapTargetSize: compact ? MaterialTapTargetSize.shrinkWrap : null,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    ).copyWith(
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? disabledColor : color,
+      ),
+      iconColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled) ? disabledColor : color,
+      ),
+      side: WidgetStateProperty.resolveWith(
+        (states) => BorderSide(
+          color: states.contains(WidgetState.disabled) ? disabledColor : color,
+          width: 1.5,
+        ),
+      ),
     );
     final labelWidget = Text(
       label,
@@ -49,12 +61,7 @@ class AppButton extends StatelessWidget {
     if (icon != null) {
       return OutlinedButton.icon(
         style: style,
-        // foregroundColor drives both icon and text color automatically
-        icon: Icon(
-          icon,
-          size: 16,
-          color: color,
-        ),
+        icon: Icon(icon, size: 16),
         label: labelWidget,
         onPressed: onPressed,
       );
