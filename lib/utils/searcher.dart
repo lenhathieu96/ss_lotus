@@ -15,7 +15,7 @@ class HouseholdSearcher {
       indexName: AlgoliaConfig.indexName,
       searchParamsObject: SearchParamsObject(
         query: query.trim(),
-        hitsPerPage: 50,
+        hitsPerPage: 100,
       ),
     );
 
