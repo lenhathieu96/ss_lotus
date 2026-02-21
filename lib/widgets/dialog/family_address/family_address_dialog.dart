@@ -19,9 +19,9 @@ class FamilyAddressDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formState = ref.watch(FamilyAddressFormProvider(defaultAddress));
+    final formState = ref.watch(familyAddressFormProvider(defaultAddress));
     final formNotifier =
-        ref.read(FamilyAddressFormProvider(defaultAddress).notifier);
+        ref.read(familyAddressFormProvider(defaultAddress).notifier);
 
     return Dialog(
       child: IntrinsicHeight(

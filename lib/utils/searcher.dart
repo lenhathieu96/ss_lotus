@@ -13,7 +13,7 @@ class HouseholdSearcher {
 
     final response = await _client.searchSingleIndex(
       indexName: AlgoliaConfig.indexName,
-      searchParamsObject: SearchParamsObject(
+      searchParams: SearchParamsObject(
         query: query.trim(),
         hitsPerPage: 100,
       ),
