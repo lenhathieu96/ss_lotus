@@ -52,6 +52,7 @@ dependencies:
   firebase_app_check: ^0.3.2+10
   unorm_dart: ^0.3.2
   file_saver: ^0.2.14
+  algoliasearch: ^1.0.0
 
 dev_dependencies:
   flutter_test:

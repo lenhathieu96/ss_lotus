@@ -1,43 +1,26 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:algoliasearch/algoliasearch.dart';
 import 'package:ss_lotus/entities/household.dart';
-import 'package:unorm_dart/unorm_dart.dart' as unorm;
+import 'package:ss_lotus/utils/algolia_config.dart';
 
 class HouseholdSearcher {
-  final CollectionReference _householdRef =
-      FirebaseFirestore.instance.collection("tdhp");
+  final SearchClient _client = SearchClient(
+    appId: AlgoliaConfig.appId,
+    apiKey: AlgoliaConfig.searchApiKey,
+  );
 
   Future<List<HouseHold>> search(String query) async {
     if (query.trim().isEmpty) return [];
 
-    final words = unorm.nfc(query.toLowerCase().trim()).split(RegExp(r'\s+'));
-    final firstWord = words.first;
+    final response = await _client.searchSingleIndex(
+      indexName: AlgoliaConfig.indexName,
+      searchParamsObject: SearchParamsObject(
+        query: query.trim(),
+        hitsPerPage: 50,
+      ),
+    );
 
-    // Firestore array-contains query on first keyword
-    final snapshot = await _householdRef
-        .where('searchKeywords', arrayContains: firstWord)
-        .limit(50)
-        .get();
-
-    List<HouseHold> results = snapshot.docs
-        .map((doc) =>
-            HouseHold.fromJson(doc.data() as Map<String, dynamic>))
+    return response.hits
+        .map((hit) => HouseHold.fromJson(hit))
         .toList();
-
-    // Client-side filter for additional words (if multi-word query)
-    if (words.length > 1) {
-      results = results.where((household) {
-        final houseKeywords = household.searchKeywords;
-        return words.every(
-            (word) => houseKeywords.any((kw) => kw.contains(word)));
-      }).toList();
-    }
-
-    return results;
-  }
-
-  Future<HouseHold?> getById(int id) async {
-    final doc = await _householdRef.doc(id.toString()).get();
-    if (!doc.exists) return null;
-    return HouseHold.fromJson(doc.data() as Map<String, dynamic>);
   }
 }
