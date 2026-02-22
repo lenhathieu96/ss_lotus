@@ -17,7 +17,7 @@ const List<Period> PERIOD_TYPES = [
   Period.night,
   Period.unknown
 ];
-const double DATE_PICKER_SIZE = 32.0;
+const double DATE_PICKER_SIZE = 30.0;
 
 class AppointmentRegistrationDialog extends ConsumerWidget {
   final Appointment? defaultAppointment;
@@ -85,172 +85,141 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
             ),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(SPACE_LG * 0.8),
+                padding: const EdgeInsets.fromLTRB(SPACE_LG * 0.8, 0, SPACE_LG * 0.8, SPACE_LG * 0.8),
                 child: Column(
                   spacing: COMMON_SPACING * 3.2,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                SizedBox(
-                  height: MediaQuery.sizeOf(context).height * 0.48,
-                  child: TableCalendar(
-                    locale: "vi-VN",
-                    focusedDay: DateTime.now(),
-                    firstDay: DateTime(2000, 1, 1),
-                    lastDay: DateTime(2100, 12, 31),
-                    onDaySelected: (selectedDate, _) {
-                      formNotifier.updateDate(selectedDate);
-                    },
-                    startingDayOfWeek: StartingDayOfWeek.monday,
-                    enabledDayPredicate: (day) => !day
-                        .isBefore(DateTime.now().subtract(Duration(days: 1))),
-                    selectedDayPredicate: (day) =>
-                        isSameDay(day, formState.date.value),
-                    calendarStyle: CalendarStyle(
-                      cellMargin: const EdgeInsets.all(2.0),
-                      cellPadding: EdgeInsets.zero,
-                    ),
-                    headerStyle: HeaderStyle(formatButtonVisible: false),
-                    calendarBuilders: CalendarBuilders(
-                      headerTitleBuilder: (context, date) {
-                        return SizedBox();
+                    TableCalendar(
+                      locale: "vi-VN",
+                      focusedDay: DateTime.now(),
+                      firstDay: DateTime(2000, 1, 1),
+                      lastDay: DateTime(2100, 12, 31),
+                      onDaySelected: (selectedDate, _) {
+                        formNotifier.updateDate(selectedDate);
                       },
-                      outsideBuilder: (context, date, focusedDay) {
-                        final lunar = Utils.convertToLunarDate(date);
-                        return SizedBox(
+                      startingDayOfWeek: StartingDayOfWeek.monday,
+                      enabledDayPredicate: (day) => !day
+                          .isBefore(DateTime.now().subtract(Duration(days: 1))),
+                      selectedDayPredicate: (day) =>
+                          isSameDay(day, formState.date.value),
+                      headerStyle: HeaderStyle(formatButtonVisible: false),
+                      calendarBuilders: CalendarBuilders(
+                        headerTitleBuilder: (context, date) {
+                          return SizedBox();
+                        },
+                        outsideBuilder: (context, date, focusedDay) {
+                          final lunar = Utils.convertToLunarDate(date);
+                          return SizedBox(
+                              width: DATE_PICKER_SIZE,
+                              height: DATE_PICKER_SIZE,
+                              child: Center(
+                                child: Text('${lunar?.day}',
+                                    style: TextStyle(fontSize: 11)),
+                              ));
+                        },
+                        defaultBuilder: (context, date, focusedDay) {
+                          final lunar = Utils.convertToLunarDate(date);
+                          return SizedBox(
+                              width: DATE_PICKER_SIZE,
+                              height: DATE_PICKER_SIZE,
+                              child: Center(
+                                child: Text('${lunar?.day}',
+                                    style: TextStyle(fontSize: 11)),
+                              ));
+                        },
+                        selectedBuilder: (context, date, focusedDay) {
+                          final lunar = Utils.convertToLunarDate(date);
+                          return Container(
+                            width: DATE_PICKER_SIZE,
+                            height: DATE_PICKER_SIZE,
+                            decoration: BoxDecoration(
+                                color: AppColors.actionPrimary,
+                                shape: BoxShape.circle),
+                            child: Center(
+                              child: Text('${lunar?.day}',
+                                  style: TextStyle(
+                                      fontSize: 11, color: Colors.white)),
+                            ),
+                          );
+                        },
+                        todayBuilder: (context, date, focusedDay) {
+                          final lunar = Utils.convertToLunarDate(date);
+                          return Container(
+                            width: DATE_PICKER_SIZE,
+                            height: DATE_PICKER_SIZE,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: AppColors.actionPrimary, width: 1.5),
+                            ),
+                            child: Center(
+                              child: Text('${lunar?.day}',
+                                  style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.actionPrimary,
+                                      fontWeight: FontWeight.w600)),
+                            ),
+                          );
+                        },
+                        disabledBuilder: (context, date, focusedDay) {
+                          final lunar = Utils.convertToLunarDate(date);
+                          return SizedBox(
                             width: DATE_PICKER_SIZE,
                             height: DATE_PICKER_SIZE,
                             child: Center(
                               child: Text('${lunar?.day}',
-                                  style: TextStyle(fontSize: 11)),
-                            ));
-                      },
-                      defaultBuilder: (context, date, focusedDay) {
-                        final lunar = Utils.convertToLunarDate(date);
-                        return SizedBox(
-                            width: DATE_PICKER_SIZE,
-                            height: DATE_PICKER_SIZE,
-                            child: Center(
-                              child: Text('${lunar?.day}',
-                                  style: TextStyle(fontSize: 11)),
-                            ));
-                      },
-                      selectedBuilder: (context, date, focusedDay) {
-                        final lunar = Utils.convertToLunarDate(date);
-                        return Container(
-                          width: DATE_PICKER_SIZE,
-                          height: DATE_PICKER_SIZE,
-                          decoration: BoxDecoration(
-                              color: AppColors.actionPrimary,
-                              shape: BoxShape.circle),
-                          child: Center(
-                            child: Text('${lunar?.day}',
-                                style: TextStyle(
-                                    fontSize: 11, color: Colors.white)),
-                          ),
-                        );
-                      },
-                      todayBuilder: (context, date, focusedDay) {
-                        final lunar = Utils.convertToLunarDate(date);
-                        return Container(
-                          width: DATE_PICKER_SIZE,
-                          height: DATE_PICKER_SIZE,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: AppColors.actionPrimary, width: 1.5),
-                          ),
-                          child: Center(
-                            child: Text('${lunar?.day}',
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.actionPrimary,
-                                    fontWeight: FontWeight.w600)),
-                          ),
-                        );
-                      },
-                      disabledBuilder: (context, date, focusedDay) {
-                        final lunar = Utils.convertToLunarDate(date);
-                        return SizedBox(
-                          width: DATE_PICKER_SIZE,
-                          height: DATE_PICKER_SIZE,
-                          child: Center(
-                            child: Text('${lunar?.day}',
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.pallet.gray40)),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                Divider(),
-                Wrap(
-                  spacing: SPACE_SM,
-                  children: PERIOD_TYPES.map((period) {
-                    final isSelected = formState.period.value == period;
-                    return ChoiceChip(
-                      label: Text(Utils.getPeriodTitle(period)),
-                      selected: isSelected,
-                      selectedColor: AppColors.actionSchedule,
-                      backgroundColor: AppColors.surfaceBackground,
-                      side: BorderSide(
-                          color: isSelected
-                              ? Colors.transparent
-                              : AppColors.surfaceDivider),
-                      labelStyle: TextStyle(
-                        color:
-                            isSelected ? Colors.white : AppColors.textPrimary,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                                  style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.pallet.gray40)),
+                            ),
+                          );
+                        },
                       ),
-                      onSelected: (_) => formNotifier.updatePeriod(period),
-                    );
-                  }).toList(),
-                ),
-                // SizedBox(
-                //   height: DATE_PICKER_SIZE,
-                //   child: ListView.separated(
-                //     shrinkWrap: true,
-                //     scrollDirection: Axis.horizontal,
-                //     itemCount: PERIOD_TYPES.length,
-                //     separatorBuilder: (_, __) => SizedBox(width: ),
-                //     itemBuilder: (context, i) => Row(
-                //       crossAxisAlignment: CrossAxisAlignment.center,
-                //       mainAxisAlignment: MainAxisAlignment.center,
-                //       mainAxisSize: MainAxisSize.min,
-                //       children: [
-                //         Radio<Period>(
-                //           value: PERIOD_TYPES[i],
-                //           groupValue: formState.period.value,
-                //           onChanged: formNotifier.updatePeriod,
-                //         ),
-                //         Text(
-                //           Utils.getPeriodTitle(PERIOD_TYPES[i]),
-                //         )
-                //       ],
-                //     ),
-                //   ),
-                // ),
-                SizedBox(
-                  width: double.infinity,
-                  child: AppButton(
-                    variant: AppButtonVariant.elevated,
-                    label: defaultAppointment == null ? 'Đăng ký' : 'Cập nhật',
-                    color: defaultAppointment == null
-                        ? AppColors.actionPrimary
-                        : AppColors.actionSchedule,
-                    onPressed: !formState.isValid
-                        ? null
-                        : () {
-                            onAppointmentUpdated(Appointment(
-                                date: formState.date.value!,
-                                period: formState.period.value,
-                                appointmentType: AppointmentType.ca));
-                            Navigator.of(context).pop();
-                          },
-                  ),
-                ),
+                    ),
+                    Wrap(
+                      spacing: SPACE_SM,
+                      children: PERIOD_TYPES.map((period) {
+                        final isSelected = formState.period.value == period;
+                        return ChoiceChip(
+                          label: Text(Utils.getPeriodTitle(period)),
+                          selected: isSelected,
+                          selectedColor: AppColors.actionSchedule,
+                          backgroundColor: AppColors.surfaceBackground,
+                          side: BorderSide(
+                              color: isSelected
+                                  ? Colors.transparent
+                                  : AppColors.surfaceDivider),
+                          labelStyle: TextStyle(
+                            color:
+                                isSelected ? Colors.white : AppColors.textPrimary,
+                            fontWeight:
+                                isSelected ? FontWeight.w600 : FontWeight.normal,
+                          ),
+                          onSelected: (_) => formNotifier.updatePeriod(period),
+                        );
+                      }).toList(),
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+
+                      child: AppButton(
+                        variant: AppButtonVariant.elevated,
+                        label: defaultAppointment == null ? 'Đăng ký' : 'Cập nhật',
+                        color: defaultAppointment == null
+                            ? AppColors.actionPrimary
+                            : AppColors.actionSchedule,
+                        onPressed: !formState.isValid
+                            ? null
+                            : () {
+                                onAppointmentUpdated(Appointment(
+                                    date: formState.date.value!,
+                                    period: formState.period.value,
+                                    appointmentType: AppointmentType.ca));
+                                Navigator.of(context).pop();
+                              },
+                      ),
+                    ),
               ],
             ),
           ),
