@@ -80,7 +80,7 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
                   ],
                 ),
                 SizedBox(
-                  height: MediaQuery.sizeOf(context).height * 0.4,
+                  height: MediaQuery.sizeOf(context).height * 0.42,
                   child: TableCalendar(
                     locale: "vi-VN",
                     focusedDay: DateTime.now(),
