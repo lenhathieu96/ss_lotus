@@ -105,6 +105,10 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
                         .isBefore(DateTime.now().subtract(Duration(days: 1))),
                     selectedDayPredicate: (day) =>
                         isSameDay(day, formState.date.value),
+                    calendarStyle: CalendarStyle(
+                      cellMargin: const EdgeInsets.all(2.0),
+                      cellPadding: EdgeInsets.zero,
+                    ),
                     headerStyle: HeaderStyle(formatButtonVisible: false),
                     calendarBuilders: CalendarBuilders(
                       headerTitleBuilder: (context, date) {
