@@ -11,7 +11,8 @@
       "Bash(open:*)",
       "Bash(python3:*)",
       "Bash(wc:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(echo:*)"
     ]
   }
 }

@@ -344,6 +344,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
         context: context,
         builder: (context) => FamilyAddressDialog(
               allowInitHouseHold: allowInitHouseHold,
+              familyId: familyId,
               defaultAddress: defaultAddress,
               onAddressUpdated: (address, houseHoldId) {
                 familyId != null && defaultAddress != null

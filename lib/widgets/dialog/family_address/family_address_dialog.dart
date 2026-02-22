@@ -7,6 +7,7 @@ import 'package:ss_lotus/utils/constants.dart';
 import 'family_address_dialog_provider.dart';
 
 class FamilyAddressDialog extends ConsumerWidget {
+  final int? familyId;
   final String? defaultAddress;
   final bool allowInitHouseHold;
   final void Function(String updatedAddress, int? houseHoldId) onAddressUpdated;
@@ -15,13 +16,15 @@ class FamilyAddressDialog extends ConsumerWidget {
       {super.key,
       required this.onAddressUpdated,
       required this.allowInitHouseHold,
+      this.familyId,
       this.defaultAddress});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formState = ref.watch(familyAddressFormProvider(defaultAddress));
+    final formState =
+        ref.watch(familyAddressFormProvider(familyId, defaultAddress));
     final formNotifier =
-        ref.read(familyAddressFormProvider(defaultAddress).notifier);
+        ref.read(familyAddressFormProvider(familyId, defaultAddress).notifier);
 
     return Dialog(
       child: IntrinsicHeight(

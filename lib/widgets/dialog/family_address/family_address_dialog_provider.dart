@@ -45,7 +45,7 @@ class FamilyAddressFormState {
 @riverpod
 class FamilyAddressForm extends _$FamilyAddressForm {
   @override
-  FamilyAddressFormState build(String? defaultAddress) {
+  FamilyAddressFormState build(int? familyId, String? defaultAddress) {
     return FamilyAddressFormState(
         address: defaultAddress != null
             ? AddressInput.dirty(defaultAddress)
