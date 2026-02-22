@@ -36,51 +36,62 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
         .read(appointmentRegistrationFormProvider(defaultAppointment).notifier);
 
     return Dialog(
-      child: IntrinsicHeight(
-        child: Container(
-            width: MediaQuery.sizeOf(context).width * DIALOG_MD,
-            padding: const EdgeInsets.all(SPACE_LG * 0.8),
-            child: Column(
-              spacing: COMMON_SPACING * 3.2,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.9,
+          maxWidth: MediaQuery.sizeOf(context).width * DIALOG_MD,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  SPACE_LG * 0.8, SPACE_LG * 0.8, SPACE_LG * 0.8, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    spacing: 10,
+                    children: [
+                      Container(
+                        width: 26,
+                        height: 26,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.pallet.warmPurple
+                              .withValues(alpha: 0.12),
+                        ),
+                        child: Icon(Icons.calendar_month,
+                            color: AppColors.actionSchedule, size: 14),
+                      ),
+                      Text(
+                        defaultAppointment == null
+                            ? 'Đăng ký lịch'
+                            : 'Cập nhật lịch',
+                        style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary),
+                      ),
+                    ],
+                  ),
+                  AppIconButton(
+                    icon: Icons.close,
+                    iconSize: 16,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(SPACE_LG * 0.8),
+                child: Column(
+                  spacing: COMMON_SPACING * 3.2,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      spacing: 10,
-                      children: [
-                        Container(
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.pallet.warmPurple
-                                .withValues(alpha: 0.12),
-                          ),
-                          child: Icon(Icons.calendar_month,
-                              color: AppColors.actionSchedule, size: 14),
-                        ),
-                        Text(
-                          defaultAppointment == null
-                              ? 'Đăng ký lịch'
-                              : 'Cập nhật lịch',
-                          style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary),
-                        ),
-                      ],
-                    ),
-                    AppIconButton(
-                      icon: Icons.close,
-                      iconSize: 16,
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
                 SizedBox(
-                  height: MediaQuery.sizeOf(context).height * 0.45,
+                  height: MediaQuery.sizeOf(context).height * 0.48,
                   child: TableCalendar(
                     locale: "vi-VN",
                     focusedDay: DateTime.now(),
@@ -237,7 +248,11 @@ class AppointmentRegistrationDialog extends ConsumerWidget {
                   ),
                 ),
               ],
-            )),
+            ),
+          ),
+        ),
+          ],
+        ),
       ),
     );
   }
