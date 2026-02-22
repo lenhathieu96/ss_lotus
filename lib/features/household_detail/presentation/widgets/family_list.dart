@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ss_lotus/entities/user.dart';
-import 'package:ss_lotus/entities/user_group.dart';
+import 'package:ss_lotus/entities/family.dart';
 import 'package:ss_lotus/themes/colors.dart';
 import 'package:ss_lotus/utils/constants.dart';
 import 'package:ss_lotus/widgets/app_button.dart';
@@ -11,7 +11,7 @@ part 'family_card.dart';
 
 // ── Root widget ───────────────────────────────────────────────────────────────
 class FamilyList extends StatefulWidget {
-  final List<UserGroup> families;
+  final List<Family> families;
   final void Function(
     int oldItemIndex,
     int oldFamilyIndex,
@@ -19,7 +19,7 @@ class FamilyList extends StatefulWidget {
     int newFamilyIndex,
   ) onMoveUser;
   final void Function(BuildContext context, int familyId, String defaultAddress,
-      bool allowInitHousehold) onEditAddress;
+      int? defaultHouseHoldId) onEditAddress;
   final void Function(BuildContext context, int familyId, int userIndex)
       onRemoveUser;
   final void Function(BuildContext context, int familyId,

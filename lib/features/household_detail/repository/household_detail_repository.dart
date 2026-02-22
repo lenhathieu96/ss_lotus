@@ -1,18 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ss_lotus/entities/household.dart';
-import 'package:ss_lotus/entities/user_group.dart';
+import 'package:ss_lotus/entities/family.dart';
 
 part 'household_detail_repository.g.dart';
 
 abstract class HouseHoldDetailRepositoryProtocol {
-  Future splitFamily(HouseHold currentHouseHold, UserGroup splitFamily);
+  Future splitFamily(HouseHold currentHouseHold, Family splitFamily);
   Future combineFamily(HouseHold updatedHouseHold, HouseHold removedHouseHold);
   Future<HouseHold> updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
-      HouseHold? unusedHouseHold, bool isInitHousehold,
-      {bool isNewAutoId = false});
+      {bool isNewHousehold = false});
   Future createHouseHold(HouseHold houseHold);
   Future<HouseHold?> getHouseHoldById(int id, int? oldId);
   Future<int> getNextHouseholdId();
@@ -37,7 +34,7 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
   }
 
   @override
-  Future splitFamily(HouseHold updatedHouseHold, UserGroup splitFamily) async {
+  Future splitFamily(HouseHold updatedHouseHold, Family splitFamily) async {
     final WriteBatch batch = db.batch();
     final splitHousehold =
         HouseHold(id: splitFamily.id, families: [splitFamily]);
@@ -52,17 +49,16 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
 
   @override
   Future<HouseHold> updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
-      HouseHold? unusedHouseHold, bool isInitHousehold,
-      {bool isNewAutoId = false}) async {
-    final counterRef = db.collection('counters').doc(householdRef.id);
-
-    if (isNewAutoId) {
+      {bool isNewHousehold = false}) async {
+    if (isNewHousehold) {
+      // New household: atomically claim next ID and write the doc
+      final counterRef = db.collection('counters').doc(householdRef.id);
       late HouseHold confirmedHousehold;
+
       await db.runTransaction((transaction) async {
         final counterSnap = await transaction.get(counterRef);
-        final confirmedId = counterSnap.exists
-            ? ((counterSnap.data()!['lastId'] as int) + 1)
-            : 1;
+        final confirmedId =
+            counterSnap.exists ? ((counterSnap.data()!['lastId'] as int) + 1) : 1;
 
         confirmedHousehold = updatedHouseHold.id == confirmedId
             ? updatedHouseHold
@@ -73,21 +69,20 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
                 id: confirmedId,
               );
 
-        final docRef = householdRef.doc(confirmedId.toString());
-        transaction.set(docRef, _toJsonWithKeywords(confirmedHousehold));
+        transaction.set(
+            householdRef.doc(confirmedId.toString()),
+            _toJsonWithKeywords(confirmedHousehold));
         transaction.set(
             counterRef, {'lastId': confirmedId}, SetOptions(merge: true));
       });
+
       return confirmedHousehold;
     }
 
+    // Existing household: plain set (merge: false to overwrite)
+    // When a new family was added, its id already equals the houseHoldId
+    // from getNextHouseholdId(), so we just persist as-is.
     final docRef = householdRef.doc(updatedHouseHold.id.toString());
-    if (isInitHousehold) {
-      final docSnapshot = await docRef.get();
-      if (docSnapshot.exists) {
-        throw Exception("Mã số này đã tồn tại");
-      }
-    }
     await docRef.set(_toJsonWithKeywords(updatedHouseHold));
     return updatedHouseHold;
   }

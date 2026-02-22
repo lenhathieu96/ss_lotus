@@ -8,16 +8,17 @@ import 'family_address_dialog_provider.dart';
 
 class FamilyAddressDialog extends ConsumerWidget {
   final int? familyId;
+  final int? defaultHouseHoldId;
   final String? defaultAddress;
-  final bool allowInitHouseHold;
-  final void Function(String updatedAddress, int? houseHoldId) onAddressUpdated;
+  final void Function(String updatedAddress) onConfirmAddress;
 
-  const FamilyAddressDialog(
-      {super.key,
-      required this.onAddressUpdated,
-      required this.allowInitHouseHold,
-      this.familyId,
-      this.defaultAddress});
+  const FamilyAddressDialog({
+    super.key,
+    this.familyId,
+    this.defaultHouseHoldId,
+    this.defaultAddress,
+    required this.onConfirmAddress,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -66,7 +67,7 @@ class FamilyAddressDialog extends ConsumerWidget {
                     ),
                   ],
                 ),
-                if (allowInitHouseHold == true)
+                if (defaultHouseHoldId != null)
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -91,11 +92,9 @@ class FamilyAddressDialog extends ConsumerWidget {
                     textInputAction: TextInputAction.next,
                     onFieldSubmitted: (_) {
                       if (formState.address.value.isNotEmpty) {
-                        onAddressUpdated(
-                            formState.address.value.toUpperCase(),
-                            formState.houseHoldId.value.isNotEmpty
-                                ? int.parse(formState.houseHoldId.value)
-                                : null);
+                        onConfirmAddress(
+                          formState.address.value.toUpperCase(),
+                        );
                         Navigator.of(context).pop();
                       }
                     }),
@@ -116,11 +115,9 @@ class FamilyAddressDialog extends ConsumerWidget {
                           textInputAction: TextInputAction.next,
                           onFieldSubmitted: (_) {
                             if (formState.houseHoldId.value.isNotEmpty) {
-                              onAddressUpdated(
+                              onConfirmAddress(
                                   formState.address.value.toUpperCase(),
-                                  formState.houseHoldId.value.isNotEmpty
-                                      ? int.parse(formState.houseHoldId.value)
-                                      : null);
+                                  );
                               Navigator.of(context).pop();
                             }
                           })
@@ -133,11 +130,9 @@ class FamilyAddressDialog extends ConsumerWidget {
                     label: defaultAddress == null ? 'Thêm mới' : 'Cập nhật',
                     color: AppColors.actionPrimary,
                     onPressed: () {
-                      onAddressUpdated(
+                      onConfirmAddress(
                           formState.address.value.toUpperCase(),
-                          formState.houseHoldId.value.isNotEmpty
-                              ? int.parse(formState.houseHoldId.value)
-                              : null);
+                          );
                       Navigator.of(context).pop();
                     },
                   ),

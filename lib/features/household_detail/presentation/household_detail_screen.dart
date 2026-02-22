@@ -111,11 +111,11 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                                 ),
                                 onTap: () {
                                   houseHoldNotifier.openSearchHouseholdsDialog(
-                                      context, false);
+                                      context, null);
                                 },
                                 onSubmitted: (_) {
                                   houseHoldNotifier.openSearchHouseholdsDialog(
-                                      context, false);
+                                      context, null);
                                 },
                               ),
                             ),
@@ -131,7 +131,7 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                                   ? null
                                   : () {
                                       houseHoldNotifier.openAddNewFamilyDialog(
-                                          context, null, null, true);
+                                          context, null, null, null);
                                     },
                             ),
                           ),
@@ -195,7 +195,7 @@ class HouseHoldDetailScreen extends ConsumerWidget {
                               color: AppColors.actionPrimary,
                               onPressed: () {
                                 houseHoldNotifier.openSearchHouseholdsDialog(
-                                    context, false);
+                                    context, null);
                               },
                             ),
                           ],

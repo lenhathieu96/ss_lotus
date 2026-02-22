@@ -4,7 +4,7 @@ import 'package:ss_lotus/entities/appointment.dart';
 import 'package:ss_lotus/entities/common.enum.dart';
 import 'package:ss_lotus/entities/household.dart';
 import 'package:ss_lotus/entities/user.dart';
-import 'package:ss_lotus/entities/user_group.dart';
+import 'package:ss_lotus/entities/family.dart';
 import 'package:ss_lotus/utils/utils.dart';
 import 'package:ss_lotus/widgets/dialog/appointment_registration/appointment_registration_dialog.dart';
 import 'package:ss_lotus/widgets/dialog/confirmation/confirmation_dialog.dart';
@@ -33,31 +33,21 @@ class HouseHoldDetail extends _$HouseHoldDetail {
 
   void _addNewFamily(String address, int? defaultHouseHoldId) async {
     final currentHouseHold = state.household;
-    final houseHoldId =
-        defaultHouseHoldId ?? await _repository.getNextHouseholdId();
+    final houseHoldId = await _repository.getNextHouseholdId();
 
-    final UserGroup draftFamily =
-        UserGroup(id: houseHoldId, address: address, members: []);
-    late final HouseHold updatedHousehold;
+    final draftFamily = Family(id: houseHoldId, address: address, members: []);
 
-    if (currentHouseHold == null) {
-      updatedHousehold = HouseHold(
-        id: houseHoldId,
-        families: [draftFamily],
-      );
-    } else {
-      final List<UserGroup> updatedFamilies = [
-        ...currentHouseHold.families,
-        draftFamily
-      ];
-      updatedHousehold = currentHouseHold.copyWith(families: updatedFamilies);
-    }
+    final updatedHousehold = currentHouseHold == null
+        ? HouseHold(id: houseHoldId, families: [draftFamily])
+        : currentHouseHold.copyWith(
+            families: [...currentHouseHold.families, draftFamily]);
+
+    debugPrint('[_addNewFamily] case=${currentHouseHold == null ? "new household" : "add to existing"} houseHoldId=$houseHoldId isNewHousehold=${defaultHouseHoldId == null}');
 
     state = state.copyWith(
         printable: false,
         household: updatedHousehold,
-        isInitHousehold: defaultHouseHoldId != null,
-        isNewAutoId: defaultHouseHoldId == null);
+        isNewHousehold: defaultHouseHoldId == null);
   }
 
   void _splitFamily(int familyId) async {
@@ -71,7 +61,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
           .firstWhere((family) => family.id == familyId);
 
       //2: remove the splitFamily from the current families
-      final List<UserGroup> updatedFamilies =
+      final List<Family> updatedFamilies =
           List.from(currentHouseHold.families);
       updatedFamilies.removeWhere((family) => family.id == familyId);
 
@@ -110,7 +100,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
       return;
     }
 
-    final List<UserGroup> updatedFamilies = [
+    final List<Family> updatedFamilies = [
       ...currentHouseHold.families,
       preCombineFamilies[0]
     ];
@@ -241,7 +231,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
       return;
     }
 
-    final updatedFamilies = List<UserGroup>.from(currentHouseHold.families);
+    final updatedFamilies = List<Family>.from(currentHouseHold.families);
 
     if (oldFamilyIndex == newFamilyIndex) {
       // Moving within the same family
@@ -285,15 +275,13 @@ class HouseHoldDetail extends _$HouseHoldDetail {
     if (houseHold == null) return;
     try {
       final confirmed = await _repository.updateHouseHoldDetailChanged(
-          houseHold, state.unusedHouseHold, state.isInitHousehold,
-          isNewAutoId: state.isNewAutoId);
+          houseHold,
+          isNewHousehold: state.isNewHousehold);
       Utils.showToast("Cập nhật thành công", ToastStatus.success);
       state = state.copyWith(
           printable: true,
           household: confirmed,
-          unusedHouseHold: null,
-          isInitHousehold: false,
-          isNewAutoId: false);
+          isNewHousehold: false);
     } catch (e) {
       Utils.showToast(
           e.toString().replaceFirst("Exception:", ""), ToastStatus.error);
@@ -339,17 +327,17 @@ class HouseHoldDetail extends _$HouseHoldDetail {
   }
 
   void openAddNewFamilyDialog(BuildContext context, int? familyId,
-      String? defaultAddress, bool allowInitHouseHold) {
+      String? defaultAddress, int? defaultHouseHoldId) {
     showDialog(
         context: context,
         builder: (context) => FamilyAddressDialog(
-              allowInitHouseHold: allowInitHouseHold,
               familyId: familyId,
               defaultAddress: defaultAddress,
-              onAddressUpdated: (address, houseHoldId) {
+              defaultHouseHoldId: defaultHouseHoldId,
+              onConfirmAddress: (address) {
                 familyId != null && defaultAddress != null
                     ? _updateFamilyAddress(familyId, address)
-                    : _addNewFamily(address, houseHoldId);
+                    : _addNewFamily(address, defaultHouseHoldId);
               },
             ));
   }
@@ -375,16 +363,16 @@ class HouseHoldDetail extends _$HouseHoldDetail {
             ));
   }
 
-  void openSearchHouseholdsDialog(BuildContext context, bool isCombineFamily) {
+  void openSearchHouseholdsDialog(BuildContext context, int? defaultHouseHoldId) {
     showDialog(
       context: context,
       builder: (context) => SearchHouseholdsDialog(
-        onAddNewFamily: isCombineFamily == true
+        onAddNewFamily: defaultHouseHoldId != null
             ? () {
-                openAddNewFamilyDialog(context, null, null, false);
+                openAddNewFamilyDialog(context, null, null, defaultHouseHoldId);
               }
             : null,
-        onSelectHousehold: isCombineFamily == true
+        onSelectHousehold: defaultHouseHoldId != null
             ? (selectedHousehold) {
                 openCombineFamilyConfirmDialog(context, selectedHousehold);
               }

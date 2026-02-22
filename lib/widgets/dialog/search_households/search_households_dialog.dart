@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ss_lotus/entities/household.dart';
-import 'package:ss_lotus/entities/user_group.dart';
+import 'package:ss_lotus/entities/family.dart';
 import 'package:ss_lotus/themes/colors.dart';
 import 'package:ss_lotus/widgets/app_button.dart';
 import 'package:ss_lotus/widgets/app_icon_button.dart';
@@ -226,7 +226,7 @@ class _SearchHouseholdsDialogState
                                                     .asMap()
                                                     .entries
                                                     .map((entry) {
-                                                  UserGroup family = entry.value;
+                                                  Family family = entry.value;
                                                   final hasMembers = family.members.isNotEmpty;
                                                   final extraCount = hasMembers ? family.members.length - 1 : 0;
 

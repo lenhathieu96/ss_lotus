@@ -52,9 +52,9 @@ class _DropIndicator extends StatelessWidget {
 
 // ── Shared card header ────────────────────────────────────────────────────────
 class _CardHeader extends StatelessWidget {
-  final UserGroup family;
+  final Family family;
   final bool showSplitButton;
-  final void Function(BuildContext, int, String, bool) onEditAddress;
+  final void Function(BuildContext, int, String, int?) onEditAddress;
   final void Function(BuildContext, int)? onSplitFamily;
 
   const _CardHeader({
@@ -101,7 +101,7 @@ class _CardHeader extends StatelessWidget {
                       color: AppColors.actionPrimary,
                       icon: Icons.edit_outlined,
                       onPressed: () => onEditAddress(
-                          context, family.id, family.address, false),
+                          context, family.id, family.address, null),
                     )),
               ],
             ),
@@ -174,12 +174,12 @@ class _CardFooter extends StatelessWidget {
 
 // ── Grid card: DragTarget + ReorderableListView ───────────────────────────────
 class _FamilyGridCard extends StatefulWidget {
-  final UserGroup family;
+  final Family family;
   final int familyIndex;
   final bool showSplitButton;
   final bool enableCrossFamilyDrag;
   final _UserDragData? activeDrag;
-  final void Function(BuildContext, int, String, bool) onEditAddress;
+  final void Function(BuildContext, int, String, int?) onEditAddress;
   final void Function(BuildContext, int, int) onRemoveUser;
   final void Function(BuildContext, int, User?, int?) onUpdateUserProfile;
   final void Function(BuildContext, int)? onSplitFamily;

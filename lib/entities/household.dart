@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ss_lotus/entities/user_group.dart';
+import 'package:ss_lotus/entities/family.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 import 'appointment.dart';
@@ -12,7 +12,7 @@ abstract class HouseHold with _$HouseHold {
   const factory HouseHold(
       {required int id,
       int? oldId,
-      required List<UserGroup> families,
+      required List<Family> families,
       Appointment? appointment,
       @Default([]) List<String> searchKeywords}) = _HouseHold;
 

@@ -13,7 +13,7 @@ class HouseHoldDetailHeader extends StatelessWidget {
   final int familyQuantity;
   final Appointment? appointment;
   final void Function() onClearHouseHold;
-  final void Function(BuildContext context, bool isCombineFamily)
+  final void Function(BuildContext context, int houseHoldId)
       onCombineFamily;
   final void Function(BuildContext context, Appointment? appointment)
       onRegisterAppointment;
@@ -92,7 +92,7 @@ class HouseHoldDetailHeader extends StatelessWidget {
                 color: AppColors.actionSchedule,
                 icon: Icons.merge_outlined,
                 label: 'Gộp gia đình',
-                onPressed: () => onCombineFamily(context, true),
+                onPressed: () => onCombineFamily(context, houseHoldId),
               ),
               appointment != null
                   ? AppButton(
