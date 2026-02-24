@@ -13,7 +13,7 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
           top: COMMON_PADDING,
           right: 1.5 * COMMON_PADDING,
           left: 1.5 * COMMON_PADDING,
-          bottom: 4 * COMMON_PADDING),
+          bottom: 3.5 * COMMON_PADDING),
       header: (context) {
         if (context.pageNumber > 1) {
           return pw.Container();
@@ -131,10 +131,10 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                   pw.Flexible(
                       flex: 1,
                       child: pw.Container(
-                        height: 44,
+                        height: PRINT_ROW_HEIGHT,
                         decoration: pw.BoxDecoration(border: pw.Border.all()),
                         alignment: pw.Alignment.center,
-                        padding: const pw.EdgeInsets.all(COMMON_SPACING),
+                        padding: const pw.EdgeInsets.symmetric(horizontal: COMMON_SPACING, vertical: PRINT_ROW_VERTICAL_PADDING),
                         child: pw.Text(
                           "${index + 1}",
                           style: pw.TextStyle(font: pageBoldFont, fontSize: 12),
@@ -143,10 +143,10 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                   pw.Flexible(
                       flex: 3,
                       child: pw.Container(
-                        height: 44,
+                        height: PRINT_ROW_HEIGHT,
                         decoration: pw.BoxDecoration(border: pw.Border.all()),
                         alignment: pw.Alignment.centerLeft,
-                        padding: const pw.EdgeInsets.all(COMMON_SPACING),
+                        padding: const pw.EdgeInsets.symmetric(horizontal: COMMON_SPACING, vertical: PRINT_ROW_VERTICAL_PADDING),
                         child: pw.Text(
                           member.fullName,
                           style: pw.TextStyle(font: pageBoldFont, fontSize: 12),
@@ -155,10 +155,10 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                   pw.Flexible(
                     flex: 2,
                     child: pw.Container(
-                      height: 44,
+                      height: PRINT_ROW_HEIGHT,
                       decoration: pw.BoxDecoration(border: pw.Border.all()),
                       alignment: pw.Alignment.centerLeft,
-                      padding: const pw.EdgeInsets.all(COMMON_SPACING),
+                      padding: const pw.EdgeInsets.symmetric(horizontal: COMMON_SPACING, vertical: PRINT_ROW_VERTICAL_PADDING),
                       child: pw.Text(
                         member.christineName ?? "",
                         style: pw.TextStyle(font: pageBoldFont, fontSize: 12),

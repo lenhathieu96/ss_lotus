@@ -7,6 +7,10 @@ const double TOOLBAR_ELEMENT_HEIGHT = 40.0;
 
 const EdgeInsets COMMON_EDGE_INSETS_PADDING = EdgeInsets.all(COMMON_PADDING);
 
+// Print
+const double PRINT_ROW_HEIGHT = 36.0;
+const double PRINT_ROW_VERTICAL_PADDING = 4.0;
+
 // Spacing scale
 const double SPACE_XS = 4.0;
 const double SPACE_SM = 8.0;
