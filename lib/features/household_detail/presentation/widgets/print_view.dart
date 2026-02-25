@@ -24,37 +24,33 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
               pw.Image(logo, width: 50, height: 50),
               pw.Spacer(flex: 1),
               pw.Center(
-                  child: pw.Text("CẦU AN",
-                      style: pw.TextStyle(
-                        font: pageBoldFont,
-                        fontSize: 18,
-                      ))),
+                  child: pw.Column(children: [
+                pw.Text("CẦU AN",
+                    style: pw.TextStyle(
+                      font: pageBoldFont,
+                      fontSize: 18,
+                    )),
+                pw.SizedBox(height: COMMON_SPACING / 2),
+                pw.Text(Utils.getAppointmentTitle(houseHold.appointment, true),
+                    style: pw.TextStyle(font: pageBoldFont, fontSize: 14)),
+              ])),
               pw.Spacer(flex: 1),
-              pw.Column(
-                children: [
-                  pw.Text(
-                      Utils.getAppointmentTitle(houseHold.appointment, true),
-                      style: pw.TextStyle(font: pageBoldFont, fontSize: 10)),
-                  pw.SizedBox(height: COMMON_SPACING / 2),
-                  pw.Container(
-                      padding: pw.EdgeInsets.symmetric(
-                          horizontal: COMMON_SPACING, vertical: COMMON_SPACING),
-                      decoration: pw.BoxDecoration(border: pw.Border.all()),
-                      child: pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.center,
-                          mainAxisAlignment: pw.MainAxisAlignment.center,
-                          children: [
-                            pw.Text("Mã số",
-                                style:
-                                    pw.TextStyle(font: pageFont, fontSize: 10)),
-                            pw.Text(houseHold.id.toString(),
-                                style: pw.TextStyle(
-                                  font: pageBoldFont,
-                                  fontSize: 10,
-                                )),
-                          ]))
-                ],
-              )
+              pw.Container(
+                  padding: pw.EdgeInsets.symmetric(
+                      horizontal: COMMON_SPACING, vertical: COMMON_SPACING),
+                  decoration: pw.BoxDecoration(border: pw.Border.all()),
+                  child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.center,
+                      mainAxisAlignment: pw.MainAxisAlignment.center,
+                      children: [
+                        pw.Text("Mã số",
+                            style: pw.TextStyle(font: pageFont, fontSize: 10)),
+                        pw.Text(houseHold.id.toString(),
+                            style: pw.TextStyle(
+                              font: pageBoldFont,
+                              fontSize: 10,
+                            )),
+                      ]))
             ]);
       },
       footer: (context) {
@@ -134,7 +130,9 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                         height: PRINT_ROW_HEIGHT,
                         decoration: pw.BoxDecoration(border: pw.Border.all()),
                         alignment: pw.Alignment.center,
-                        padding: const pw.EdgeInsets.symmetric(horizontal: COMMON_SPACING, vertical: PRINT_ROW_VERTICAL_PADDING),
+                        padding: const pw.EdgeInsets.symmetric(
+                            horizontal: COMMON_SPACING,
+                            vertical: PRINT_ROW_VERTICAL_PADDING),
                         child: pw.Text(
                           "${index + 1}",
                           style: pw.TextStyle(font: pageBoldFont, fontSize: 12),
@@ -146,7 +144,9 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                         height: PRINT_ROW_HEIGHT,
                         decoration: pw.BoxDecoration(border: pw.Border.all()),
                         alignment: pw.Alignment.centerLeft,
-                        padding: const pw.EdgeInsets.symmetric(horizontal: COMMON_SPACING, vertical: PRINT_ROW_VERTICAL_PADDING),
+                        padding: const pw.EdgeInsets.symmetric(
+                            horizontal: COMMON_SPACING,
+                            vertical: PRINT_ROW_VERTICAL_PADDING),
                         child: pw.Text(
                           member.fullName,
                           style: pw.TextStyle(font: pageBoldFont, fontSize: 12),
@@ -158,7 +158,9 @@ pw.Page buildPrintPage(pw.ImageProvider logo, pw.Font pageFont,
                       height: PRINT_ROW_HEIGHT,
                       decoration: pw.BoxDecoration(border: pw.Border.all()),
                       alignment: pw.Alignment.centerLeft,
-                      padding: const pw.EdgeInsets.symmetric(horizontal: COMMON_SPACING, vertical: PRINT_ROW_VERTICAL_PADDING),
+                      padding: const pw.EdgeInsets.symmetric(
+                          horizontal: COMMON_SPACING,
+                          vertical: PRINT_ROW_VERTICAL_PADDING),
                       child: pw.Text(
                         member.christineName ?? "",
                         style: pw.TextStyle(font: pageBoldFont, fontSize: 12),
