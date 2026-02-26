@@ -104,13 +104,15 @@ class UserProfileDialog extends ConsumerWidget {
                     variant: AppButtonVariant.elevated,
                     label: user == null ? 'Thêm mới' : 'Cập nhật',
                     color: AppColors.actionPrimary,
-                    onPressed: () {
-                      onProfileUpdated(User(
-                          fullName: formState.name.value.toUpperCase(),
-                          christineName:
-                              formState.christineName.value.toUpperCase()));
-                      Navigator.of(context).pop();
-                    },
+                    onPressed: formState.isValid
+                        ? () {
+                            onProfileUpdated(User(
+                                fullName: formState.name.value.toUpperCase(),
+                                christineName: formState.christineName.value
+                                    .toUpperCase()));
+                            Navigator.of(context).pop();
+                          }
+                        : null,
                   ),
                 ),
               ],

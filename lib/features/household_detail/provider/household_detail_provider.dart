@@ -274,8 +274,14 @@ class HouseHoldDetail extends _$HouseHoldDetail {
     final houseHold = state.household;
     if (houseHold == null) return;
     try {
+      final filteredFamilies = houseHold.families
+          .map((f) => f.copyWith(
+              members: f.members
+                  .where((m) => m.fullName.trim().isNotEmpty)
+                  .toList()))
+          .toList();
       final confirmed = await _repository.updateHouseHoldDetailChanged(
-          houseHold,
+          houseHold.copyWith(families: filteredFamilies),
           isNewHousehold: state.isNewHousehold);
       Utils.showToast("Cập nhật thành công", ToastStatus.success);
       state = state.copyWith(
