@@ -31,7 +31,7 @@ HouseHold                        — top-level unit (hộ khẩu)
   └── searchKeywords: List<str>  — denormalized, NFC-normalized search tokens
 
 UserGroup (family)               — a family residing at one address
-  ├── id: int                    — equals the household id of its origin
+  ├── id: int                    — globally-unique counter-based ID (same pool as household IDs)
   ├── address: String            — stored UPPERCASE
   └── members: List<User>        — ordered list of buddhist members
 
@@ -49,7 +49,7 @@ Appointment                      — scheduled event attached to a household
 ### Entity Relationships
 
 - A **HouseHold** always has at least **1 family** when it exists in Firestore.
-- A **family** (`UserGroup`) tracks its origin via `id`, which matches the household's `id` at split time.
+- A **family** (`UserGroup`) has a globally-unique `id` drawn from the same auto-increment counter as household IDs. When a family is split into its own household, the new household's `id` equals the family's `id`.
 - A **family** can have **0 or more members** during editing, but **saving is blocked if any family has 0 members**.
 - A **HouseHold** has at most **1 appointment** at a time. Updating replaces the previous one.
 
@@ -78,7 +78,7 @@ void _selectHousehold(HouseHold selectedHousehold) async {
   final household = await _repository.getHouseHoldById(
       selectedHousehold.id, selectedHousehold.oldId);
   if (household != null) {
-    state = state.copyWith(household: household);
+    state = state.copyWith(household: household, pendingNewFamilyCount: 0);
   }
 }
 ```
@@ -92,18 +92,17 @@ void _selectHousehold(HouseHold selectedHousehold) async {
 2. User enters address. Optionally taps "Hộ đã tồn tại mã số trước đó?" to reveal an ID field and enters a manual ID.
 3. Dialog calls `onAddressUpdated(address, houseHoldId?)`.
 4. Provider `_addNewFamily(address, houseHoldId?)`:
-   - If no manual ID → calls `_repository.getNextHouseholdId()` (**plain read** of `counters/tdhp` — returns a tentative ID for display only, does **not** write the counter).
-   - Creates a new `UserGroup` with the tentative ID and the address.
-   - Creates a new `HouseHold` with `id = tentativeId`, `families = [newFamily]`.
-   - Sets `state.isNewAutoId = true`.
-5. `state.isInitHousehold = true` when a manual ID was provided.
-6. **Not yet saved to Firestore** — only local state updated. Save happens on "Lưu thay đổi".
+   - Calls `_repository.getNextHouseholdId()` (**plain read** of `counters/tdhp` — does **not** write the counter) to get `baseId`.
+   - Draft `familyId = baseId + state.pendingNewFamilyCount` (offset ensures uniqueness if multiple families are added before saving).
+   - Draft `householdId = familyId` (first family's ID becomes the household ID).
+   - Creates a new `UserGroup(id: familyId, address)` and a new `HouseHold(id: householdId, families: [family])`.
+   - Increments `state.pendingNewFamilyCount`.
+5. **Not yet saved to Firestore** — only local state updated. Save happens on "Lưu thay đổi".
 
 **Rules:**
 - Household ID is 1–4 digits (validated in `HouseHoldIdInput`).
 - Address is required and non-empty (validated in `AddressInput`).
-- When saving with `isInitHousehold = true`, the repository checks if the document already exists → throws `Exception("Mã số này đã tồn tại")` if it does.
-- Auto-incremented IDs are **confirmed and committed atomically on save** (see §2.3), not at ID-fetch time. The tentative ID shown in the UI may differ from the final confirmed ID if a concurrent save advanced the counter first.
+- Auto-incremented IDs are **confirmed and committed atomically on save** (see §2.3), not at ID-fetch time. Draft IDs shown in the UI may differ from the final confirmed IDs if a concurrent save advanced the counter first.
 
 ### 2.3 Save Changes (Update)
 
@@ -115,17 +114,19 @@ void _selectHousehold(HouseHold selectedHousehold) async {
 
 **Flow:**
 1. Provider calls `onSaveChanges()`.
-2. Calls `_repository.updateHouseHoldDetailChanged(household, unusedHouseHold, isInitHousehold, isNewAutoId: state.isNewAutoId)`.
-3. Repository saves the household and returns the confirmed `HouseHold` (id may differ from tentative if counter advanced concurrently).
-4. On success: `state.printable = true`, `state.household = confirmed`, `state.unusedHouseHold = null`, `state.isInitHousehold = false`, `state.isNewAutoId = false`.
+2. Calls `_repository.updateHouseHoldDetailChanged(household, isNewHousehold: state.isNewHousehold, pendingNewFamilyCount: state.pendingNewFamilyCount)`.
+3. Repository saves and returns the confirmed `HouseHold` (IDs may differ from draft if the counter advanced concurrently).
+4. On success: `state.printable = true`, `state.household = confirmed`, `state.isNewHousehold = false`, `state.pendingNewFamilyCount = 0`.
 5. Shows "Cập nhật thành công" success toast.
 6. On error: shows error toast with the exception message.
 
 **Rules:**
 - Every save overwrites the full document (not a merge).
 - `searchKeywords` are always regenerated on every save.
-- If `isInitHousehold == true`, save first checks for document existence and refuses if it already exists.
-- If `isNewAutoId == true`, save runs inside a Firestore **transaction** that atomically re-reads the counter, claims the next ID, writes the household doc, and increments the counter — preventing race conditions when multiple users create households simultaneously.
+- Whenever `isNewHousehold == true` OR `pendingNewFamilyCount > 0`, the save runs inside a Firestore **transaction** that atomically re-reads the counter, claims one slot per new family, writes the doc, and advances the counter — preventing race conditions when multiple users create or extend households simultaneously.
+  - `isNewHousehold`: all families are new; household ID = first claimed slot; each additional family gets the next slot.
+  - `pendingNewFamilyCount > 0` (existing household): only the trailing `N` families in the list are new and get fresh slots; existing families keep their IDs.
+- When no new families are pending, save is a plain `set()` with no transaction overhead.
 
 ### 2.4 Clear / Close Household
 
@@ -148,14 +149,17 @@ A **family** (`UserGroup`) lives inside a household's `families` list. All famil
 **Flow:**
 1. `openAddNewFamilyDialog(context, null, null, false)` — `familyId` and `defaultAddress` are both null, `allowInitHouseHold: false`.
 2. Dialog returns address.
-3. `_addNewFamily(address, null)` → auto-increments a new ID for the family.
-4. Appends new `UserGroup` to `currentHouseHold.families`.
-5. `printable = false`.
+3. `_addNewFamily(address, null)`:
+   - Reads `baseId = getNextHouseholdId()` (plain counter read, no write).
+   - Draft `familyId = baseId + state.pendingNewFamilyCount`.
+   - Appends new `UserGroup(id: familyId, address)` to `currentHouseHold.families`.
+   - Increments `state.pendingNewFamilyCount`.
+4. `printable = false`.
 
 **Rules:**
-- Each family within a household has its own `id` (matching its origin household ID).
 - `allowInitHouseHold: false` → no manual ID field shown.
 - A new family starts with 0 members; saving will be blocked until at least 1 member is added.
+- Draft family IDs are counter-based with an offset; final IDs are confirmed atomically on save (§2.3).
 
 ### 3.2 Edit Family Address
 
@@ -479,6 +483,17 @@ Document ID: `{householdId}` as string
           "yob": 1975
         }
       ]
+    },
+    {
+      "id": 124,
+      "address": "SỐ 12 LÊ LỢI, PHƯỜNG 1",
+      "members": [
+        {
+          "fullName": "TRẦN THỊ B",
+          "christineName": null,
+          "yob": 1980
+        }
+      ]
     }
   ],
   "appointment": {
@@ -490,6 +505,12 @@ Document ID: `{householdId}` as string
 }
 ```
 
+**Family ID assignment:**
+- Each family has a globally-unique `id` drawn from the same `counters/tdhp` pool as household IDs.
+- For a new household with N families, the save transaction claims N sequential slots: household + first family = slot 1, second family = slot 2, etc.
+- For an existing household, adding N new families claims N slots on save; existing families keep their original IDs.
+- A family's `id` serves as the new household's `id` when that family is split out (§3.3).
+
 ### Collection: `counters`
 Document ID: `tdhp`
 
@@ -497,15 +518,17 @@ Document ID: `tdhp`
 { "lastId": 456 }
 ```
 
+`lastId` is incremented by the number of new families on each transactional save (1 for a single-family household, N for a household created with N families or an existing household that gained N new families).
+
 ### Firestore Operations Reference
 
 | Operation | Method | Atomicity |
 |---|---|---|
 | Read household | `get(doc)` | Single read |
-| Create/Update household | `set(doc)` | Single write |
+| Update household (no new families) | `set(doc)` | Single write |
+| Create household / add new families | `runTransaction` | Atomic transaction |
 | Split family | `batch.set × 2` | Atomic batch |
 | Combine family | `batch.set + batch.delete` | Atomic batch |
-| Auto-increment ID | `runTransaction` | Atomic transaction |
 | Backfill keywords | `batch.update × N` | Per-batch atomic |
 
 ---

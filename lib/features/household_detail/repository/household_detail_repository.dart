@@ -9,7 +9,7 @@ abstract class HouseHoldDetailRepositoryProtocol {
   Future splitFamily(HouseHold currentHouseHold, Family splitFamily);
   Future combineFamily(HouseHold updatedHouseHold, HouseHold removedHouseHold);
   Future<HouseHold> updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
-      {bool isNewHousehold = false});
+      {bool isNewHousehold = false, int pendingNewFamilyCount = 0});
   Future createHouseHold(HouseHold houseHold);
   Future<HouseHold?> getHouseHoldById(int id, int? oldId);
   Future<int> getNextHouseholdId();
@@ -49,39 +49,66 @@ class HouseholdDetailRepository implements HouseHoldDetailRepositoryProtocol {
 
   @override
   Future<HouseHold> updateHouseHoldDetailChanged(HouseHold updatedHouseHold,
-      {bool isNewHousehold = false}) async {
-    if (isNewHousehold) {
-      // New household: atomically claim next ID and write the doc
-      final counterRef = db.collection('counters').doc(householdRef.id);
+      {bool isNewHousehold = false, int pendingNewFamilyCount = 0}) async {
+    final counterRef = db.collection('counters').doc(householdRef.id);
+
+    if (isNewHousehold || pendingNewFamilyCount > 0) {
+      // Atomically claim one counter slot per new family so every family gets
+      // a globally-unique id regardless of concurrent writes.
       late HouseHold confirmedHousehold;
 
       await db.runTransaction((transaction) async {
         final counterSnap = await transaction.get(counterRef);
-        final confirmedId =
-            counterSnap.exists ? ((counterSnap.data()!['lastId'] as int) + 1) : 1;
+        final lastId =
+            counterSnap.exists ? (counterSnap.data()!['lastId'] as int) : 0;
 
-        confirmedHousehold = updatedHouseHold.id == confirmedId
-            ? updatedHouseHold
-            : updatedHouseHold.copyWith(
-                families: updatedHouseHold.families
-                    .map((f) => f.copyWith(id: confirmedId))
-                    .toList(),
-                id: confirmedId,
-              );
+        late List<Family> confirmedFamilies;
+
+        final int slotsToclaim;
+
+        if (isNewHousehold) {
+          // All families are new: assign sequential slots starting at lastId+1.
+          // The household id takes the first slot.
+          slotsToclaim = updatedHouseHold.families.length;
+          confirmedFamilies = List.generate(slotsToclaim, (i) {
+            return updatedHouseHold.families[i].copyWith(id: lastId + 1 + i);
+          });
+          confirmedHousehold = updatedHouseHold.copyWith(
+            id: lastId + 1,
+            families: confirmedFamilies,
+          );
+          transaction.set(
+              householdRef.doc((lastId + 1).toString()),
+              _toJsonWithKeywords(confirmedHousehold));
+        } else {
+          // Existing household: only the trailing pendingNewFamilyCount
+          // families need fresh counter slots; existing families keep their ids.
+          slotsToclaim = pendingNewFamilyCount;
+          final existingCount =
+              updatedHouseHold.families.length - pendingNewFamilyCount;
+          confirmedFamilies = List<Family>.from(updatedHouseHold.families);
+          for (int i = 0; i < pendingNewFamilyCount; i++) {
+            confirmedFamilies[existingCount + i] =
+                confirmedFamilies[existingCount + i]
+                    .copyWith(id: lastId + 1 + i);
+          }
+          confirmedHousehold =
+              updatedHouseHold.copyWith(families: confirmedFamilies);
+          transaction.set(
+              householdRef.doc(updatedHouseHold.id.toString()),
+              _toJsonWithKeywords(confirmedHousehold));
+        }
 
         transaction.set(
-            householdRef.doc(confirmedId.toString()),
-            _toJsonWithKeywords(confirmedHousehold));
-        transaction.set(
-            counterRef, {'lastId': confirmedId}, SetOptions(merge: true));
+            counterRef,
+            {'lastId': lastId + slotsToclaim},
+            SetOptions(merge: true));
       });
 
       return confirmedHousehold;
     }
 
-    // Existing household: plain set (merge: false to overwrite)
-    // When a new family was added, its id already equals the houseHoldId
-    // from getNextHouseholdId(), so we just persist as-is.
+    // No new families: plain overwrite.
     final docRef = householdRef.doc(updatedHouseHold.id.toString());
     await docRef.set(_toJsonWithKeywords(updatedHouseHold));
     return updatedHouseHold;

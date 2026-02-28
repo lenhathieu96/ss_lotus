@@ -33,21 +33,26 @@ class HouseHoldDetail extends _$HouseHoldDetail {
 
   void _addNewFamily(String address, int? defaultHouseHoldId) async {
     final currentHouseHold = state.household;
-    final houseHoldId = await _repository.getNextHouseholdId();
 
-    final draftFamily = Family(id: houseHoldId, address: address, members: []);
+    // Always derive the draft ID from the counter so it stays counter-based
+    // and globally unique. The offset (pendingNewFamilyCount) ensures each
+    // family added in the same unsaved session gets a distinct local ID.
+    final baseId = await _repository.getNextHouseholdId();
+    final familyId = baseId + state.pendingNewFamilyCount;
+    final houseHoldId = currentHouseHold?.id ?? familyId;
+
+    final draftFamily = Family(id: familyId, address: address, members: []);
 
     final updatedHousehold = currentHouseHold == null
         ? HouseHold(id: houseHoldId, families: [draftFamily])
-        : currentHouseHold.copyWith(
-            families: [...currentHouseHold.families, draftFamily]);
-
-    debugPrint('[_addNewFamily] case=${currentHouseHold == null ? "new household" : "add to existing"} houseHoldId=$houseHoldId isNewHousehold=${defaultHouseHoldId == null}');
+        : currentHouseHold
+            .copyWith(families: [...currentHouseHold.families, draftFamily]);
 
     state = state.copyWith(
         printable: false,
         household: updatedHousehold,
-        isNewHousehold: defaultHouseHoldId == null);
+        isNewHousehold: defaultHouseHoldId == null,
+        pendingNewFamilyCount: state.pendingNewFamilyCount + 1);
   }
 
   void _splitFamily(int familyId) async {
@@ -61,8 +66,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
           .firstWhere((family) => family.id == familyId);
 
       //2: remove the splitFamily from the current families
-      final List<Family> updatedFamilies =
-          List.from(currentHouseHold.families);
+      final List<Family> updatedFamilies = List.from(currentHouseHold.families);
       updatedFamilies.removeWhere((family) => family.id == familyId);
 
       //3: update house hold families with the updated families
@@ -117,7 +121,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
     final household = await _repository.getHouseHoldById(
         selectedHousehold.id, selectedHousehold.oldId);
     if (household != null) {
-      state = state.copyWith(household: household);
+      state = state.copyWith(household: household, pendingNewFamilyCount: 0);
     }
   }
 
@@ -282,12 +286,14 @@ class HouseHoldDetail extends _$HouseHoldDetail {
           .toList();
       final confirmed = await _repository.updateHouseHoldDetailChanged(
           houseHold.copyWith(families: filteredFamilies),
-          isNewHousehold: state.isNewHousehold);
+          isNewHousehold: state.isNewHousehold,
+          pendingNewFamilyCount: state.pendingNewFamilyCount);
       Utils.showToast("Cập nhật thành công", ToastStatus.success);
       state = state.copyWith(
           printable: true,
           household: confirmed,
-          isNewHousehold: false);
+          isNewHousehold: false,
+          pendingNewFamilyCount: 0);
     } catch (e) {
       Utils.showToast(
           e.toString().replaceFirst("Exception:", ""), ToastStatus.error);
@@ -295,7 +301,7 @@ class HouseHoldDetail extends _$HouseHoldDetail {
   }
 
   void onClearHousehold() {
-    state = state.copyWith(household: null);
+    state = state.copyWith(household: null, pendingNewFamilyCount: 0);
   }
 
   void openUpdateUserProfileDialog(
@@ -369,7 +375,8 @@ class HouseHoldDetail extends _$HouseHoldDetail {
             ));
   }
 
-  void openSearchHouseholdsDialog(BuildContext context, int? defaultHouseHoldId) {
+  void openSearchHouseholdsDialog(
+      BuildContext context, int? defaultHouseHoldId) {
     showDialog(
       context: context,
       builder: (context) => SearchHouseholdsDialog(

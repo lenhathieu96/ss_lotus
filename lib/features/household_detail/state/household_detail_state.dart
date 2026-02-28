@@ -12,5 +12,6 @@ abstract class HouseholdDetailState with _$HouseholdDetailState {
     @Default(true) bool printable,
     @Default(false) bool isNewHousehold,
     @Default([]) List<Family> suggestedFamilies,
+    @Default(0) int pendingNewFamilyCount,
   }) = _HouseholdDetailState;
 }
