@@ -30,13 +30,14 @@ class Utils {
   static String getAppointmentTitle(
       Appointment? appointment, bool? showSeparator) {
     final date = convertToLunarDate(appointment?.date);
-    if (appointment?.period == Period.unknown || date?.day == null) {
+    if (date == null || appointment?.period == Period.unknown) {
       return showSeparator == true ? "Chùa cúng" : "chùa cúng";
     }
     final periodTitle = getPeriodTitle(appointment?.period);
+    final dateTitle = date.day < 10 ? "Mồng" : "Ngày";
     return showSeparator == true
-        ? "$periodTitle | Mồng ${date?.day}"
-        : "${periodTitle.toLowerCase()} mồng ${date?.day}";
+        ? "$periodTitle | $dateTitle ${date.day}"
+        : "${periodTitle.toLowerCase()} ${dateTitle.toLowerCase()} ${date.day}";
   }
 
   static showToast(String title, ToastStatus status) {
