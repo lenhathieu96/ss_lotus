@@ -34,7 +34,7 @@ class Utils {
       return showSeparator == true ? "Chùa cúng" : "chùa cúng";
     }
     final periodTitle = getPeriodTitle(appointment?.period);
-    final dateTitle = date.day < 10 ? "Mồng" : "Ngày";
+    final dateTitle = date.day < 10 ? "Mùng" : "Ngày";
     return showSeparator == true
         ? "$periodTitle | $dateTitle ${date.day}"
         : "${periodTitle.toLowerCase()} ${dateTitle.toLowerCase()} ${date.day}";
