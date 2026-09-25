@@ -1,0 +1,8 @@
+project_id = "ss-lotus"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322

@@ -1,5 +1,7 @@
 # Supabase Database Schema — SS Lotus
 
+> **Status:** Historical design draft. The deployed schema is defined by the executable migrations in `supabase/migrations/`, especially `20260924053000_upgrade-pagoda-schema.sql`, `20260924082000_add-deceased-people-catalog.sql`, and `20260924084500_add-household-write-rpc.sql`.
+
 ## Overview
 
 Normalized PostgreSQL schema replacing Firestore `tdhp` collection + Algolia search. All primary keys are UUID.
@@ -24,6 +26,10 @@ CREATE TYPE appointment_type_enum AS ENUM ('ca', 'cs');
 ---
 
 ## Tables
+
+### Household creation RPC
+
+The browser editor creates a household through `public.create_household(integer, jsonb)`. It requires an authenticated administrator, validates that every family has at least one member, allocates consecutive business numbers under a row lock, writes the household/families/members atomically, and records an audit event. Direct table writes remain denied by RLS.
 
 ### pagodas
 
@@ -178,6 +184,26 @@ CREATE TABLE members (
 | `position` | SMALLINT | Display order within family (0-based, supports drag reorder) |
 
 ---
+
+## Deceased-person catalog
+
+`deceased_people` is the persistent, reusable catalog for Cầu siêu. Every record belongs to one family; its household is derived from that family. The catalog code is globally unique and stored uppercase.
+
+| Column | Notes |
+|---|---|
+| `code` | Required, globally unique deceased-person code |
+| `full_name`, `dharma_name`, `date_of_death` | Person details; dharma name is optional |
+| `recorded_by` | Required name supplied by the admin workflow |
+| `family_id` | Required family ownership; the submitted household and family business numbers must match |
+| `created_by_user_id` | Authenticated administrator who created the record |
+
+The browser never writes this table directly. Authenticated administrators use these security-definer RPCs:
+
+- `create_deceased_person(...)` — creates and audits one catalog entry.
+- `import_deceased_people(jsonb)` — imports a validated CSV batch atomically; any invalid or duplicate row rolls back the entire batch.
+- `list_deceased_people()` — returns catalog rows with derived household and family business references.
+
+`prayer_people.deceased_person_id` optionally links a Cầu siêu entry back to the catalog. A trigger rejects a link to a person from a different family.
 
 ## Indexes
 
