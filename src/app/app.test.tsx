@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { HouseholdWorkspace } from '../features/households/household-workspace';
 import OverviewPage from './(dashboard)/overview/page';
+
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 describe('App Router pages', () => {
   it('renders the household workspace', () => {
@@ -19,7 +21,7 @@ describe('App Router pages', () => {
     await user.click(screen.getByRole('button', { name: 'Thêm gia đình' }));
     await user.click(screen.getByRole('button', { name: 'Đóng và bỏ bản nháp' }));
 
-    expect(screen.getByRole('dialog', { name: 'Bỏ bản nháp' })).toBeVisible();
+    expect(screen.getByRole('alertdialog', { name: 'Bỏ bản nháp' })).toBeVisible();
   });
 
   it('renders the overview page', () => {

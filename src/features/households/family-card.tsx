@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Trash2 } from 'lucide-react';
 import { Family, Member } from './household-domain';
+import { Button } from '@/components/ui/button';
 
 interface FamilyCardProps {
   family: Family;
@@ -16,9 +17,9 @@ interface SortableMemberProps {
 function SortableMember({ member, onRemove }: SortableMemberProps) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: member.id });
   return <li ref={setNodeRef} className="member-row" style={{ transform: CSS.Transform.toString(transform), transition }}>
-    <button className="drag-handle" type="button" aria-label={`Di chuyển ${member.fullName}`} {...attributes} {...listeners}><GripVertical aria-hidden="true" /></button>
+    <Button className="drag-handle" variant="ghost" size="icon-sm" type="button" aria-label={`Di chuyển ${member.fullName}`} {...attributes} {...listeners}><GripVertical aria-hidden="true" /></Button>
     <span><strong>{member.fullName}</strong>{member.dharmaName && <small>Pháp danh: {member.dharmaName}</small>}</span>
-    <button className="icon-button danger" type="button" aria-label={`Xóa ${member.fullName}`} onClick={onRemove}><Trash2 aria-hidden="true" /></button>
+    <Button className="icon-button danger" variant="ghost" size="icon-sm" type="button" aria-label={`Xóa ${member.fullName}`} onClick={onRemove}><Trash2 aria-hidden="true" /></Button>
   </li>;
 }
 

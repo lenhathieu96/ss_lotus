@@ -1,5 +1,5 @@
-import { PrayerPage } from '../../../features/prayer/prayer-page';
+import { redirect } from 'next/navigation';
 
 export default function WellbeingPrayerPage() {
-  return <PrayerPage type="wellbeing" />;
+  redirect('/households');
 }

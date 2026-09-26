@@ -42,3 +42,8 @@ npm run build
 - Preserve the current browser-only Supabase login unless a task explicitly adds server-side auth.
 - Read a file before editing it. Run focused tests, then `npm test` and `npm run build` for shared contract changes.
 - Before changing the database, create a backup and add an executable migration under `supabase/migrations/`.
+
+## Production Deployment Safety
+
+- Never deploy, promote, or release to production without the user's explicit authorization in the current conversation.
+- A plan phase, implementation request, previous approval, or preview deployment does not authorize a production release. Stop before production and ask for explicit approval.

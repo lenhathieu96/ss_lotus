@@ -1,5 +1,5 @@
-import { DeceasedPersonCatalogPage } from '../../../../features/deceased-persons/deceased-person-catalog-page';
+import { redirect } from 'next/navigation';
 
 export default function DeceasedPeoplePage() {
-  return <DeceasedPersonCatalogPage />;
+  redirect('/huong-linh');
 }

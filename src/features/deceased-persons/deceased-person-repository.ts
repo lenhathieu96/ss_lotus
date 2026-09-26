@@ -1,5 +1,6 @@
 import { supabase } from '../../lib/supabase';
 import { DeceasedPerson } from './deceased-person-domain';
+import { LunarDayMonth, isValidLunarDayMonth } from '../calendar/lunar-date-domain';
 
 function requireClient() {
   if (!supabase) throw new Error('Thiếu cấu hình Supabase.');
@@ -11,16 +12,36 @@ function requireBusinessNumber(value: string, label: string): number {
   return Number(value);
 }
 
+function readLunarDayMonth(row: Record<string, unknown>): LunarDayMonth {
+  const value = { day: Number(row.death_lunar_day), month: Number(row.death_lunar_month), isLeap: row.death_lunar_is_leap === true };
+  if (!isValidLunarDayMonth(value) || typeof row.death_lunar_is_leap !== 'boolean') throw new Error('Dữ liệu ngày mất âm lịch không hợp lệ.');
+  return value;
+}
+
 function toCatalogPerson(row: Record<string, unknown>): DeceasedPerson {
+  const history = Array.isArray(row.prayer_history) ? row.prayer_history as Array<{ date: string; period: 'morning' | 'afternoon' | 'evening' }> : [];
   return {
+    id: String(row.id),
     code: String(row.code),
     fullName: String(row.full_name),
     dharmaName: String(row.dharma_name ?? ''),
-    dateOfDeath: String(row.date_of_death),
+    dateOfDeath: readLunarDayMonth(row),
     createdBy: String(row.recorded_by),
     householdReference: row.household_reference ? String(row.household_reference) : '',
     familyReference: row.family_reference ? String(row.family_reference) : '',
+    prayerHistory: history,
   };
+}
+
+export async function updateDeceasedPersonAssociation(person: DeceasedPerson): Promise<void> {
+  if (!person.id) throw new Error('Thiếu mã định danh hương linh.');
+  if (!!person.householdReference !== !!person.familyReference) throw new Error('Mã hộ và mã gia đình phải nhập cùng nhau.');
+  const { error } = await requireClient().rpc('update_deceased_person_association', {
+    p_deceased_person_id: person.id,
+    p_household_business_number: person.householdReference ? requireBusinessNumber(person.householdReference, 'Mã hộ') : null,
+    p_family_business_number: person.familyReference ? requireBusinessNumber(person.familyReference, 'Mã gia đình') : null,
+  });
+  if (error) throw toUserMessage(error);
 }
 
 function toUserMessage(error: { code?: string; message: string }): Error {
@@ -39,7 +60,9 @@ export async function createDeceasedPerson(person: DeceasedPerson): Promise<void
     p_code: person.code,
     p_full_name: person.fullName,
     p_dharma_name: person.dharmaName,
-    p_date_of_death: person.dateOfDeath,
+    p_death_lunar_day: person.dateOfDeath.day,
+    p_death_lunar_month: person.dateOfDeath.month,
+    p_death_lunar_is_leap: person.dateOfDeath.isLeap,
     p_recorded_by: person.createdBy,
     p_household_business_number: person.householdReference ? requireBusinessNumber(person.householdReference, 'Mã hộ') : null,
     p_family_business_number: person.familyReference ? requireBusinessNumber(person.familyReference, 'Mã gia đình') : null,

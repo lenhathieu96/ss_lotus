@@ -1,4 +1,5 @@
 import { DeceasedPerson, normalizeDeceasedPerson } from './deceased-person-domain';
+import { LunarDayMonth, isValidLunarDayMonth } from '../calendar/lunar-date-domain';
 
 export const deceasedPersonCsvHeaders = ['ma_so', 'ho_ten', 'phap_danh', 'ngay_mat', 'nguoi_lap', 'ma_ho', 'ma_gia_dinh'] as const;
 type Header = typeof deceasedPersonCsvHeaders[number];
@@ -16,10 +17,14 @@ function csvCells(line: string): string[] {
   }
   cells.push(cell.trim()); return cells;
 }
-function validDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const date = new Date(`${value}T00:00:00Z`);
-  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+function parseLunarDate(value: string, isLeapValue: string): LunarDayMonth | null {
+  const match = /^(\d{1,2})\/(\d{1,2})$/.exec(value.trim());
+  if (!match) return null;
+  const normalizedLeap = isLeapValue.trim().toLocaleLowerCase('vi-VN');
+  const isLeap = ['true', '1', 'yes', 'y', 'có', 'co', 'nhuận', 'nhuan'].includes(normalizedLeap);
+  if (normalizedLeap && !isLeap && !['false', '0', 'no', 'n', 'không', 'khong', 'thường', 'thuong'].includes(normalizedLeap)) return null;
+  const date = { day: Number(match[1]), month: Number(match[2]), isLeap };
+  return isValidLunarDayMonth(date) ? date : null;
 }
 
 export function parseDeceasedPersonCsv(content: string, existingCodes: string[] = []): ImportPreview {
@@ -29,12 +34,13 @@ export function parseDeceasedPersonCsv(content: string, existingCodes: string[] 
   if (missing.length) { const row = { rowNumber: 1, errors: [`Dòng 1: Thiếu cột ${missing.join(', ')}.`] }; return { rows: [row], validRows: [], invalidRows: [row] }; }
   const seen = new Set(existingCodes.map((code) => code.trim().toLocaleUpperCase('vi-VN')));
   const rows = lines.slice(1).map((line, index) => {
-    const values = csvCells(line); const source = Object.fromEntries(headers.map((header, cellIndex) => [header, values[cellIndex] ?? ''])) as Record<Header, string>;
-    const person = normalizeDeceasedPerson({ code: source.ma_so, fullName: source.ho_ten, dharmaName: source.phap_danh, dateOfDeath: source.ngay_mat, createdBy: source.nguoi_lap, householdReference: source.ma_ho, familyReference: source.ma_gia_dinh });
+    const values = csvCells(line); const source = Object.fromEntries(headers.map((header, cellIndex) => [header, values[cellIndex] ?? ''])) as Record<Header, string> & { thang_nhuan?: string };
+    const dateOfDeath = parseLunarDate(source.ngay_mat, source.thang_nhuan ?? '');
+    const person = normalizeDeceasedPerson({ code: source.ma_so, fullName: source.ho_ten, dharmaName: source.phap_danh, dateOfDeath: dateOfDeath ?? { day: 0, month: 0, isLeap: false }, createdBy: source.nguoi_lap, householdReference: source.ma_ho, familyReference: source.ma_gia_dinh });
     const rowNumber = index + 2; const errors: string[] = [];
     if (!person.code) errors.push(`Dòng ${rowNumber}: Mã số là bắt buộc.`); else if (seen.has(person.code)) errors.push(`Dòng ${rowNumber}: Mã số trùng: ${person.code}.`); else seen.add(person.code);
     if (!person.fullName) errors.push(`Dòng ${rowNumber}: Họ tên là bắt buộc.`);
-    if (!person.dateOfDeath || !validDate(person.dateOfDeath)) errors.push(`Dòng ${rowNumber}: Ngày mất không hợp lệ.`);
+    if (!isValidLunarDayMonth(person.dateOfDeath)) errors.push(`Dòng ${rowNumber}: Ngày mất âm lịch không hợp lệ; dùng dd/mm và ghi tháng nhuận ở cột thang_nhuan.`);
     if (!person.createdBy) errors.push(`Dòng ${rowNumber}: Người lập là bắt buộc.`);
     if (person.householdReference && !/^\d{1,4}$/.test(person.householdReference)) errors.push(`Dòng ${rowNumber}: Mã hộ phải từ 1 đến 4 chữ số.`);
     if (person.familyReference && !/^\d{1,4}$/.test(person.familyReference)) errors.push(`Dòng ${rowNumber}: Mã gia đình phải từ 1 đến 4 chữ số.`);

@@ -3,7 +3,7 @@ import './theme.css';
 
 export const metadata: Metadata = {
   title: 'SS Lotus',
-  description: 'Quản trị hộ gia đình và lễ cầu an, cầu siêu.',
+  description: 'Quản lý hộ gia đình, hương linh và đăng ký cầu an, cầu siêu theo lịch âm.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

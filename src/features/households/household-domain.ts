@@ -1,3 +1,5 @@
+import type { LunarDayMonth } from '../calendar/lunar-date-domain';
+
 export type PrayerType = 'wellbeing' | 'memorial';
 export type CeremonyPeriod = 'morning' | 'afternoon' | 'evening';
 
@@ -6,6 +8,21 @@ export interface Member {
   fullName: string;
   dharmaName?: string;
   yearOfBirth?: number;
+  prayerHistory?: PrayerHistory[];
+}
+
+export interface PrayerHistory {
+  date: string;
+  period: CeremonyPeriod;
+}
+
+export interface HouseholdDeceasedPerson {
+  id: string;
+  code: string;
+  fullName: string;
+  dharmaName?: string | null;
+  dateOfDeath: LunarDayMonth;
+  prayerHistory: PrayerHistory[];
 }
 
 export interface Family {
@@ -13,6 +30,7 @@ export interface Family {
   businessNumber?: number;
   address: string;
   members: Member[];
+  deceasedPeople?: HouseholdDeceasedPerson[];
 }
 
 export interface Household {
@@ -42,7 +60,7 @@ export function hasEmptyFamily(household: Household | null): boolean {
 }
 
 export function allowedPeriods(type: PrayerType): CeremonyPeriod[] {
-  return type === 'memorial' ? ['evening'] : ['morning', 'afternoon', 'evening'];
+  return ['morning', 'afternoon', 'evening'];
 }
 
 export function isFutureOrToday(date: Date, today = new Date()): boolean {
