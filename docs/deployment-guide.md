@@ -17,6 +17,27 @@ Both variables are intentionally browser-visible. Do not add database URLs, serv
 
 The current migration intentionally preserves browser-only Supabase login. It does not add server-side session cookies or protected Next.js routes.
 
+## GitHub Actions CI/CD
+
+`.github/workflows/vercel-deployment.yml` validates every pull request and push
+to `master` with `npm ci`, `npm test`, and `npm run build`. A push to `master`
+deploys the Vercel prebuilt artifact only after the validation job succeeds and
+the GitHub `production` environment allows the job to start.
+
+Before enabling this workflow, configure the repository's `production`
+environment with the required deployment reviewers. Add these repository or
+environment secrets:
+
+- `VERCEL_TOKEN`: a Vercel token with access to `ss-lotus-v2`.
+- `VERCEL_ORG_ID`: the Vercel team ID for `hieules-projects-adae357f`.
+- `VERCEL_PROJECT_ID`: the Vercel project ID for `ss-lotus-v2`.
+
+The Vercel CLI reads the organization and project IDs from the workflow
+environment, so `.vercel/project.json` remains local and is never committed.
+If the Vercel project has Git-based production deployments enabled, disable
+that production trigger before enabling this workflow to prevent duplicate
+deployments for the same `master` commit.
+
 ## Administrator provisioning
 
 Signing in verifies the configured username and password, but it does not grant
