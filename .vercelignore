@@ -1,0 +1,13 @@
+# Local dotenv configuration may contain credentials. Vercel uses its project
+# environment variables instead, so dotenv files do not belong in a deployment.
+.?nv
+.?nv.*
+
+# Local tooling state and non-runtime artifacts are not part of the build.
+.agent/
+.claude/
+dist/
+plans/
+supabase/.temp/
+*.tsbuildinfo
+supabase_schema.md

@@ -37,3 +37,4 @@ supabase/.branches/
 !.vscode/settings.json
 .vercel
 plans
+.env*
