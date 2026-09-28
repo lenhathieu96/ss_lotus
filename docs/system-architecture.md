@@ -10,7 +10,7 @@
 
 ## Registration and database boundary
 
-Browser-side Supabase authentication is preserved. Administrators enter a username and password; the client normalizes the username and submits the internal Supabase Auth email alias `${username}@ss-lotus.local` with that password. The dashboard route group checks the persisted Supabase session before mounting feature screens; absent or expired sessions redirect to `/login`, preventing RPCs from running as the `anon` role. Mutations use authenticated, admin-gated security-definer RPCs; ownership is validated from database relationships, and registration/association writes create audit events. Registrations, ceremony slots, and death dates retain canonical PostgreSQL `date` values in solar calendar form for comparison, capacity, and sorting. The application converts dates at the repository boundary.
+Browser-side Supabase authentication is preserved. Administrators can enter a real email address and password, or use a legacy username; the client submits a valid email directly and normalizes a legacy username into the internal `${username}@ss-lotus.local` Auth alias. The dashboard route group checks the persisted Supabase session before mounting feature screens; absent or expired sessions redirect to `/login`, preventing RPCs from running as the `anon` role. Mutations use authenticated, admin-gated security-definer RPCs; ownership is validated from database relationships, and registration/association writes create audit events. Registrations, ceremony slots, and death dates retain canonical PostgreSQL `date` values in solar calendar form for comparison, capacity, and sorting. The application converts dates at the repository boundary.
 
 ## Calendar contract
 

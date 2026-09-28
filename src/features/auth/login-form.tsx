@@ -7,20 +7,20 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { usernameToAuthEmail } from './username-auth-email';
+import { loginIdentifierToAuthEmail } from './username-auth-email';
 
 export function LoginForm() {
   const router = useRouter();
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<string | null>(supabaseConfigurationError);
 
   async function signIn(event: FormEvent) {
     event.preventDefault();
     if (!supabase) return;
-    const email = usernameToAuthEmail(username);
+    const email = loginIdentifierToAuthEmail(identifier);
     if (!email) {
-      setMessage('Tài khoản phải có từ 3 đến 32 ký tự: chữ, số, dấu chấm, gạch dưới hoặc gạch ngang.');
+      setMessage('Nhập email hợp lệ hoặc tài khoản từ 3 đến 32 ký tự: chữ, số, dấu chấm, gạch dưới hoặc gạch ngang.');
       return;
     }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -28,5 +28,5 @@ export function LoginForm() {
     if (!error) router.replace('/households');
   }
 
-  return <main className="auth-page"><Card className="auth-card"><form onSubmit={signIn}><h1>SS Lotus</h1><p>Đăng nhập quản trị</p><Label className="auth-field">Tài khoản<Input type="text" autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} required /></Label><Label className="auth-field">Mật khẩu<Input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></Label>{message && <p className="notice" role="alert">{message}</p>}<Button type="submit" disabled={!supabase}>Đăng nhập</Button></form></Card></main>;
+  return <main className="auth-page"><Card className="auth-card"><form onSubmit={signIn}><h1>SS Lotus</h1><p>Đăng nhập quản trị</p><Label className="auth-field">Tài khoản hoặc email<Input type="text" autoComplete="username" value={identifier} onChange={(event) => setIdentifier(event.target.value)} required /></Label><Label className="auth-field">Mật khẩu<Input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></Label>{message && <p className="notice" role="alert">{message}</p>}<Button type="submit" disabled={!supabase}>Đăng nhập</Button></form></Card></main>;
 }
