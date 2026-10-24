@@ -1,5 +1,18 @@
-import { CeremonyPeriod } from '../households/household-domain';
-import { supabase } from '../../lib/supabase';
+import { type CeremonyPeriod, type PrayerType } from '@features/households/household-repository';
+import { supabase } from '@data/network/supabase/browser-client';
+
+export interface PrayerRegistrationInput {
+  type: PrayerType;
+  personIds: string[];
+  solarDate: string;
+  period: CeremonyPeriod;
+}
+
+export const ceremonyPeriodLabels: Record<CeremonyPeriod, string> = {
+  morning: 'Sáng',
+  afternoon: 'Chiều',
+  evening: 'Tối',
+};
 
 function requireSupabase() {
   if (!supabase) throw new Error('Thiếu cấu hình Supabase.');
@@ -13,7 +26,12 @@ function throwRpcError(message: string): never {
   throw new Error(message);
 }
 
-export async function createHouseholdWellbeingRegistration(householdId: string, memberIds: string[], solarDate: string, period: CeremonyPeriod): Promise<void> {
+export async function createHouseholdWellbeingRegistration(
+  householdId: string,
+  memberIds: string[],
+  solarDate: string,
+  period: CeremonyPeriod,
+): Promise<void> {
   if (!memberIds.length) throw new Error('Chọn ít nhất một thành viên.');
   const { error } = await requireSupabase().rpc('create_household_wellbeing_registration', {
     p_household_id: householdId,
@@ -24,7 +42,11 @@ export async function createHouseholdWellbeingRegistration(householdId: string, 
   if (error) throwRpcError(error.message);
 }
 
-export async function createMemorialRegistration(deceasedPersonId: string, solarDate: string, period: CeremonyPeriod): Promise<void> {
+export async function createMemorialRegistration(
+  deceasedPersonId: string,
+  solarDate: string,
+  period: CeremonyPeriod,
+): Promise<void> {
   const { error } = await requireSupabase().rpc('create_memorial_registration', {
     p_deceased_person_id: deceasedPersonId,
     p_ceremony_date: solarDate,

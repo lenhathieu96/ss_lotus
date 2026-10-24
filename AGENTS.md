@@ -16,12 +16,14 @@ SS Lotus is a Next.js App Router web application for managing Buddhist household
 
 ```text
 src/
-├── app/          # Route pages, layouts, and global CSS
+├── app/          # Next routing, metadata, redirects and parameter forwarding only
 ├── components/   # Shared presentation components
-├── features/     # Feature-owned UI, domain state, and repositories
+├── data/         # local/ and network/ client infrastructure only
+├── features/     # Feature-owned UI and one feature logic/repository module
 ├── lib/          # Framework/service integrations
 └── test/         # Test setup
 supabase/
+├── functions/    # Privileged library lifecycle and S3 operations
 └── migrations/   # Executable database migrations
 ```
 
@@ -31,11 +33,17 @@ supabase/
 npm run dev
 npm test
 npm run build
+npm run functions:check
+npm run functions:test
+npm run test:scripts
 ```
 
 ## Conventions
 
-- Keep `src/app` route files thin; place reusable business behavior in `src/features`.
+- Use folder-specific source aliases: `@components/`, `@features/`, `@data/`, `@lib/`, `@hooks/`, and `@test/`, not `@/`. Keep TypeScript, Vitest and shadcn alias configuration aligned.
+- Within a feature, keep `pages/` and `components/` folders, then consolidate non-UI behavior into one root module such as `household-repository.ts`. That module may contain types, validation, reducer helpers, browser I/O, and provider calls. `lunar-date-domain.ts` is the calendar exception because it has no provider integration. Import within a feature with the shortest relative path; use `@features/<other-feature>/...` only across feature boundaries. Do not recreate `domain/`, `repositories/`, or `services/` folders.
+- Keep `src/app` limited to framework adapters; screen composition and styles belong to `src/features`. Feature repositories implement provider behavior directly; `src/data/network` holds only the shared browser client.
+- Library mutations and signed-download lookup call the Supabase `library-lifecycle` Function. Do not add Next API routes or put privileged clients in frontend source.
 - Components using hooks, browser APIs, drag/drop, Supabase browser auth, or `FileReader` require `'use client'` at their client boundary.
 - Use `next/link` and `next/navigation`; do not add React Router.
 - Public browser environment values use only `NEXT_PUBLIC_*` names. Never expose database URLs, service-role keys, or other server secrets.

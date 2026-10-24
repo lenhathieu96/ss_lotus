@@ -22,6 +22,9 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: npm run test:scripts
+      - run: npm run functions:check
+      - run: npm run functions:test
       - run: npm test
       - run: npm run build
 
@@ -44,6 +47,8 @@ jobs:
           node-version: 24
           cache: npm
 
+      - run: npm ci
+
       - name: Install Vercel CLI
         run: npm install --global vercel@65.2.0
 
@@ -52,6 +57,14 @@ jobs:
 
       - name: Build deployment artifact
         run: vercel build --prod --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Verify deployed library Function matches this release
+        env:
+          LIBRARY_FUNCTION_HEALTH_URL: ${{ vars.LIBRARY_FUNCTION_HEALTH_URL }}
+        run: |
+          test -n "$LIBRARY_FUNCTION_HEALTH_URL" || { echo "Configure LIBRARY_FUNCTION_HEALTH_URL before production rollout."; exit 1; }
+          expected_release=$(node scripts/library-function-release-id.mjs)
+          node scripts/verify-library-function-release.mjs --url "$LIBRARY_FUNCTION_HEALTH_URL" --expected "$expected_release"
 
       - name: Deploy production artifact
         id: deploy

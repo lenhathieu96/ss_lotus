@@ -1,6 +1,162 @@
-import { supabase } from '../../lib/supabase';
-import { DeceasedPerson } from './deceased-person-domain';
-import { LunarDayMonth, isValidLunarDayMonth } from '../calendar/lunar-date-domain';
+import { supabase } from '@data/network/supabase/browser-client';
+import { normalizeUppercase, type PrayerHistory } from '@features/households/household-repository';
+import { formatLunarDayMonth, isValidLunarDayMonth, type LunarDayMonth } from '@features/calendar/lunar-date-domain';
+
+export interface DeceasedPerson {
+  id?: string;
+  code: string;
+  fullName: string;
+  dharmaName: string;
+  dateOfDeath: LunarDayMonth;
+  createdBy: string;
+  householdReference?: string;
+  familyReference?: string;
+  prayerHistory?: PrayerHistory[];
+}
+
+export type DeceasedPersonInput = Omit<DeceasedPerson, 'code'> & { code: string };
+
+export function normalizeDeceasedPerson(input: DeceasedPersonInput): DeceasedPerson {
+  return {
+    code: normalizeUppercase(input.code),
+    fullName: normalizeUppercase(input.fullName),
+    dharmaName: normalizeUppercase(input.dharmaName),
+    dateOfDeath: { ...input.dateOfDeath, isLeap: input.dateOfDeath.isLeap === true },
+    createdBy: normalizeUppercase(input.createdBy),
+    householdReference: normalizeUppercase(input.householdReference ?? ''),
+    familyReference: normalizeUppercase(input.familyReference ?? ''),
+  };
+}
+
+export function searchDeceasedPerson(person: DeceasedPerson, query: string): boolean {
+  const fold = (value: string) => value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLocaleLowerCase('vi-VN');
+  const searchable = [
+    person.code,
+    person.fullName,
+    person.dharmaName,
+    formatLunarDayMonth(person.dateOfDeath),
+    person.createdBy,
+    person.householdReference ?? '',
+    person.familyReference ?? '',
+  ];
+  return fold(searchable.join(' ')).includes(fold(query.trim()));
+}
+
+export interface DeceasedPersonCatalogState {
+  people: DeceasedPerson[];
+}
+export type DeceasedPersonCatalogAction =
+  | { type: 'catalog-loaded'; people: DeceasedPerson[] }
+  | { type: 'person-added'; person: DeceasedPerson }
+  | { type: 'people-imported'; people: DeceasedPerson[] };
+
+export function deceasedPersonCatalogReducer(state: DeceasedPersonCatalogState, action: DeceasedPersonCatalogAction): DeceasedPersonCatalogState {
+  if (action.type === 'catalog-loaded') return { people: action.people };
+  return action.type === 'person-added' ? { people: [...state.people, action.person] } : { people: [...state.people, ...action.people] };
+}
+
+export const deceasedPersonCsvHeaders = ['ma_so', 'ho_ten', 'phap_danh', 'ngay_mat', 'nguoi_lap', 'ma_ho', 'ma_gia_dinh'] as const;
+type Header = typeof deceasedPersonCsvHeaders[number];
+export interface ImportRow {
+  rowNumber: number;
+  person?: DeceasedPerson;
+  errors: string[];
+}
+export interface ImportPreview {
+  rows: ImportRow[];
+  validRows: DeceasedPerson[];
+  invalidRows: ImportRow[];
+}
+
+function csvCells(line: string): string[] {
+  const cells: string[] = [];
+  let cell = '';
+  let quoted = false;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (char === '"' && quoted && line[index + 1] === '"') {
+      cell += char;
+      index += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === ',' && !quoted) {
+      cells.push(cell.trim());
+      cell = '';
+    } else {
+      cell += char;
+    }
+  }
+
+  cells.push(cell.trim());
+  return cells;
+}
+
+function parseLunarDate(value: string, isLeapValue: string): LunarDayMonth | null {
+  const match = /^(\d{1,2})\/(\d{1,2})$/.exec(value.trim());
+  if (!match) return null;
+  const normalizedLeap = isLeapValue.trim().toLocaleLowerCase('vi-VN');
+  const isLeap = ['true', '1', 'yes', 'y', 'có', 'co', 'nhuận', 'nhuan'].includes(normalizedLeap);
+  if (normalizedLeap && !isLeap && !['false', '0', 'no', 'n', 'không', 'khong', 'thường', 'thuong'].includes(normalizedLeap)) return null;
+  const date = { day: Number(match[1]), month: Number(match[2]), isLeap };
+  return isValidLunarDayMonth(date) ? date : null;
+}
+
+export function parseDeceasedPersonCsv(content: string, existingCodes: string[] = []): ImportPreview {
+  const lines = content.replace(/^\uFEFF/, '').split(/\r?\n/).filter((line) => line.trim());
+  const headers = csvCells(lines[0] ?? '');
+  const missing = deceasedPersonCsvHeaders.filter((header) => !headers.includes(header));
+  if (missing.length) {
+    const row = { rowNumber: 1, errors: [`Dòng 1: Thiếu cột ${missing.join(', ')}.`] };
+    return { rows: [row], validRows: [], invalidRows: [row] };
+  }
+
+  const seen = new Set(existingCodes.map((code) => code.trim().toLocaleUpperCase('vi-VN')));
+  const rows = lines.slice(1).map((line, index) => {
+    const values = csvCells(line);
+    const source = Object.fromEntries(
+      headers.map((header, cellIndex) => [header, values[cellIndex] ?? '']),
+    ) as Record<Header, string> & { thang_nhuan?: string };
+    const dateOfDeath = parseLunarDate(source.ngay_mat, source.thang_nhuan ?? '');
+    const person = normalizeDeceasedPerson({
+      code: source.ma_so,
+      fullName: source.ho_ten,
+      dharmaName: source.phap_danh,
+      dateOfDeath: dateOfDeath ?? { day: 0, month: 0, isLeap: false },
+      createdBy: source.nguoi_lap,
+      householdReference: source.ma_ho,
+      familyReference: source.ma_gia_dinh,
+    });
+    const rowNumber = index + 2;
+    const errors: string[] = [];
+
+    if (!person.code) {
+      errors.push(`Dòng ${rowNumber}: Mã số là bắt buộc.`);
+    } else if (seen.has(person.code)) {
+      errors.push(`Dòng ${rowNumber}: Mã số trùng: ${person.code}.`);
+    } else {
+      seen.add(person.code);
+    }
+    if (!person.fullName) errors.push(`Dòng ${rowNumber}: Họ tên là bắt buộc.`);
+    if (!isValidLunarDayMonth(person.dateOfDeath)) errors.push(`Dòng ${rowNumber}: Ngày mất âm lịch không hợp lệ; dùng dd/mm và ghi tháng nhuận ở cột thang_nhuan.`);
+    if (!person.createdBy) errors.push(`Dòng ${rowNumber}: Người lập là bắt buộc.`);
+    if (person.householdReference && !/^\d{1,4}$/.test(person.householdReference)) errors.push(`Dòng ${rowNumber}: Mã hộ phải từ 1 đến 4 chữ số.`);
+    if (person.familyReference && !/^\d{1,4}$/.test(person.familyReference)) errors.push(`Dòng ${rowNumber}: Mã gia đình phải từ 1 đến 4 chữ số.`);
+    if (!!person.householdReference !== !!person.familyReference) errors.push(`Dòng ${rowNumber}: Mã hộ và mã gia đình phải nhập cùng nhau.`);
+    return { rowNumber, person, errors };
+  });
+
+  return {
+    rows,
+    validRows: rows.filter((row) => !row.errors.length).map((row) => row.person!),
+    invalidRows: rows.filter((row) => row.errors.length),
+  };
+}
 
 function requireClient() {
   if (!supabase) throw new Error('Thiếu cấu hình Supabase.');
@@ -13,7 +169,11 @@ function requireBusinessNumber(value: string, label: string): number {
 }
 
 function readLunarDayMonth(row: Record<string, unknown>): LunarDayMonth {
-  const value = { day: Number(row.death_lunar_day), month: Number(row.death_lunar_month), isLeap: row.death_lunar_is_leap === true };
+  const value = {
+    day: Number(row.death_lunar_day),
+    month: Number(row.death_lunar_month),
+    isLeap: row.death_lunar_is_leap === true,
+  };
   if (!isValidLunarDayMonth(value) || typeof row.death_lunar_is_leap !== 'boolean') throw new Error('Dữ liệu ngày mất âm lịch không hợp lệ.');
   return value;
 }
@@ -72,7 +232,11 @@ export async function createDeceasedPerson(person: DeceasedPerson): Promise<void
 
 export async function importDeceasedPeople(people: DeceasedPerson[]): Promise<void> {
   people.forEach((person) => {
-    if ((person.householdReference && !/^\d{1,4}$/.test(person.householdReference)) || (person.familyReference && !/^\d{1,4}$/.test(person.familyReference))) throw new Error('Mã hộ và mã gia đình phải từ 1 đến 4 chữ số.');
+    const hasInvalidHousehold = person.householdReference && !/^\d{1,4}$/.test(person.householdReference);
+    const hasInvalidFamily = person.familyReference && !/^\d{1,4}$/.test(person.familyReference);
+    if (hasInvalidHousehold || hasInvalidFamily) {
+      throw new Error('Mã hộ và mã gia đình phải từ 1 đến 4 chữ số.');
+    }
     if (!!person.householdReference !== !!person.familyReference) throw new Error('Mã hộ và mã gia đình phải nhập cùng nhau.');
   });
   const { error } = await requireClient().rpc('import_deceased_people', { p_people: people });

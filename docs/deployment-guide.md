@@ -2,7 +2,7 @@
 
 ## Vercel production deployment
 
-The Next.js App Router application on `chore/V2` is deployed as the Vercel project `ss-lotus`.
+The Next.js App Router application is deployed as the Vercel project `ss-lotus`.
 
 - Production URL: `https://ss-lotus.vercel.app`
 - Build command: `npm run build`
@@ -16,16 +16,21 @@ The project requires these production environment variables:
 
 The `NEXT_PUBLIC_*` values are intentionally browser-visible. Do not add database URLs, service-role keys, or other server secrets to Vercel variables with the `NEXT_PUBLIC_` prefix.
 
-Local dotenv files are excluded from deployments by `.vercelignore`, except the credential-free `.env.example` template. Configure both browser-visible values and server-only credentials in the Vercel project settings; never depend on local dotenv configuration during a remote build.
+Local dotenv files are excluded from deployments by `.vercelignore`, except the credential-free `.env.example` template. Configure browser-visible values in Vercel. Backend Supabase and AWS credentials belong to the Supabase Function secret store; never depend on local dotenv configuration during a remote build.
 
-Browser login remains client-side and does not use server-side session cookies. The PDF library's admin API Route Handlers separately validate bearer tokens and `admin_users` membership before invoking lifecycle operations; see the [system architecture](system-architecture.md).
+Browser login remains client-side and does not use server-side session cookies. The PDF library's Supabase Function validates user tokens and admin_users membership before lifecycle mutations; see the [Function contract and local setup](library-function-contract.md). There are no Next API routes.
 
 ## GitHub Actions CI/CD
 
 `.github/workflows/vercel-deployment.yml` validates every pull request and push
-to `master` with `npm ci`, `npm test`, and `npm run build`. Each push to
+to `master` with frontend tests/build, Node release-script tests, and Deno
+Function checks/tests after `npm ci`. Each push to
 `master` deploys the Vercel prebuilt artifact to production after validation
-passes. The `production` environment is used for its deployment secrets and
+passes and the deployed Function health fingerprint matches the checkout.
+Set the repository or production-environment variable `LIBRARY_FUNCTION_HEALTH_URL`
+to `<supabase-url>/functions/v1/library-lifecycle/health`; missing/mismatched
+Function readiness blocks frontend promotion. Deploy the approved Function
+artifact first using the release steps below. The `production` environment is used for its deployment secrets and
 must not have required reviewers if deployment should start automatically.
 After a successful production deployment, the workflow creates one GitHub
 Release tagged and titled `0.<workflow-run-number>.0`. The run number increases
@@ -55,7 +60,8 @@ an authorized database operator must add that Supabase Auth user's UUID to
 `public.admin_users`. Verify the intended Auth user and take the required backup
 before changing production data; do not grant access to every authenticated user.
 
-To deploy the linked project again:
+Only after explicit production approval and a successful Function release check,
+the deployment owner may deploy the linked frontend:
 
 ```bash
 vercel deploy --prod --yes --scope hieules-projects-adae357f
@@ -88,7 +94,7 @@ Provision a Singapore (`ap-southeast-1`) S3 bucket before cutover. Keep Block Pu
 }
 ```
 
-Give the Vercel runtime those credentials through its secure environment or an approved workload-identity provider. Configure separate, least-privilege CORS rules for the exact approved origins—`http://localhost:3000` and `https://ss-lotus.vercel.app`—never a wildcard origin or credentials:
+Give the Supabase Function runtime those credentials through its protected secret store. Retain any credentials needed by the previous Vercel deployment until the rollback window ends. Configure separate, least-privilege S3 CORS rules for the exact approved origins—`http://localhost:3000` and `https://ss-lotus.vercel.app`—never a wildcard origin or credentials:
 
 ```json
 [
@@ -111,7 +117,27 @@ Give the Vercel runtime those credentials through its secure environment or an a
 
 The reader rule enables PDF.js direct S3 range requests; it must not authorize browser `DELETE` or write headers. CORS is bucket-wide and is not an authorization mechanism: public bucket policy remains limited to `documents/*`, while `pending/*` stays private. Export the existing bucket CORS JSON to the approved operational record and read the final JSON back before changing it. Production CORS changes still require current explicit authorization.
 
-Set `NEXT_PUBLIC_S3_LIBRARY_BASE_URL` to the HTTPS public S3 base. Store `AWS_REGION`, `S3_LIBRARY_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS` and `SUPABASE_SERVICE_ROLE_KEY` only as secure server-side environment variables; never use a `NEXT_PUBLIC_` name for them. The runtime also accepts the AWS-standard `AWS_SECRET_ACCESS_KEY` and prefers it if both names are configured. The Vercel runtime identity requires `s3:GetObject`, `s3:PutObject`, and `s3:DeleteObject` on both `pending/*` and `documents/*`; direct browser uploads alone do not prove the runtime can verify or publish a PDF. If the bucket uses a customer-managed SSE-KMS key, grant the runtime identity the corresponding KMS decrypt/encrypt permissions as well. Test the policy in non-production: anonymous known-document GET succeeds; staging read/list/write/delete fail; an allowed-origin signed `PUT` succeeds once and its replay receives `412`.
+Set `NEXT_PUBLIC_S3_LIBRARY_BASE_URL` to the HTTPS public S3 base. Configure `AWS_REGION`, `S3_LIBRARY_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (or existing `AWS_SECRET_ACCESS` alias), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and `LIBRARY_ALLOWED_ORIGINS` for the Function only. The origin allowlist contains exact comma-separated browser origins; until configured, origin-bearing requests fail closed. Never use a NEXT_PUBLIC prefix for privileged credentials. The Function IAM identity requires GetObject, PutObject and DeleteObject on pending/* and documents/*, plus the restricted existence-check policy above. If using SSE-KMS, grant only the necessary encryption/decryption access. Verify on disposable non-production resources: public known-document read succeeds, anonymous staging/list/write/delete fail, and signed PUT replay returns 412 while staging still exists. After staging deletion, the same unexpired signed URL can recreate that key; do not describe this existing behavior as revocation or strict single-use.
+
+## Library Function release
+
+Use the pinned Deno tool through npm scripts. Run `npm run functions:check`,
+`npm run functions:test`, `npm run test:scripts`, `npm test` and `npm run build`.
+`npm run functions:prepare` generates immutable build identity from Function
+source/config/dependencies. Use the installed Supabase CLI's live help for
+local serving and deployment; this repository does not automatically deploy
+Functions on PRs. Local gateway smoke tests need Docker and a Supabase stack.
+
+After explicit release approval, provision Function secrets and deploy the
+fingerprinted Function artifact first. Verify GET health against the expected
+identity with `node scripts/verify-library-function-release.mjs --url <supabase-url>/functions/v1/library-lifecycle/health`.
+Then promote the frontend through its gated workflow. Confirm no uploads have
+started since the user's completed-upload report and refresh old browser tabs;
+they still reference the retired API until reloaded. Keep the previous frontend
+deployment and credentials available for rollback and retain the Function for
+any new clients. Runtime import/unit checks do not establish actual hosted
+gateway, 100 MB workload or IAM/KMS compatibility; record isolated smoke proof
+before production.
 
 Before the approved migration window, record read-only evidence that both Supabase Storage `library/documents/*` and all `library_documents` lifecycle rows are empty. Any source PDF or active/published/deleting metadata row requires a separate remediation plan. Take and record a PostgreSQL backup reference outside the repository. Apply the migration with the lock still enabled, deploy the S3-aware build and secure variables, verify legacy and new lifecycle paths are blocked, then perform non-production-style smoke checks. Only an approved operator may unset the maintenance lock and reopen writes. On failure, repair and reconcile forward; do not redeploy the old Supabase Storage browser flow or roll back the database migration.
 
