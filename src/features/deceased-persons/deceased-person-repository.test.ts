@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { rpc } = vi.hoisted(() => ({ rpc: vi.fn() }));
 vi.mock('@data/network/supabase/browser-client', () => ({ supabase: { rpc } }));
+vi.mock('@features/pagodas/pagoda-client', () => ({ activePagodaId: () => 'pagoda-1' }));
 
 import { createDeceasedPerson, importDeceasedPeople, listDeceasedPeople, normalizeDeceasedPerson, parseDeceasedPersonCsv, searchDeceasedPerson } from './deceased-person-repository';
 
@@ -12,7 +13,7 @@ describe('deceased-person repository', () => {
     rpc.mockResolvedValue({ data: [{ id: 'spirit-1', code: 'HL-01', full_name: 'HƯƠNG LINH A', dharma_name: null, death_lunar_day: 1, death_lunar_month: 2, death_lunar_is_leap: true, recorded_by: 'ADMIN', household_reference: null, family_reference: null, prayer_history: [] }], error: null });
 
     await expect(listDeceasedPeople()).resolves.toEqual([expect.objectContaining({ dateOfDeath: { day: 1, month: 2, isLeap: true } })]);
-    expect(rpc).toHaveBeenCalledWith('list_deceased_people');
+    expect(rpc).toHaveBeenCalledWith('list_deceased_people', { p_pagoda_id: 'pagoda-1' });
   });
 
   it('sends only explicit yearless fields to the create RPC', async () => {
@@ -20,7 +21,7 @@ describe('deceased-person repository', () => {
 
     await createDeceasedPerson({ code: 'HL-01', fullName: 'HƯƠNG LINH A', dharmaName: '', dateOfDeath: { day: 1, month: 2, isLeap: true }, createdBy: 'ADMIN', householdReference: '', familyReference: '' });
 
-    expect(rpc).toHaveBeenCalledWith('create_deceased_person', expect.objectContaining({ p_death_lunar_day: 1, p_death_lunar_month: 2, p_death_lunar_is_leap: true }));
+    expect(rpc).toHaveBeenCalledWith('create_deceased_person', expect.objectContaining({ p_pagoda_id: 'pagoda-1', p_death_lunar_day: 1, p_death_lunar_month: 2, p_death_lunar_is_leap: true }));
     expect(rpc.mock.calls[0][1]).not.toHaveProperty('p_date_of_death');
   });
 
@@ -30,7 +31,7 @@ describe('deceased-person repository', () => {
 
     await importDeceasedPeople(people);
 
-    expect(rpc).toHaveBeenCalledWith('import_deceased_people', { p_people: people });
+    expect(rpc).toHaveBeenCalledWith('import_deceased_people', { p_pagoda_id: 'pagoda-1', p_people: people });
   });
 });
 

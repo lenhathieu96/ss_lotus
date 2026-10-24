@@ -24,14 +24,23 @@ Browser login remains client-side and does not use server-side session cookies. 
 
 `.github/workflows/vercel-deployment.yml` validates every pull request and push
 to `master` with frontend tests/build, Node release-script tests, and Deno
-Function checks/tests after `npm ci`. Each push to
-`master` deploys the Vercel prebuilt artifact to production after validation
-passes and the deployed Function health fingerprint matches the checkout.
+Function checks/tests after `npm ci`. A `master` push then applies pending
+Supabase migrations before the Vercel production deployment. Both jobs use the
+protected `production` environment, so its required reviewer is the approval
+gate for a database-changing release. Take and verify the production database
+backup before approving that job; the workflow records migration history and a
+dry-run but cannot create or verify a backup on its own. The deployed Function
+health fingerprint must still match the checkout before the frontend promotion.
+`20261024090001_correct-pagoda-access.sql` also restores administrator-only
+legacy RPC overloads for the original pagoda while the tenant-aware frontend is
+promoted. Do not remove those overloads until that older frontend is retired.
+Configure at least one required reviewer on the `production` environment;
+without it, pending migrations run automatically after each successful `master`
+push.
 Set the repository or production-environment variable `LIBRARY_FUNCTION_HEALTH_URL`
 to `<supabase-url>/functions/v1/library-lifecycle/health`; missing/mismatched
 Function readiness blocks frontend promotion. Deploy the approved Function
-artifact first using the release steps below. The `production` environment is used for its deployment secrets and
-must not have required reviewers if deployment should start automatically.
+artifact first using the release steps below.
 After a successful production deployment, the workflow creates one GitHub
 Release tagged and titled `0.<workflow-run-number>.0`. The run number increases
 for every workflow execution, so production deployments receive unique release
@@ -45,12 +54,22 @@ Configure these repository or `production` environment secrets:
 - `VERCEL_ORG_ID`: the organization ID from the linked `ss-lotus` project's
   `.vercel/project.json`.
 - `VERCEL_PROJECT_ID`: the project ID from that same file.
+- `SUPABASE_ACCESS_TOKEN`: a scoped Supabase token that can link the project
+  and write database migrations.
+- `SUPABASE_DB_PASSWORD`: the database password used only by the migration job.
+
+Configure this `production` environment variable:
+
+- `SUPABASE_PROJECT_REF`: the Supabase project reference targeted by the
+  migration job.
 
 The Vercel CLI reads the organization and project IDs from the workflow
 environment, so `.vercel/project.json` remains local and is never committed.
 This GitHub Actions workflow is the production deployment owner. Disable
 Vercel's Git-based production deployment trigger to avoid duplicate
-deployments for the same `master` commit.
+deployments for the same `master` commit. The `production` environment must
+retain its required-reviewer protection because the workflow can apply database
+migrations.
 
 ## Administrator provisioning
 

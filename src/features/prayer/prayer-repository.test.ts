@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { rpc } = vi.hoisted(() => ({ rpc: vi.fn() }));
 vi.mock('@data/network/supabase/browser-client', () => ({ supabase: { rpc } }));
+vi.mock('@features/pagodas/pagoda-client', () => ({ activePagodaId: () => 'pagoda-1' }));
 
 import { ceremonyPeriodLabels, createHouseholdWellbeingRegistration, createMemorialRegistration } from './prayer-repository';
 
@@ -18,6 +19,7 @@ describe('prayer repository', () => {
     await createHouseholdWellbeingRegistration('household-1', ['member-1', 'member-2'], '2026-02-17', 'afternoon');
 
     expect(rpc).toHaveBeenCalledWith('create_household_wellbeing_registration', {
+      p_pagoda_id: 'pagoda-1',
       p_household_id: 'household-1',
       p_member_ids: ['member-1', 'member-2'],
       p_ceremony_date: '2026-02-17',
@@ -37,6 +39,7 @@ describe('prayer repository', () => {
     rpc.mockResolvedValueOnce({ error: null });
     await createMemorialRegistration('deceased-1', '2026-02-17', 'evening');
     expect(rpc).toHaveBeenLastCalledWith('create_memorial_registration', {
+      p_pagoda_id: 'pagoda-1',
       p_deceased_person_id: 'deceased-1',
       p_ceremony_date: '2026-02-17',
       p_period: 'evening',

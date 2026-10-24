@@ -12,6 +12,9 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ replace: mocks.replace }) }));
+vi.mock('@features/pagodas/pagoda-access-context', () => ({
+  PagodaAccessProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
 vi.mock('../auth-repository', () => ({
   authRepository: {
     getSession: mocks.getSession,

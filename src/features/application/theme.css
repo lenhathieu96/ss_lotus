@@ -90,6 +90,9 @@ body {
 .topbar { display: flex; align-items: center; gap: 1rem; min-height: 72px; padding: 1rem 2rem; background: #fff; border-bottom: 1px solid var(--border); }
 .topbar p { margin: 0; color: #6b7871; font-size: .8rem; }
 .profile, .menu-button { color: #285640; background: var(--secondary); }
+.pagoda-switcher { display: grid; gap: .15rem; margin-left: auto; color: #6b7871; font-size: .7rem; font-weight: 700; }
+.pagoda-switcher select { min-height: 34px; min-width: 180px; padding: .25rem .45rem; color: var(--foreground); background: #fff; border: 1px solid var(--input); border-radius: 8px; font: inherit; }
+.pagoda-switcher-empty { margin-left: auto; color: var(--muted-foreground); font-size: .8rem; }
 .menu-button { display: none; }
 .bottom-nav { display: none; }
 
