@@ -13,11 +13,13 @@ const repository = vi.hoisted(() => ({
 }));
 
 vi.mock('./library-repository', () => repository);
-vi.mock('./library-storage-api', () => ({
-  cleanupLibraryS3Uploads: vi.fn(),
-  deleteLibraryS3Document: vi.fn(),
-  reconcileLibraryS3Document: vi.fn(),
-  recoverLibraryS3Upload: vi.fn(),
+vi.mock('./data/library-data-source', () => ({
+  libraryDataSource: {
+    cleanupUploads: vi.fn(),
+    deleteDocument: vi.fn(),
+    reconcileDocument: vi.fn(),
+    recoverUpload: vi.fn(),
+  },
 }));
 
 describe('LibraryAdminPage', () => {

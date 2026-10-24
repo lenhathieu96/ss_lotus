@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import { LibraryDocument } from './library-domain';
 import { getLibraryDocument } from './library-repository';
 import { LibraryPdfReader } from './library-pdf-reader';
-import { libraryDownloadUrl, publicLibraryDocumentUrl } from './library-storage-api';
+import { libraryDataSource } from './data/library-data-source';
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -50,11 +50,11 @@ export function LibraryDetailPage({ documentId }: { documentId: string }) {
 
   if (loading) return <main className="page"><p role="status">Đang tải tài liệu…</p></main>;
   if (unavailable || !document) return <main className="page"><Card className="empty-panel"><h1>Không tìm thấy tài liệu</h1><p>Tài liệu có thể đã bị xóa hoặc đường dẫn không hợp lệ.</p><Link href="/thu-vien">Quay lại thư viện</Link></Card></main>;
-  const downloadUrl = libraryDownloadUrl(document.id);
+  const downloadUrl = libraryDataSource.downloadUrl(document.id);
   let previewUrl: string | null = null;
   let readerConfigurationError: string | null = null;
   try {
-    previewUrl = publicLibraryDocumentUrl(document.id);
+    previewUrl = libraryDataSource.publicDocumentUrl(document.id);
   } catch {
     readerConfigurationError = 'Trình đọc trực tuyến chưa được cấu hình. Bạn vẫn có thể tải PDF xuống.';
   }

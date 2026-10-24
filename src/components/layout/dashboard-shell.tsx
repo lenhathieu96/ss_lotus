@@ -4,10 +4,10 @@ import { ReactNode, useEffect, useState } from 'react';
 import { BookOpen, Flower2, Home, House, LogOut, Menu, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabase';
 import { fromSolarDate, getVietnamToday } from '../../features/calendar/lunar-date-domain';
 import { Button } from '@/components/ui/button';
 import { isLibraryAdmin } from '@/features/library/library-repository';
+import { authRepository } from '@/features/auth/auth-repository';
 
 const navigation = [
   { to: '/overview', label: 'Tổng quan', icon: Home },
@@ -24,38 +24,33 @@ function isCurrentRoute(pathname: string, route: string): boolean {
 export function DashboardShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [libraryAdmin, setLibraryAdmin] = useState(false);
-  const [adminUserId, setAdminUserId] = useState('');
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
-    if (!supabase) return;
     let active = true;
     async function refreshCapability() {
-      const { data: { session } } = await supabase!.auth.getSession();
+      const session = await authRepository.getSession();
       if (!session) {
         setLibraryAdmin(false);
-        setAdminUserId('');
         return;
       }
-      setAdminUserId(session.user.id);
       try { setLibraryAdmin(await isLibraryAdmin()); }
       catch { setLibraryAdmin(false); }
     }
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const unsubscribe = authRepository.subscribeToSession((session) => {
       if (!session) {
         setLibraryAdmin(false);
-        setAdminUserId('');
       } else {
         window.setTimeout(() => { if (active) void refreshCapability(); }, 0);
       }
     });
     void refreshCapability();
-    return () => { active = false; subscription.unsubscribe(); };
-  }, [adminUserId]);
+    return () => { active = false; unsubscribe(); };
+  }, []);
 
   async function signOut() {
-    await supabase?.auth.signOut();
+    await authRepository.signOut();
     router.push('/login');
   }
 

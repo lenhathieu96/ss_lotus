@@ -1,5 +1,5 @@
 import { hasPdfSignature, LibraryUploadTicket } from './library-domain';
-import { cancelLibraryS3Upload, completeLibraryS3Upload, prepareLibraryS3Upload, resolveLibraryS3Upload } from './library-storage-api';
+import { libraryDataSource } from './data/library-data-source';
 
 export type LibraryUploadProgress = Readonly<{ uploadedBytes: number; totalBytes: number; percent: number }>;
 
@@ -31,15 +31,15 @@ export async function startLibraryPdfUpload(input: {
   signal?: AbortSignal;
 }): Promise<LibraryUploadTicket> {
   if (!await hasPdfSignature(input.file)) throw new Error('Tệp không có chữ ký PDF hợp lệ.');
-  const ticket = await prepareLibraryS3Upload(input);
+  const ticket = await libraryDataSource.prepareUpload(input);
   input.onPrepared?.(ticket);
   try {
     await putStagedPdf(input.file, ticket, input.onProgress, input.signal);
-    await completeLibraryS3Upload(ticket.documentId);
+    await libraryDataSource.completeUpload(ticket.documentId);
   } catch (cause) {
-    const resolved = await resolveLibraryS3Upload(ticket.documentId).catch(() => ({ status: 'pending' as const }));
+    const resolved = await libraryDataSource.resolveUpload(ticket.documentId).catch(() => ({ status: 'pending' as const }));
     if (resolved.status === 'published') return ticket;
-    if (input.signal?.aborted) await cancelLibraryS3Upload(ticket.documentId).catch(() => undefined);
+    if (input.signal?.aborted) await libraryDataSource.cancelUpload(ticket.documentId).catch(() => undefined);
     throw cause instanceof Error ? cause : new Error('Không thể tải PDF; lượt tải đang được dàn xếp trước khi thử lại.');
   }
   return ticket;

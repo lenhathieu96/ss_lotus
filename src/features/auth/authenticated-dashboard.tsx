@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase';
+import { authRepository } from './auth-repository';
 
 type AuthenticatedDashboardProps = Readonly<{ children: React.ReactNode }>;
 
@@ -12,13 +12,8 @@ export function AuthenticatedDashboard({ children }: AuthenticatedDashboardProps
   const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
-    if (!supabase) {
-      router.replace('/login');
-      return;
-    }
-
     let active = true;
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const unsubscribe = authRepository.subscribeToSession((session) => {
       if (!active) return;
       if (session) {
         setHasSession(true);
@@ -28,7 +23,7 @@ export function AuthenticatedDashboard({ children }: AuthenticatedDashboardProps
       router.replace('/login');
     });
 
-    void supabase.auth.getSession().then(({ data: { session } }) => {
+    void authRepository.getSession().then((session) => {
       if (!active) return;
       if (session) {
         setHasSession(true);
@@ -39,7 +34,7 @@ export function AuthenticatedDashboard({ children }: AuthenticatedDashboardProps
 
     return () => {
       active = false;
-      subscription.unsubscribe();
+      unsubscribe();
     };
   }, [router]);
 

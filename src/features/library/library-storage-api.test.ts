@@ -6,7 +6,7 @@ vi.mock('@/lib/supabase', () => ({
   supabaseConfigurationError: null,
 }));
 
-import { libraryDownloadUrl, prepareLibraryS3Upload, publicLibraryDocumentUrl, recoverLibraryS3Upload } from './library-storage-api';
+import { libraryDataSource } from './data/library-data-source';
 
 describe('library storage API', () => {
   beforeEach(() => {
@@ -18,18 +18,18 @@ describe('library storage API', () => {
 
   it('sends the current Supabase bearer token only to the same-origin ticket route', async () => {
     const file = new File(['%PDF-1.7'], 'book.pdf', { type: 'application/pdf' });
-    await expect(prepareLibraryS3Upload({ categoryId: '11111111-1111-4111-8111-111111111111', title: 'Book', author: '', file })).resolves.toMatchObject({ documentId: 'doc-1', stagingPath: 'pending/doc-1.pdf' });
+    await expect(libraryDataSource.prepareUpload({ categoryId: '11111111-1111-4111-8111-111111111111', title: 'Book', author: '', file })).resolves.toMatchObject({ documentId: 'doc-1', stagingPath: 'pending/doc-1.pdf' });
     expect(fetch).toHaveBeenCalledWith('/api/library/uploads', expect.objectContaining({ headers: expect.objectContaining({ authorization: 'Bearer access-token' }) }));
   });
 
   it('builds preview and signed-download routes without a storage-management URL', () => {
-    expect(publicLibraryDocumentUrl('doc-1')).toBe('https://library.example.test/documents/doc-1.pdf');
-    expect(libraryDownloadUrl('doc-1')).toBe('/api/library/documents/doc-1/download');
+    expect(libraryDataSource.publicDocumentUrl('doc-1')).toBe('https://library.example.test/documents/doc-1.pdf');
+    expect(libraryDataSource.downloadUrl('doc-1')).toBe('/api/library/documents/doc-1/download');
   });
 
   it('uses the authenticated recovery route for a stalled upload', async () => {
     vi.mocked(fetch).mockResolvedValueOnce(new Response(JSON.stringify({ status: 'needs_s3_access', capability: 'read_staging', message: 'S3 từ chối đọc file chờ xử lý.' }), { status: 200 }));
-    await expect(recoverLibraryS3Upload('doc-1')).resolves.toMatchObject({ status: 'needs_s3_access', capability: 'read_staging' });
+    await expect(libraryDataSource.recoverUpload('doc-1')).resolves.toMatchObject({ status: 'needs_s3_access', capability: 'read_staging' });
     expect(fetch).toHaveBeenCalledWith('/api/library/uploads/doc-1/recover', expect.objectContaining({ method: 'POST' }));
   });
 });

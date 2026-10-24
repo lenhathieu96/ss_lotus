@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
-import { createStagingUploadUrl } from '@/lib/s3-server';
-import { invokeLibraryLifecycle, requireRpcRow, rpcString } from '@/lib/library-lifecycle-server';
+import { getLibraryServerLifecycleSource } from '@/features/library/data/network/server/source';
 import { LibraryRouteError, requireLibraryAdmin, requireObject, requiredString, requireUuid, routeErrorResponse } from '@/lib/library-server-auth';
 
 const MAX_PDF_SIZE_BYTES = 100 * 1024 * 1024;
@@ -17,17 +16,13 @@ export async function POST(request: NextRequest) {
     requireUuid(categoryId, 'Invalid categoryId.');
     const author = typeof input.author === 'string' ? input.author.trim() : null;
     if (author && author.length > 500) throw new LibraryRouteError('Invalid author.', 400);
-    const data = await invokeLibraryLifecycle('prepare_s3_library_upload', {
-      p_actor_id: admin.userId,
-      p_category_id: categoryId,
-      p_title: requiredString(input, 'title', 500),
-      p_author: author,
-      p_original_filename: requiredString(input, 'originalFilename', 500),
-      p_expected_size: expectedSize,
-    });
-    const row = requireRpcRow(data, 'Could not create an upload ticket.');
-    const documentId = rpcString(row, 'document_id');
-    const ticket = await createStagingUploadUrl(documentId);
-    return Response.json({ documentId, expiresAt: rpcString(row, 'upload_expires_at'), ...ticket });
+    return Response.json(await getLibraryServerLifecycleSource().prepareUpload({
+      actorId: admin.userId,
+      categoryId,
+      title: requiredString(input, 'title', 500),
+      author,
+      originalFilename: requiredString(input, 'originalFilename', 500),
+      expectedSize,
+    }));
   } catch (error) { return routeErrorResponse(error); }
 }

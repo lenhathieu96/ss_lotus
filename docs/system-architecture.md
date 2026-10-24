@@ -12,6 +12,22 @@
 
 Browser-side Supabase authentication is preserved. Administrators enter a username and password; the client normalizes the username and submits the internal Supabase Auth email alias `${username}@ss-lotus.local` with that password. The dashboard route group checks the persisted Supabase session before mounting feature screens; absent or expired sessions redirect to `/login`, preventing RPCs from running as the `anon` role. Mutations use authenticated, admin-gated security-definer RPCs; ownership is validated from database relationships, and registration/association writes create audit events. Registrations, ceremony slots, and death dates retain canonical PostgreSQL `date` values in solar calendar form for comparison, capacity, and sorting. The application converts dates at the repository boundary.
 
+## Feature data boundaries
+
+Presentation code depends on feature-owned contracts so transport and provider
+choices remain replaceable. The [auth repository](../src/features/auth/auth-repository.ts)
+owns the browser authentication boundary, and the [library data source](../src/features/library/data/library-data-source.ts)
+owns browser library operations. Their network adapters are selected in the
+feature data folders; the reserved local contracts intentionally provide no
+session, token, cache, or offline-record persistence until an explicit product
+decision adds that requirement.
+
+The [server lifecycle source composition point](../src/features/library/data/network/server/source.ts)
+owns the server-side library workflow boundary. Route handlers retain request
+validation and authorization while the source owns the provider-specific
+lifecycle implementation; see the [server lifecycle interface](../src/features/library/data/network/server/interface.ts)
+for the replaceable contract.
+
 ## Calendar contract
 
 All date entry and date display in the admin interface use the Vietnamese lunar calendar and the `Asia/Ho_Chi_Minh` date boundary. `src/features/calendar/lunar-date-domain.ts` owns full lunar/solar conversion, lunar-month/leap-month enumeration, strict round-trip validation, and ceremony-date serialization.
