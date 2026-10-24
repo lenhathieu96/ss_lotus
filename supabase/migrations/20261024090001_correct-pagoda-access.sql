@@ -3,6 +3,132 @@
 -- disposable database.
 begin;
 
+-- `20261024090000` was manually marked applied for one production project
+-- after only its pagodas table existed. Bootstrap every missing prerequisite
+-- here so this unapplied corrective migration converges both that partial
+-- state and a database where the preceding migration completed normally.
+create table if not exists public.pagodas (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
+  name text not null check (btrim(name) <> ''),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.pagoda_memberships (
+  pagoda_id uuid not null references public.pagodas(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (pagoda_id, user_id)
+);
+create index if not exists pagoda_memberships_user_idx on public.pagoda_memberships (user_id, pagoda_id);
+
+create table if not exists public.pagoda_number_counters (
+  pagoda_id uuid primary key references public.pagodas(id) on delete cascade,
+  last_number integer not null default 0 check (last_number between 0 and 9999)
+);
+
+insert into public.pagodas (id, slug, name)
+values ('00000000-0000-4000-8000-000000000001', 'legacy-ss-lotus', 'Chùa SS Lotus')
+on conflict (id) do nothing;
+insert into public.pagoda_number_counters (pagoda_id, last_number)
+select '00000000-0000-4000-8000-000000000001', last_number
+from public.number_counter
+where singleton
+on conflict (pagoda_id) do nothing;
+
+alter table public.households add column if not exists pagoda_id uuid references public.pagodas(id);
+alter table public.families add column if not exists pagoda_id uuid references public.pagodas(id);
+alter table public.members add column if not exists pagoda_id uuid references public.pagodas(id);
+alter table public.deceased_people add column if not exists pagoda_id uuid references public.pagodas(id);
+alter table public.prayer_profiles add column if not exists pagoda_id uuid references public.pagodas(id);
+alter table public.prayer_people add column if not exists pagoda_id uuid references public.pagodas(id);
+alter table public.ceremony_slots add column if not exists pagoda_id uuid references public.pagodas(id);
+alter table public.registrations add column if not exists pagoda_id uuid references public.pagodas(id);
+alter table public.audit_events add column if not exists pagoda_id uuid references public.pagodas(id);
+
+update public.households set pagoda_id = '00000000-0000-4000-8000-000000000001' where pagoda_id is null;
+update public.families family set pagoda_id = household.pagoda_id
+from public.households household where household.id = family.household_id and family.pagoda_id is null;
+update public.members member set pagoda_id = family.pagoda_id
+from public.families family where family.id = member.family_id and member.pagoda_id is null;
+update public.deceased_people deceased set pagoda_id = coalesce(family.pagoda_id, '00000000-0000-4000-8000-000000000001'::uuid)
+from public.families family where family.id = deceased.family_id and deceased.pagoda_id is null;
+update public.deceased_people set pagoda_id = '00000000-0000-4000-8000-000000000001' where pagoda_id is null;
+update public.prayer_profiles profile set pagoda_id = coalesce(
+  (select household.pagoda_id from public.households household where household.id = profile.household_id),
+  (select family.pagoda_id from public.families family where family.id = profile.family_id),
+  (select deceased.pagoda_id from public.deceased_people deceased where deceased.id = profile.deceased_person_id),
+  '00000000-0000-4000-8000-000000000001'::uuid
+) where profile.pagoda_id is null;
+update public.prayer_people person set pagoda_id = profile.pagoda_id
+from public.prayer_profiles profile where profile.id = person.profile_id and person.pagoda_id is null;
+update public.registrations registration set pagoda_id = profile.pagoda_id
+from public.prayer_profiles profile where profile.id = registration.profile_id and registration.pagoda_id is null;
+update public.ceremony_slots set pagoda_id = '00000000-0000-4000-8000-000000000001' where pagoda_id is null;
+update public.audit_events set pagoda_id = '00000000-0000-4000-8000-000000000001' where pagoda_id is null;
+
+alter table public.households alter column pagoda_id set not null;
+alter table public.families alter column pagoda_id set not null;
+alter table public.members alter column pagoda_id set not null;
+alter table public.deceased_people alter column pagoda_id set not null;
+alter table public.prayer_profiles alter column pagoda_id set not null;
+alter table public.prayer_people alter column pagoda_id set not null;
+alter table public.ceremony_slots alter column pagoda_id set not null;
+alter table public.registrations alter column pagoda_id set not null;
+
+alter table public.households drop constraint if exists households_business_number_key;
+alter table public.households drop constraint if exists households_legacy_number_key;
+alter table public.families drop constraint if exists families_business_number_key;
+alter table public.deceased_people drop constraint if exists deceased_people_code_key;
+do $$
+declare current_slot_key text[];
+begin
+  select array_agg(attribute.attname order by key_column.ordinality)
+    into current_slot_key
+  from pg_constraint pc
+  join unnest(pc.conkey) with ordinality as key_column(attribute_number, ordinality) on true
+  join pg_attribute attribute on attribute.attrelid = pc.conrelid and attribute.attnum = key_column.attribute_number
+  where pc.conrelid = 'public.ceremony_slots'::regclass and pc.contype = 'p';
+  if current_slot_key is distinct from array['pagoda_id', 'ceremony_date', 'period', 'prayer_type'] then
+    alter table public.ceremony_slots drop constraint if exists ceremony_slots_pkey cascade;
+  end if;
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.ceremony_slots'::regclass and contype = 'p'
+  ) then
+    alter table public.ceremony_slots add primary key (pagoda_id, ceremony_date, period, prayer_type);
+  end if;
+end;
+$$;
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conrelid = 'public.households'::regclass and conname = 'households_pagoda_business_number_key') then
+    alter table public.households add constraint households_pagoda_business_number_key unique (pagoda_id, business_number);
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.households'::regclass and conname = 'households_pagoda_legacy_number_key') then
+    alter table public.households add constraint households_pagoda_legacy_number_key unique (pagoda_id, legacy_number);
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.families'::regclass and conname = 'families_pagoda_business_number_key') then
+    alter table public.families add constraint families_pagoda_business_number_key unique (pagoda_id, business_number);
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.deceased_people'::regclass and conname = 'deceased_people_pagoda_code_key') then
+    alter table public.deceased_people add constraint deceased_people_pagoda_code_key unique (pagoda_id, code);
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.registrations'::regclass and conname = 'registrations_pagoda_slot_fkey') then
+    alter table public.registrations add constraint registrations_pagoda_slot_fkey
+      foreign key (pagoda_id, ceremony_date, period, prayer_type)
+      references public.ceremony_slots (pagoda_id, ceremony_date, period, prayer_type);
+  end if;
+end;
+$$;
+create index if not exists registrations_pagoda_slot_idx on public.registrations (pagoda_id, ceremony_date, period) where status = 'active';
+create index if not exists deceased_people_pagoda_idx on public.deceased_people (pagoda_id, code);
+
+alter table public.pagodas enable row level security;
+alter table public.pagoda_memberships enable row level security;
+alter table public.pagoda_number_counters enable row level security;
+
 -- Every assigned person has identical pagoda business access. Platform admins
 -- are global and never depend on membership rows.
 -- These policies depend on the role-bearing helper in the preceding migration,
@@ -18,7 +144,16 @@ drop policy if exists pagoda_read_audit on public.audit_events;
 drop policy if exists admin_read_deceased_people on public.deceased_people;
 drop policy if exists pagoda_members_can_read_pagodas on public.pagodas;
 drop policy if exists users_can_read_own_pagoda_memberships on public.pagoda_memberships;
-drop function if exists public.is_pagoda_member(uuid, public.pagoda_role[]);
+do $$
+begin
+  -- Referencing the enum directly when it was never created fails before
+  -- `DROP FUNCTION IF EXISTS` can take effect. The partial migration path has
+  -- no enum; the fully applied predecessor does.
+  if to_regtype('public.pagoda_role') is not null then
+    execute 'drop function if exists public.is_pagoda_member(uuid, public.pagoda_role[])';
+  end if;
+end;
+$$;
 drop function if exists public.require_pagoda_admin(uuid);
 drop function if exists public.list_my_pagodas();
 alter table public.pagoda_memberships drop column if exists role;
@@ -161,6 +296,14 @@ drop policy if exists pagoda_read_people on public.prayer_people;
 drop policy if exists pagoda_read_slots on public.ceremony_slots;
 drop policy if exists pagoda_read_registrations on public.registrations;
 drop policy if exists pagoda_read_audit on public.audit_events;
+drop policy if exists admin_read_households on public.households;
+drop policy if exists admin_read_families on public.families;
+drop policy if exists admin_read_members on public.members;
+drop policy if exists admin_read_profiles on public.prayer_profiles;
+drop policy if exists admin_read_people on public.prayer_people;
+drop policy if exists admin_read_slots on public.ceremony_slots;
+drop policy if exists admin_read_registrations on public.registrations;
+drop policy if exists admin_read_audit on public.audit_events;
 drop policy if exists admin_read_deceased_people on public.deceased_people;
 drop policy if exists pagoda_members_can_read_pagodas on public.pagodas;
 drop policy if exists users_can_read_own_pagoda_memberships on public.pagoda_memberships;
@@ -539,7 +682,7 @@ $$;
 -- tenant-aware frontend is promoted. These overloads deliberately bind all
 -- legacy calls to the pre-multitenancy pagoda and can be removed only after
 -- the former frontend version has been retired.
-create function public.require_legacy_pagoda_admin()
+create or replace function public.require_legacy_pagoda_admin()
 returns void language plpgsql security definer set search_path = public as $$
 begin
   if not public.is_admin() then
@@ -548,7 +691,7 @@ begin
 end;
 $$;
 
-create function public.search_households(p_query text)
+create or replace function public.search_households(p_query text)
 returns table(id uuid, business_number integer, legacy_number integer, address text)
 language plpgsql stable security definer set search_path = public as $$
 begin
@@ -557,7 +700,7 @@ begin
 end;
 $$;
 
-create function public.create_household(p_legacy_number integer, p_families jsonb)
+create or replace function public.create_household(p_legacy_number integer, p_families jsonb)
 returns jsonb language plpgsql security definer set search_path = public as $$
 begin
   perform public.require_legacy_pagoda_admin();
@@ -565,7 +708,7 @@ begin
 end;
 $$;
 
-create function public.get_household_workspace(p_household_id uuid)
+create or replace function public.get_household_workspace(p_household_id uuid)
 returns jsonb language plpgsql stable security definer set search_path = public as $$
 begin
   perform public.require_legacy_pagoda_admin();
@@ -573,7 +716,7 @@ begin
 end;
 $$;
 
-create function public.create_deceased_person(
+create or replace function public.create_deceased_person(
   p_code text, p_full_name text, p_dharma_name text, p_death_lunar_day smallint,
   p_death_lunar_month smallint, p_death_lunar_is_leap boolean, p_recorded_by text,
   p_household_business_number integer, p_family_business_number integer
@@ -587,7 +730,7 @@ begin
 end;
 $$;
 
-create function public.list_deceased_people()
+create or replace function public.list_deceased_people()
 returns table(id uuid, code text, full_name text, dharma_name text, death_lunar_day smallint,
   death_lunar_month smallint, death_lunar_is_leap boolean, recorded_by text,
   household_reference text, family_reference text, prayer_history jsonb)
@@ -598,7 +741,7 @@ begin
 end;
 $$;
 
-create function public.import_deceased_people(p_people jsonb)
+create or replace function public.import_deceased_people(p_people jsonb)
 returns integer language plpgsql security definer set search_path = public as $$
 begin
   perform public.require_legacy_pagoda_admin();
@@ -606,7 +749,7 @@ begin
 end;
 $$;
 
-create function public.update_deceased_person_association(
+create or replace function public.update_deceased_person_association(
   p_deceased_person_id uuid, p_household_business_number integer, p_family_business_number integer
 )
 returns void language plpgsql security definer set search_path = public as $$
@@ -617,7 +760,7 @@ begin
 end;
 $$;
 
-create function public.reserve_registration(
+create or replace function public.reserve_registration(
   p_profile_id uuid, p_date date, p_period public.ceremony_period, p_year smallint
 )
 returns public.registrations language plpgsql security definer set search_path = public as $$
@@ -628,7 +771,7 @@ begin
 end;
 $$;
 
-create function public.create_household_wellbeing_registration(
+create or replace function public.create_household_wellbeing_registration(
   p_household_id uuid, p_member_ids uuid[], p_ceremony_date date, p_period public.ceremony_period
 )
 returns uuid language plpgsql security definer set search_path = public as $$
@@ -639,7 +782,7 @@ begin
 end;
 $$;
 
-create function public.create_memorial_registration(
+create or replace function public.create_memorial_registration(
   p_deceased_person_id uuid, p_ceremony_date date, p_period public.ceremony_period
 )
 returns uuid language plpgsql security definer set search_path = public as $$

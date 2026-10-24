@@ -1,9 +1,10 @@
 begin;
 
-select plan(20);
+select plan(21);
 
 select has_table('public', 'pagodas', 'Pagodas are the tenant records');
 select has_table('public', 'pagoda_memberships', 'Memberships assign users to pagodas');
+select has_table('public', 'pagoda_number_counters', 'Each pagoda has its own household-number counter');
 select hasnt_column('public', 'pagoda_memberships', 'role', 'Memberships have no business-access role');
 select has_function('public', 'is_pagoda_member', array['uuid'], 'Literal membership predicate exists');
 select has_function('public', 'has_pagoda_access', array['uuid'], 'Canonical access predicate exists');

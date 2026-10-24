@@ -33,7 +33,11 @@ dry-run but cannot create or verify a backup on its own. The deployed Function
 health fingerprint must still match the checkout before the frontend promotion.
 `20261024090001_correct-pagoda-access.sql` also restores administrator-only
 legacy RPC overloads for the original pagoda while the tenant-aware frontend is
-promoted. Do not remove those overloads until that older frontend is retired.
+promoted. It also converges the known partial state where the preceding pagoda
+migration was recorded after only `pagodas` existed. Do not mark migrations
+applied or reverted manually to recover a failed migration: preserve the failed
+run log, take a backup, and use a reviewed forward migration. Do not remove the
+legacy overloads until that older frontend is retired.
 Configure at least one required reviewer on the `production` environment;
 without it, pending migrations run automatically after each successful `master`
 push.
