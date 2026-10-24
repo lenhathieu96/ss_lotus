@@ -1,5 +1,5 @@
-import { createSupabaseAuthSource } from './data/network/supabase-auth-source';
-import type { AuthCredentials, AuthNetworkSource, AuthSession, AuthSessionListener } from './data/network/interface';
+import { createSupabaseAuthSource } from '@/data/auth/network/supabase-auth-source';
+import type { AuthCredentials, AuthNetworkSource, AuthSession, AuthSessionListener } from '@/data/auth/network/interface';
 
 /** Stable browser-auth contract for auth presentation. */
 export interface AuthRepository {

@@ -2,7 +2,7 @@ import { createBrowserLibraryNetworkSource } from './network/browser-library-net
 import { createLibraryBrowserNetworkConfig } from './network/config';
 import type { LibraryBrowserNetwork } from './network/interface';
 import { getLibraryDataSourceConfig, type LibraryDataSourceConfig } from './library-data-source-config';
-import type { LibraryUploadTicket } from '../library-domain';
+import type { LibraryUploadTicket } from '@/features/library/library-domain';
 
 export type LibraryUploadRecovery = Readonly<{
   status: 'published' | 'reupload_required' | 'needs_s3_access' | 'pending';

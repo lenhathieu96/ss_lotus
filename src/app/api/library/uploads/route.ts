@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getLibraryServerLifecycleSource } from '@/features/library/data/network/server/source';
+import { getLibraryServerLifecycleSource } from '@/data/library/network/server/source';
 import { LibraryRouteError, requireLibraryAdmin, requireObject, requiredString, requireUuid, routeErrorResponse } from '@/lib/library-server-auth';
 
 const MAX_PDF_SIZE_BYTES = 100 * 1024 * 1024;

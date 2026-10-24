@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LibraryAdminDocument, LibraryCategory } from './library-domain';
 import { createLibraryCategory, deleteLibraryCategory, listLibraryCategories, listLibraryDocumentsAdmin, reorderLibraryCategories, updateLibraryCategory, updateLibraryDocument } from './library-repository';
-import { libraryDataSource } from './data/library-data-source';
+import { libraryDataSource } from '@/data/library/library-data-source';
 import { LibraryBatchUploadDialog } from './library-batch-upload-dialog';
 import { LibraryCategoryManager } from './library-category-manager';
 import { LibraryDocumentEditor } from './library-document-editor';

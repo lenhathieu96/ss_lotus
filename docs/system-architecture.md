@@ -16,16 +16,16 @@ Browser-side Supabase authentication is preserved. Administrators enter a userna
 
 Presentation code depends on feature-owned contracts so transport and provider
 choices remain replaceable. The [auth repository](../src/features/auth/auth-repository.ts)
-owns the browser authentication boundary, and the [library data source](../src/features/library/data/library-data-source.ts)
+owns the browser authentication boundary, and the [library data source](../src/data/library/library-data-source.ts)
 owns browser library operations. Their network adapters are selected in the
-feature data folders; the reserved local contracts intentionally provide no
+top-level data folder; the reserved local contracts intentionally provide no
 session, token, cache, or offline-record persistence until an explicit product
 decision adds that requirement.
 
-The [server lifecycle source composition point](../src/features/library/data/network/server/source.ts)
+The [server lifecycle source composition point](../src/data/library/network/server/source.ts)
 owns the server-side library workflow boundary. Route handlers retain request
 validation and authorization while the source owns the provider-specific
-lifecycle implementation; see the [server lifecycle interface](../src/features/library/data/network/server/interface.ts)
+lifecycle implementation; see the [server lifecycle interface](../src/data/library/network/server/interface.ts)
 for the replaceable contract.
 
 ## Calendar contract

@@ -4,7 +4,7 @@ import { LibraryDetailPage } from './library-detail-page';
 
 const { getLibraryDocument, downloadUrl, publicDocumentUrl } = vi.hoisted(() => ({ getLibraryDocument: vi.fn(), downloadUrl: vi.fn(() => '/download'), publicDocumentUrl: vi.fn(() => 'https://example.test/public.pdf') }));
 vi.mock('./library-repository', () => ({ getLibraryDocument }));
-vi.mock('./data/library-data-source', () => ({ libraryDataSource: { publicDocumentUrl, downloadUrl } }));
+vi.mock('@/data/library/library-data-source', () => ({ libraryDataSource: { publicDocumentUrl, downloadUrl } }));
 vi.mock('./library-pdf-reader', () => ({ LibraryPdfReader: ({ pdfUrl, title }: { pdfUrl: string; title: string }) => <p>{`Reader: ${title} (${pdfUrl})`}</p> }));
 
 describe('LibraryDetailPage', () => {

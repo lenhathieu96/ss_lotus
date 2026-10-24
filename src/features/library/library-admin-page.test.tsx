@@ -13,7 +13,7 @@ const repository = vi.hoisted(() => ({
 }));
 
 vi.mock('./library-repository', () => repository);
-vi.mock('./data/library-data-source', () => ({
+vi.mock('@/data/library/library-data-source', () => ({
   libraryDataSource: {
     cleanupUploads: vi.fn(),
     deleteDocument: vi.fn(),

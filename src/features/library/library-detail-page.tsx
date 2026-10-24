@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import { LibraryDocument } from './library-domain';
 import { getLibraryDocument } from './library-repository';
 import { LibraryPdfReader } from './library-pdf-reader';
-import { libraryDataSource } from './data/library-data-source';
+import { libraryDataSource } from '@/data/library/library-data-source';
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

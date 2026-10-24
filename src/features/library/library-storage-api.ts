@@ -1,7 +1,7 @@
 /** @deprecated Import `libraryDataSource` from `library-data-source` instead. */
-import { libraryDataSource } from './data/library-data-source';
+import { libraryDataSource } from '@/data/library/library-data-source';
 
-export type { LibraryUploadRecovery } from './data/library-data-source';
+export type { LibraryUploadRecovery } from '@/data/library/library-data-source';
 
 export const prepareLibraryS3Upload = libraryDataSource.prepareUpload;
 export const completeLibraryS3Upload = libraryDataSource.completeUpload;

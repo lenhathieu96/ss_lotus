@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createAuthRepository } from './auth-repository';
-import type { AuthNetworkSource } from './data/network/interface';
+import type { AuthNetworkSource } from '@/data/auth/network/interface';
 
 describe('auth repository', () => {
   it('keeps presentation on the stable auth contract while delegating to its network source', async () => {

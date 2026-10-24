@@ -6,7 +6,7 @@ vi.mock('@/lib/supabase', () => ({
   supabaseConfigurationError: null,
 }));
 
-import { libraryDataSource } from './data/library-data-source';
+import { libraryDataSource } from '@/data/library/library-data-source';
 
 describe('library storage API', () => {
   beforeEach(() => {

@@ -1,5 +1,5 @@
 import { hasPdfSignature, LibraryUploadTicket } from './library-domain';
-import { libraryDataSource } from './data/library-data-source';
+import { libraryDataSource } from '@/data/library/library-data-source';
 
 export type LibraryUploadProgress = Readonly<{ uploadedBytes: number; totalBytes: number; percent: number }>;
 

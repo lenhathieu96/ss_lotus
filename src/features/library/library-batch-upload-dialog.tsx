@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LibraryCategory, defaultLibraryTitle, validatePdfMetadata } from './library-domain';
-import { libraryDataSource } from './data/library-data-source';
+import { libraryDataSource } from '@/data/library/library-data-source';
 import { LibraryUploadProgress, startLibraryPdfUpload } from './library-upload-service';
 import { runLibraryUploadQueue } from './library-upload-queue';
 import { UploadProgress } from './library-upload-form';

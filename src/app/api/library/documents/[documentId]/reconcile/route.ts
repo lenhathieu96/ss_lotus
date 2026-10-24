@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getLibraryServerLifecycleSource } from '@/features/library/data/network/server/source';
+import { getLibraryServerLifecycleSource } from '@/data/library/network/server/source';
 import { requireLibraryAdmin, requireUuid, routeErrorResponse } from '@/lib/library-server-auth';
 
 export async function POST(request: NextRequest, context: { params: Promise<{ documentId: string }> }) {
