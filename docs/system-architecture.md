@@ -10,7 +10,7 @@
 
 ## Registration and database boundary
 
-Browser-side Supabase authentication is preserved. Administrators enter a username and password; the client normalizes the username and submits the internal Supabase Auth email alias `${username}@ss-lotus.local` with that password. The dashboard route group checks the persisted Supabase session before mounting feature screens; absent or expired sessions redirect to `/login`, preventing RPCs from running as the `anon` role. Mutations use authenticated, admin-gated security-definer RPCs; ownership is validated from database relationships, and registration/association writes create audit events. Registrations, ceremony slots, and death dates retain canonical PostgreSQL `date` values in solar calendar form for comparison, capacity, and sorting. The application converts dates at the repository boundary.
+Browser-side Supabase authentication is preserved. Administrators enter a username and password; the client normalizes the username and submits the internal Supabase Auth email alias `${username}@ss-lotus.local` with that password. The dashboard route group checks the persisted Supabase session and an authorized active pagoda before mounting feature screens; absent or expired sessions redirect to `/login`, preventing RPCs from running as the `anon` role. A pagoda is the tenant: platform admins in `admin_users` can access every pagoda, while all other users access only explicit `pagoda_memberships`, with equal pagoda-business privileges. The active-pagoda switcher is user-scoped and feature RPCs pass its `pagoda_id`; database relationships enforce same-pagoda parent/child records. The PDF library remains global, and its management remains platform-admin-only. Registrations, ceremony slots, and death dates retain canonical PostgreSQL `date` values in solar calendar form for comparison, capacity, and sorting. The application converts dates at the repository boundary.
 
 ## Feature data boundaries
 
@@ -39,7 +39,7 @@ Hương linh death dates use a separate yearless `LunarDayMonth` contract: `day`
 
 - `/households`: create a household draft or search existing households.
 - `/households/[householdId]`: household-wide Cầu an, living members grouped by family/address, linked Hương linh, and their Cầu siêu actions/history.
-- `/huong-linh`: global search, create/import, association management, lunar date of death, and Cầu siêu history/actions.
+- `/huong-linh`: active-pagoda search, create/import, association management, lunar date of death, and Cầu siêu history/actions.
 - Legacy `/prayer-for-wellbeing`, `/memorial-prayer`, and `/memorial-prayer/deceased-persons` routes redirect into household or Hương linh context.
 - `/thu-vien` and `/thu-vien/[documentId]`: public PDF catalog, search, preview, download, and stable share links. The catalog exposes only published metadata through public RPCs.
 - `/admin/thu-vien`: admin-only category and document management. The Function verifies bearer tokens and the `admin_users` table before invoking service-role-only lifecycle RPCs.

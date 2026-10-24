@@ -1,6 +1,7 @@
 import { supabase } from '@data/network/supabase/browser-client';
 import { normalizeUppercase, type PrayerHistory } from '@features/households/household-repository';
 import { formatLunarDayMonth, isValidLunarDayMonth, type LunarDayMonth } from '@features/calendar/lunar-date-domain';
+import { activePagodaId } from '@features/pagodas/pagoda-client';
 
 export interface DeceasedPerson {
   id?: string;
@@ -197,6 +198,7 @@ export async function updateDeceasedPersonAssociation(person: DeceasedPerson): P
   if (!person.id) throw new Error('Thiếu mã định danh hương linh.');
   if (!!person.householdReference !== !!person.familyReference) throw new Error('Mã hộ và mã gia đình phải nhập cùng nhau.');
   const { error } = await requireClient().rpc('update_deceased_person_association', {
+    p_pagoda_id: activePagodaId(),
     p_deceased_person_id: person.id,
     p_household_business_number: person.householdReference ? requireBusinessNumber(person.householdReference, 'Mã hộ') : null,
     p_family_business_number: person.familyReference ? requireBusinessNumber(person.familyReference, 'Mã gia đình') : null,
@@ -210,13 +212,14 @@ function toUserMessage(error: { code?: string; message: string }): Error {
 }
 
 export async function listDeceasedPeople(): Promise<DeceasedPerson[]> {
-  const { data, error } = await requireClient().rpc('list_deceased_people');
+  const { data, error } = await requireClient().rpc('list_deceased_people', { p_pagoda_id: activePagodaId() });
   if (error) throw toUserMessage(error);
   return (data ?? []).map((row: unknown) => toCatalogPerson(row as Record<string, unknown>));
 }
 
 export async function createDeceasedPerson(person: DeceasedPerson): Promise<void> {
   const { error } = await requireClient().rpc('create_deceased_person', {
+    p_pagoda_id: activePagodaId(),
     p_code: person.code,
     p_full_name: person.fullName,
     p_dharma_name: person.dharmaName,
@@ -239,6 +242,6 @@ export async function importDeceasedPeople(people: DeceasedPerson[]): Promise<vo
     }
     if (!!person.householdReference !== !!person.familyReference) throw new Error('Mã hộ và mã gia đình phải nhập cùng nhau.');
   });
-  const { error } = await requireClient().rpc('import_deceased_people', { p_people: people });
+  const { error } = await requireClient().rpc('import_deceased_people', { p_pagoda_id: activePagodaId(), p_people: people });
   if (error) throw toUserMessage(error);
 }

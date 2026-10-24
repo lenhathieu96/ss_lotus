@@ -1,5 +1,6 @@
 import { type CeremonyPeriod, type PrayerType } from '@features/households/household-repository';
 import { supabase } from '@data/network/supabase/browser-client';
+import { activePagodaId } from '@features/pagodas/pagoda-client';
 
 export interface PrayerRegistrationInput {
   type: PrayerType;
@@ -34,6 +35,7 @@ export async function createHouseholdWellbeingRegistration(
 ): Promise<void> {
   if (!memberIds.length) throw new Error('Chọn ít nhất một thành viên.');
   const { error } = await requireSupabase().rpc('create_household_wellbeing_registration', {
+    p_pagoda_id: activePagodaId(),
     p_household_id: householdId,
     p_member_ids: memberIds,
     p_ceremony_date: solarDate,
@@ -48,6 +50,7 @@ export async function createMemorialRegistration(
   period: CeremonyPeriod,
 ): Promise<void> {
   const { error } = await requireSupabase().rpc('create_memorial_registration', {
+    p_pagoda_id: activePagodaId(),
     p_deceased_person_id: deceasedPersonId,
     p_ceremony_date: solarDate,
     p_period: period,

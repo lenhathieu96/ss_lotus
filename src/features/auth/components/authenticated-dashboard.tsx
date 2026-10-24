@@ -1,32 +1,40 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@components/ui/card';
-import { authRepository } from '../auth-repository';
+import { authRepository, type AuthSession } from '../auth-repository';
+import { PagodaAccessProvider } from '@features/pagodas/pagoda-access-context';
+import { clearActivePagodaId } from '@features/pagodas/pagoda-client';
 
 type AuthenticatedDashboardProps = Readonly<{ children: React.ReactNode }>;
 
 export function AuthenticatedDashboard({ children }: AuthenticatedDashboardProps) {
   const router = useRouter();
-  const [hasSession, setHasSession] = useState(false);
+  const [session, setSession] = useState<AuthSession | null>(null);
+  const activeUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     let active = true;
-    const unsubscribe = authRepository.subscribeToSession((session) => {
+    const unsubscribe = authRepository.subscribeToSession((nextSession) => {
       if (!active) return;
-      if (session) {
-        setHasSession(true);
+      if (nextSession) {
+        if (activeUserIdRef.current && activeUserIdRef.current !== nextSession.userId) clearActivePagodaId();
+        activeUserIdRef.current = nextSession.userId;
+        setSession(nextSession);
         return;
       }
-      setHasSession(false);
+      clearActivePagodaId();
+      activeUserIdRef.current = null;
+      setSession(null);
       router.replace('/login');
     });
 
-    void authRepository.getSession().then((session) => {
+    void authRepository.getSession().then((currentSession) => {
       if (!active) return;
-      if (session) {
-        setHasSession(true);
+      if (currentSession) {
+        activeUserIdRef.current = currentSession.userId;
+        setSession(currentSession);
         return;
       }
       router.replace('/login');
@@ -38,7 +46,7 @@ export function AuthenticatedDashboard({ children }: AuthenticatedDashboardProps
     };
   }, [router]);
 
-  if (hasSession) return children;
+  if (session) return <PagodaAccessProvider key={session.userId} userId={session.userId}>{children}</PagodaAccessProvider>;
 
   return <main className="auth-page" aria-busy="true"><Card className="auth-card"><p role="status">Đang kiểm tra phiên đăng nhập…</p></Card></main>;
 }

@@ -21,6 +21,7 @@ vi.mock('@features/auth/auth-repository', () => ({ authRepository: {
   signOut: mocks.signOut,
 } }));
 vi.mock('@features/library/library-repository', () => ({ isLibraryAdmin: mocks.isLibraryAdmin }));
+vi.mock('@features/pagodas/pagoda-switcher', () => ({ PagodaSwitcher: () => <div>Pagoda switcher</div> }));
 
 describe('DashboardShell', () => {
   beforeEach(() => {

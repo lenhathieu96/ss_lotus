@@ -1,5 +1,6 @@
 import { supabase } from '@data/network/supabase/browser-client';
 import { type LunarDayMonth, isValidLunarDayMonth } from '@features/calendar/lunar-date-domain';
+import { activePagodaId } from '@features/pagodas/pagoda-client';
 
 export type PrayerType = 'wellbeing' | 'memorial';
 export type CeremonyPeriod = 'morning' | 'afternoon' | 'evening';
@@ -247,7 +248,7 @@ function mapHousehold(row: RpcHousehold): Household {
 export async function searchHouseholds(
   query: string,
 ): Promise<Array<{ id: string; businessNumber: number; legacyNumber?: number; addresses: string[] }>> {
-  const { data, error } = await requireSupabase().rpc('search_households', { p_query: query.trim() });
+  const { data, error } = await requireSupabase().rpc('search_households', { p_pagoda_id: activePagodaId(), p_query: query.trim() });
   if (error) throw new Error(error.message);
   const grouped = new Map<string, { id: string; businessNumber: number; legacyNumber?: number; addresses: string[] }>();
   for (const row of (data ?? []) as Array<{ id: string; business_number: number; legacy_number: number | null; address: string }>) {
@@ -264,7 +265,7 @@ export async function searchHouseholds(
 }
 
 export async function getHouseholdWorkspace(id: string): Promise<Household> {
-  const { data, error } = await requireSupabase().rpc('get_household_workspace', { p_household_id: id });
+  const { data, error } = await requireSupabase().rpc('get_household_workspace', { p_pagoda_id: activePagodaId(), p_household_id: id });
   if (error) throw new Error(error.message);
   return mapHousehold(data as RpcHousehold);
 }
@@ -272,6 +273,7 @@ export async function getHouseholdWorkspace(id: string): Promise<Household> {
 export async function createHousehold(household: Household): Promise<Household> {
   const client = requireSupabase();
   const { data, error } = await client.rpc('create_household', {
+    p_pagoda_id: activePagodaId(),
     p_legacy_number: household.oldNumber ?? null,
     p_families: household.families.map((family) => ({
       address: family.address,
