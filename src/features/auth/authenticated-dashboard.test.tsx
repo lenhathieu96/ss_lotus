@@ -59,6 +59,6 @@ describe('AuthenticatedDashboard', () => {
     authStateChangeListener?.('SIGNED_OUT', null);
 
     await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith('/login'));
-    expect(screen.queryByText('Protected dashboard')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Protected dashboard')).not.toBeInTheDocument());
   });
 });

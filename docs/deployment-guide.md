@@ -23,22 +23,26 @@ Browser login remains client-side and does not use server-side session cookies. 
 ## GitHub Actions CI/CD
 
 `.github/workflows/vercel-deployment.yml` validates every pull request and push
-to `master` with `npm ci`, `npm test`, and `npm run build`. A push to `master`
-deploys the Vercel prebuilt artifact only after the validation job succeeds and
-the GitHub `production` environment allows the job to start.
+to `master` with `npm ci`, `npm test`, and `npm run build`. Each push to
+`master` deploys the Vercel prebuilt artifact to production after validation
+passes. The `production` environment is used for its deployment secrets and
+must not have required reviewers if deployment should start automatically.
+After a successful production deployment, the workflow creates a GitHub
+Release tagged `deployment-<run-number>-<short-commit>` and links the commit,
+Vercel deployment, and workflow run. The deployment job needs
+`contents: write` permission to publish the release.
 
-Before enabling this workflow, configure the repository's `production`
-environment with the required deployment reviewers. Add these repository or
-environment secrets:
+Configure these repository or `production` environment secrets:
 
 - `VERCEL_TOKEN`: a Vercel token with access to `ss-lotus`.
-- `VERCEL_ORG_ID`: the Vercel team ID for `hieules-projects-adae357f`.
-- `VERCEL_PROJECT_ID`: the Vercel project ID for `ss-lotus`.
+- `VERCEL_ORG_ID`: the organization ID from the linked `ss-lotus` project's
+  `.vercel/project.json`.
+- `VERCEL_PROJECT_ID`: the project ID from that same file.
 
 The Vercel CLI reads the organization and project IDs from the workflow
 environment, so `.vercel/project.json` remains local and is never committed.
-If the Vercel project has Git-based production deployments enabled, disable
-that production trigger before enabling this workflow to prevent duplicate
+This GitHub Actions workflow is the production deployment owner. Disable
+Vercel's Git-based production deployment trigger to avoid duplicate
 deployments for the same `master` commit.
 
 ## Administrator provisioning
