@@ -15,6 +15,38 @@ create table if not exists public.pagodas (
   updated_at timestamptz not null default now()
 );
 
+-- The failed predecessor may have encountered a manually-created pagodas
+-- table with only an id. Complete that table's contract before using it.
+alter table public.pagodas add column if not exists slug text;
+alter table public.pagodas add column if not exists name text;
+alter table public.pagodas add column if not exists created_at timestamptz not null default now();
+alter table public.pagodas add column if not exists updated_at timestamptz not null default now();
+alter table public.pagodas alter column id set default gen_random_uuid();
+update public.pagodas
+set slug = 'pagoda-' || replace(id::text, '-', '')
+where slug is null or btrim(slug) = '';
+update public.pagodas
+set name = 'Pagoda ' || id::text
+where name is null or btrim(name) = '';
+alter table public.pagodas alter column slug set not null;
+alter table public.pagodas alter column name set not null;
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conrelid = 'public.pagodas'::regclass and contype = 'p') then
+    alter table public.pagodas add primary key (id);
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.pagodas'::regclass and conname = 'pagodas_slug_key') then
+    alter table public.pagodas add constraint pagodas_slug_key unique (slug);
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.pagodas'::regclass and conname = 'pagodas_slug_format_check') then
+    alter table public.pagodas add constraint pagodas_slug_format_check check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$');
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.pagodas'::regclass and conname = 'pagodas_name_check') then
+    alter table public.pagodas add constraint pagodas_name_check check (btrim(name) <> '');
+  end if;
+end;
+$$;
+
 create table if not exists public.pagoda_memberships (
   pagoda_id uuid not null references public.pagodas(id) on delete cascade,
   user_id uuid not null references auth.users(id) on delete cascade,
