@@ -16,7 +16,7 @@ The project requires these production environment variables:
 
 The `NEXT_PUBLIC_*` values are intentionally browser-visible. Do not add database URLs, service-role keys, or other server secrets to Vercel variables with the `NEXT_PUBLIC_` prefix.
 
-Local dotenv files are excluded from deployments by `.vercelignore`. Configure both browser-visible values and server-only credentials in the Vercel project settings; never depend on local dotenv configuration during a remote build.
+Local dotenv files are excluded from deployments by `.vercelignore`, except the credential-free `.env.example` template. Configure both browser-visible values and server-only credentials in the Vercel project settings; never depend on local dotenv configuration during a remote build.
 
 Browser login remains client-side and does not use server-side session cookies. The PDF library's admin API Route Handlers separately validate bearer tokens and `admin_users` membership before invoking lifecycle operations; see the [system architecture](system-architecture.md).
 

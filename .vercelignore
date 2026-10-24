@@ -2,6 +2,7 @@
 # environment variables instead, so dotenv files do not belong in a deployment.
 .?nv
 .?nv.*
+!.env.example
 
 # Local tooling state and non-runtime artifacts are not part of the build.
 .agent/
