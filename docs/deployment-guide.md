@@ -27,9 +27,11 @@ to `master` with `npm ci`, `npm test`, and `npm run build`. Each push to
 `master` deploys the Vercel prebuilt artifact to production after validation
 passes. The `production` environment is used for its deployment secrets and
 must not have required reviewers if deployment should start automatically.
-After a successful production deployment, the workflow creates a GitHub
-Release tagged `deployment-<run-number>-<short-commit>` and links the commit,
-Vercel deployment, and workflow run. The deployment job needs
+After a successful production deployment, the workflow creates one GitHub
+Release tagged and titled `0.<workflow-run-number>.0`. The run number increases
+for every workflow execution, so production deployments receive unique release
+versions without changing `package.json`. Each release links the commit, Vercel
+deployment, and workflow run. The deployment job needs
 `contents: write` permission to publish the release.
 
 Configure these repository or `production` environment secrets:

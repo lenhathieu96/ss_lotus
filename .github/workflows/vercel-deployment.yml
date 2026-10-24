@@ -61,27 +61,26 @@ jobs:
           deployment_url=$(vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN")
           echo "url=$deployment_url" >> "$GITHUB_OUTPUT"
 
-      - name: Create GitHub release
+      - name: Create GitHub release for deployment run
         env:
           GH_TOKEN: ${{ github.token }}
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          tag="deployment-${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}"
+          tag="0.${GITHUB_RUN_NUMBER}.0"
           notes=$(cat <<EOF
           Production deployment succeeded.
 
+          - Version: ${tag}
           - Commit: ${GITHUB_SHA}
           - Deployment: ${DEPLOYMENT_URL}
           - Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
           EOF
           )
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release edit "$tag" \
-              --title "Production deployment ${GITHUB_RUN_NUMBER}" \
-              --notes "$notes"
+            echo "GitHub Release ${tag} already exists; skipping release creation."
           else
             gh release create "$tag" \
               --target "$GITHUB_SHA" \
-              --title "Production deployment ${GITHUB_RUN_NUMBER}" \
+              --title "$tag" \
               --notes "$notes"
           fi
