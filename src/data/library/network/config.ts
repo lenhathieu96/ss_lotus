@@ -1,4 +1,4 @@
-import { supabase, supabaseConfigurationError } from '@/lib/supabase';
+import { supabase, supabaseConfigurationError } from '@/data/remote/supabase/browser-client';
 import type { LibraryBrowserNetworkConfig } from './interface';
 
 /** Provides browser-only dependencies without storing credentials locally. */

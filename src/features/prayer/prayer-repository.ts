@@ -1,5 +1,5 @@
 import { CeremonyPeriod } from '../households/household-domain';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '@/data/remote/supabase/browser-client';
 
 function requireSupabase() {
   if (!supabase) throw new Error('Thiếu cấu hình Supabase.');

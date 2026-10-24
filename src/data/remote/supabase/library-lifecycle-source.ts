@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { getServiceSupabaseClient } from './supabase-server';
+import { getServiceSupabaseClient } from './server-client';
 
 type RpcRow = Record<string, unknown>;
 

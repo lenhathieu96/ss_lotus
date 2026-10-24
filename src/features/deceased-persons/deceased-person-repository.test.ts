@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { rpc } = vi.hoisted(() => ({ rpc: vi.fn() }));
-vi.mock('../../lib/supabase', () => ({ supabase: { rpc } }));
+vi.mock('@/data/remote/supabase/browser-client', () => ({ supabase: { rpc } }));
 
 import { createDeceasedPerson, importDeceasedPeople, listDeceasedPeople } from './deceased-person-repository';
 

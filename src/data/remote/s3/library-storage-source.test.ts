@@ -12,7 +12,7 @@ vi.mock('@aws-sdk/client-s3', () => ({
 }));
 vi.mock('@aws-sdk/s3-request-presigner', () => ({ getSignedUrl }));
 
-import { createStagingUploadUrl, isS3AccessDenied, isS3NotFound, publicDocumentUrl, s3LibraryKeys } from './s3-server';
+import { createStagingUploadUrl, isS3AccessDenied, isS3NotFound, publicDocumentUrl, s3LibraryKeys } from './library-storage-source';
 
 describe('S3 library adapter', () => {
   beforeEach(() => {

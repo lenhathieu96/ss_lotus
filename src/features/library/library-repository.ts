@@ -1,4 +1,4 @@
-import { supabase, supabaseConfigurationError } from '@/lib/supabase';
+import { supabase, supabaseConfigurationError } from '@/data/remote/supabase/browser-client';
 import { LibraryAdminDocument, LibraryCategory, LibraryCursor, LibraryDocument } from './library-domain';
 
 function client() {

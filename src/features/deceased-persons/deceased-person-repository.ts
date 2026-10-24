@@ -1,4 +1,4 @@
-import { supabase } from '../../lib/supabase';
+import { supabase } from '@/data/remote/supabase/browser-client';
 import { DeceasedPerson } from './deceased-person-domain';
 import { LunarDayMonth, isValidLunarDayMonth } from '../calendar/lunar-date-domain';
 

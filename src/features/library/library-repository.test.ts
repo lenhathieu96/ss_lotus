@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { rpc } = vi.hoisted(() => ({ rpc: vi.fn() }));
-vi.mock('@/lib/supabase', () => ({
+vi.mock('@/data/remote/supabase/browser-client', () => ({
   supabase: { rpc },
   supabaseConfigurationError: null,
 }));

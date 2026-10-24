@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { NextRequest } from 'next/server';
-import { getServiceSupabaseClient, getSupabaseAuthClient } from './supabase-server';
+import { getServiceSupabaseClient, getSupabaseAuthClient } from '@/data/remote/supabase/server-client';
 
 export class LibraryRouteError extends Error {
   constructor(message: string, readonly status: number) { super(message); }

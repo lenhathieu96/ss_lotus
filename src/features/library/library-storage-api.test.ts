@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { getSession } = vi.hoisted(() => ({ getSession: vi.fn() }));
-vi.mock('@/lib/supabase', () => ({
+vi.mock('@/data/remote/supabase/browser-client', () => ({
   supabase: { auth: { getSession } },
   supabaseConfigurationError: null,
 }));

@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('server-only', () => ({}));
-vi.mock('@/lib/library-lifecycle-server', () => ({
+vi.mock('@/data/remote/supabase/library-lifecycle-source', () => ({
   invokeLibraryLifecycle: mocks.invoke,
   requireRpcRow: (data: unknown, message: string) => {
     const row = Array.isArray(data) ? data[0] : data;
@@ -29,7 +29,7 @@ vi.mock('@/lib/library-lifecycle-server', () => ({
     return row[key];
   },
 }));
-vi.mock('@/lib/s3-server', () => ({
+vi.mock('@/data/remote/s3/library-storage-source', () => ({
   createStagingUploadUrl: mocks.createStagingUploadUrl,
   createDownloadUrl: mocks.createDownloadUrl,
   copyStagingToDocument: mocks.copyStagingToDocument,

@@ -10,8 +10,8 @@ import {
   s3LibraryKeys,
   verifyFinalPdf,
   verifyStagingPdf,
-} from '@/lib/s3-server';
-import { invokeLibraryLifecycle, requireRpcRow, rpcNumber, rpcString } from '@/lib/library-lifecycle-server';
+} from '@/data/remote/s3/library-storage-source';
+import { invokeLibraryLifecycle, requireRpcRow, rpcNumber, rpcString } from '@/data/remote/supabase/library-lifecycle-source';
 import { libraryServerLifecycleConfig } from './config';
 import type {
   LibraryS3AccessCapability,
