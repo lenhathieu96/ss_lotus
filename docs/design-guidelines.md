@@ -6,7 +6,7 @@ SS Lotus uses the owned shadcn/Radix source in `src/components/ui` for reusable 
 
 ## Tokens
 
-`src/app/theme.css` owns semantic CSS variables and the Tailwind v4 theme bridge.
+`src/features/application/theme.css` owns semantic CSS variables and the Tailwind v4 theme bridge. The root App Router layout imports it; screen and layout composition lives in features.
 
 | Concern | Contract |
 | --- | --- |

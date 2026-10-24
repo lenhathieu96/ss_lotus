@@ -6,3 +6,8 @@ port = 54321
 
 [db]
 port = 54322
+
+[functions.library-lifecycle]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/library-lifecycle/index.ts"

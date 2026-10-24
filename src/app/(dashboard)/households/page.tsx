@@ -1,5 +1,1 @@
-import { HouseholdWorkspace } from '../../../features/households/household-workspace';
-
-export default function HouseholdsPage() {
-  return <HouseholdWorkspace />;
-}
+export { HouseholdWorkspace as default } from '@features/households/pages/household-workspace';

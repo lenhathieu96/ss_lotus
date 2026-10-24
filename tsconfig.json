@@ -20,9 +20,12 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@components/*": ["./src/components/*"],
+      "@features/*": ["./src/features/*"],
+      "@data/*": ["./src/data/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@test/*": ["./src/test/*"]
     },
     "plugins": [
       {
