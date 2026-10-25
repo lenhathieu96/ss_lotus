@@ -18,7 +18,7 @@ The `NEXT_PUBLIC_*` values are intentionally browser-visible. Do not add databas
 
 Local dotenv files are excluded from deployments by `.vercelignore`, except the credential-free `.env.example` template. Configure browser-visible values in Vercel. Backend Supabase and AWS credentials belong to the Supabase Function secret store; never depend on local dotenv configuration during a remote build.
 
-Browser login remains client-side and does not use server-side session cookies. The PDF library's Supabase Function validates user tokens and admin_users membership before lifecycle mutations; see the [Function contract and local setup](library-function-contract.md). There are no Next API routes.
+Browser login writes Supabase SDK session cookies; the proxy refreshes them and Server Components verify them with `getClaims()` before protected dashboard renders. Existing localStorage-only sessions must log in once after this release. Cookies stay browser-readable because existing RPCs and the library Function bearer flow run in the browser; do not add a custom token-transfer endpoint or make these cookies HttpOnly without redesigning those data paths. On a confirmed membership/admin denial, the client locks management UI and aborts active browser uploads; an S3 signed URL issued earlier can remain usable until it expires. The PDF library's Supabase Function validates user tokens and admin_users membership before lifecycle mutations; see the [Function contract and local setup](library-function-contract.md). There are no Next API routes.
 
 ## GitHub Actions CI/CD
 

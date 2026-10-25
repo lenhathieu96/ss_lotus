@@ -1,5 +1,6 @@
 import { FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js';
 import { supabase, supabaseConfigurationError } from '@data/network/supabase/browser-client';
+import { isAuthenticationFailure } from '@lib/supabase/auth-errors';
 
 export const LIBRARY_PAGE_SIZE = 24;
 export const LIBRARY_MAX_PDF_BYTES = 100 * 1024 * 1024;
@@ -82,6 +83,10 @@ function client() {
   return supabase;
 }
 
+function notifyLibraryAccessRevoked(): void {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('ss-lotus:library-admin-revoked'));
+}
+
 function rowValue(row: Record<string, unknown>, key: string): string {
   const value = row[key];
   if (typeof value !== 'string' || !value) throw new Error('Dữ liệu thư viện không hợp lệ.');
@@ -122,7 +127,14 @@ function toAdminDocument(row: Record<string, unknown>): LibraryAdminDocument {
 }
 
 function throwRpcError(error: { code?: string; message: string }): never {
-  if (error.code === '42501' || error.message.includes('Administrator access required')) throw new Error('Tài khoản không có quyền quản lý thư viện.');
+  if (isAuthenticationFailure(error)) {
+    notifyLibraryAccessRevoked();
+    throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+  }
+  if (error.code === '42501' || error.message.includes('Administrator access required')) {
+    notifyLibraryAccessRevoked();
+    throw new Error('Tài khoản không có quyền quản lý thư viện.');
+  }
   if (error.code === '23505') throw new Error('Tên danh mục đã tồn tại.');
   if (error.code === '23503') throw new Error('Danh mục đang có tài liệu, không thể xóa.');
   throw new Error(error.message);
@@ -238,8 +250,14 @@ async function invokeLifecycle<T>(action: LifecycleAction, payload: Record<strin
   if (error instanceof FunctionsHttpError) {
     const response = error.context as Response;
     const body = await response.json().catch(() => null) as { error?: unknown } | null;
-    if (response.status === 401) throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-    if (response.status === 403) throw new Error('Tài khoản không có quyền quản lý thư viện.');
+    if (response.status === 401) {
+      notifyLibraryAccessRevoked();
+      throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+    }
+    if (response.status === 403) {
+      notifyLibraryAccessRevoked();
+      throw new Error('Tài khoản không có quyền quản lý thư viện.');
+    }
     if (typeof body?.error === 'string') throw new Error(body.error);
     throw new Error('Không thể xử lý yêu cầu thư viện. Vui lòng thử lại.');
   }

@@ -17,6 +17,10 @@ export function LibraryBatchUploadDialog({ open, categories, onClose, onComplete
   const picker = useRef<HTMLInputElement>(null); const controllers = useRef(new Map<string, AbortController>());
   const [items, setItems] = useState<BatchItem[]>([]); const [defaultCategory, setDefaultCategory] = useState(categories[0]?.id ?? ''); const [running, setRunning] = useState(false); const [summary, setSummary] = useState('');
   useEffect(() => { const first = categories[0]?.id; if (!first) return; setDefaultCategory((value) => categories.some((category) => category.id === value) ? value : first); setItems((rows) => rows.map((row) => categories.some((category) => category.id === row.categoryId) ? row : { ...row, categoryId: first })); }, [categories]);
+  useEffect(() => () => {
+    controllers.current.forEach((controller) => controller.abort());
+    controllers.current.clear();
+  }, []);
   function update(key: string, patch: Partial<BatchItem>) { setItems((rows) => rows.map((row) => row.key === key ? { ...row, ...patch } : row)); }
   function selectFiles(files: FileList | null) { if (!files) return; if (items.some((item) => item.ticketId)) { setSummary('Hãy dàn xếp các lượt tải trước khi thêm tệp mới.'); return; } setItems((rows) => [...rows, ...Array.from(files).map((file, index) => ({ key: `${file.name}:${file.size}:${file.lastModified}:${Date.now()}:${index}`, file, title: defaultLibraryTitle(file.name), author: '', categoryId: defaultCategory, status: 'ready' as const, progress: null, ticketId: null, error: '' }))]); setSummary(''); }
   async function importFiles() {

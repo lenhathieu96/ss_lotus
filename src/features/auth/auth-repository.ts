@@ -54,7 +54,9 @@ export function createAuthRepository(
       return () => subscription.unsubscribe();
     },
     async signOut() {
-      if (config.client) await config.client.auth.signOut();
+      if (!config.client) return;
+      const { error } = await config.client.auth.signOut();
+      if (error) throw error;
     },
   };
 }

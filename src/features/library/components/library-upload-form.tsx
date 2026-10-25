@@ -21,6 +21,7 @@ export function LibraryUploadForm({ open, categories, onClose, onComplete }: { o
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => { const first = categories[0]?.id; if (first) setCategoryId((current) => categories.some((category) => category.id === current) ? current : first); }, [categories]);
+  useEffect(() => () => abortRef.current?.abort(), []);
   function reset() { setFile(null); setTitle(''); setAuthor(''); setProgress(null); setTicket(null); if (inputRef.current) inputRef.current.value = ''; }
   function selectFile(selected: File | null) { if (ticket) return; setFile(selected); if (selected && !title) setTitle(defaultLibraryTitle(selected.name)); setProgress(null); setError(''); }
   async function submit(event: React.FormEvent) {
