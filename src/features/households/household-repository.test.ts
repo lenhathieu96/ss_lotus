@@ -13,7 +13,7 @@ describe('household repository', () => {
     rpc.mockResolvedValue({ data: { id: 'household-1', businessNumber: 12, families: [{ id: 'family-1', businessNumber: 7, address: 'Địa chỉ A', members: [], deceasedPeople: [{ id: 'spirit-1', code: 'HL-01', fullName: 'HƯƠNG LINH A', dateOfDeath: { day: 1, month: 2, isLeap: true }, prayerHistory: [] }] }] }, error: null });
 
     await expect(getHouseholdWorkspace('household-1')).resolves.toMatchObject({ families: [{ deceasedPeople: [{ dateOfDeath: { day: 1, month: 2, isLeap: true } }] }] });
-    expect(rpc).toHaveBeenCalledWith('get_household_workspace', { p_pagoda_id: 'pagoda-1', p_household_id: 'household-1' });
+    expect(rpc).toHaveBeenCalledWith('get_household_workspace_v2', { p_pagoda_id: 'pagoda-1', p_household_id: 'household-1' });
   });
 });
 
@@ -56,4 +56,5 @@ describe('householdReducer', () => {
 
     expect(reordered.household?.families[0].members.map((member) => member.id)).toEqual(['m-2', 'm-1']);
   });
+
 });

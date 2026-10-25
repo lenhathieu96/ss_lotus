@@ -9,7 +9,8 @@ describe('HouseholdWorkspace', () => {
   it('renders the household workspace', () => {
     render(<HouseholdWorkspace />);
 
-    expect(screen.getByRole('heading', { name: 'Quản lý hộ khẩu' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Cầu An' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Tìm kiếm' })).toBeVisible();
   });
 
   it('asks for confirmation before discarding a household draft', async () => {

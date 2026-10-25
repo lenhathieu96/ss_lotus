@@ -13,7 +13,7 @@ import { clearActivePagodaId } from '@features/pagodas/pagoda-client';
 
 const navigation = [
   { to: '/overview', label: 'Tổng quan', icon: Home },
-  { to: '/households', label: 'Hộ gia đình', icon: House },
+  { to: '/households', label: 'Cầu An', icon: House },
   { to: '/huong-linh', label: 'Hương linh', icon: Flower2 },
   { to: '/settings', label: 'Cài đặt', icon: Settings },
   { to: '/admin/thu-vien', label: 'Thư viện', icon: BookOpen },

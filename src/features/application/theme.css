@@ -185,6 +185,36 @@ body {
 .household-search-panel ul { margin: 12px 0 0; padding: 0; list-style: none; }
 .household-search-result { display: grid; grid-template-columns: auto auto 1fr; justify-content: start; width: 100%; margin-top: 6px; color: var(--foreground); background: var(--muted); text-align: left; }
 .household-search-panel > p { margin-top: 1rem; }
+.household-search-help { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: .75rem; color: var(--muted-foreground); font-size: .85rem; }
+.household-add-link { color: var(--primary); text-decoration: none; }
+.household-add-link:hover { text-decoration: none; }
+.household-detail-page { min-height: 0; padding-bottom: 9rem; }
+.household-detail-header { position: sticky; z-index: 3; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; background: var(--background); border-bottom: 1px solid var(--border); }
+.household-detail-header h1 { margin: .2rem 0; color: var(--deep-green); }
+.wellbeing-header-summary { padding: .8rem 1rem; color: var(--primary); background: var(--secondary); border-radius: 12px; }
+.household-inline-editor { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1rem 0; padding: 1rem; background: #fff; border: 1px solid var(--border); border-radius: 14px; }
+.household-inline-editor form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: .6rem; }
+.household-inline-editor label { display: grid; gap: .35rem; font-weight: 700; }
+.household-inline-editor select { min-height: 44px; padding: .6rem .75rem; color: var(--foreground); background: #fff; border: 1px solid var(--input); border-radius: 10px; font: inherit; }
+.household-history { display: grid; gap: .75rem; margin-top: 1.5rem; }
+.household-history h2 { margin: 0; font-size: 1.05rem; }
+.household-history-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; }
+.household-history-card > div { display: grid; gap: .3rem; }
+.household-history-card small { color: var(--muted-foreground); }
+.household-action-dock { position: fixed; z-index: 10; right: 0; bottom: 0; left: 250px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 2rem; background: #fffffff5; border-top: 1px solid var(--border); box-shadow: 0 -8px 24px #19352a12; backdrop-filter: blur(12px); }
+.household-action-dock-status { display: grid; gap: .15rem; }
+.household-action-dock-status span { color: var(--muted-foreground); font-size: .82rem; }
+.household-action-dock-actions { display: flex; flex-wrap: wrap; justify-content: end; gap: .5rem; }
+.wellbeing-dialog { grid-template-rows: auto minmax(0, 1fr) auto; width: min(100%, 900px); max-width: calc(100vw - 2rem); height: min(860px, calc(100dvh - 2rem)); padding: 0; overflow: hidden; }
+.wellbeing-dialog [data-slot="dialog-header"] { padding: 1.25rem 1.25rem 0; }
+.wellbeing-dialog [data-slot="dialog-header"] p { margin: 0; color: var(--muted-foreground); }
+.wellbeing-dialog-body { min-height: 0; padding: 1rem 1.25rem; overflow-y: auto; overscroll-behavior: contain; }
+.wellbeing-day + .wellbeing-day { margin-top: 1rem; }
+.wellbeing-day h3 { margin: 0 0 .5rem; font-size: .92rem; }
+.wellbeing-slot-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+.wellbeing-slot { display: grid; justify-items: start; height: auto; min-height: 72px; padding: .7rem; text-align: left; }
+.wellbeing-slot span, .wellbeing-slot small { font-size: .75rem; opacity: .85; }
+.wellbeing-dialog [data-slot="dialog-footer"] { position: sticky; bottom: 0; margin: 0; padding: 1rem 1.25rem; background: #fff; }
 .group-prayer-panel { align-items: center; justify-content: space-between; margin: 1.5rem 0; }
 .group-prayer-panel h2 { margin: .2rem 0; font-size: 1.2rem; }
 .household-detail-families { margin-top: 1rem; }
