@@ -1,0 +1,2 @@
+-- Historical no-op: this version is retained solely to match applied history.
+-- No import-run table or import behavior is recreated by this file.
