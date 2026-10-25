@@ -6,14 +6,17 @@ import { Card } from '@components/ui/card';
 import { Input } from '@components/ui/input';
 import { Label } from '@components/ui/label';
 import { Button } from '@components/ui/button';
+import { LibraryCategoryNavigation } from '../components/library-category-navigation';
 import { listLibraryCategories, searchLibraryDocuments } from '../library-repository';
 import { LibraryCategory, LibraryCursor, LibraryDocument, LIBRARY_PAGE_SIZE } from '../library-repository';
 
-export function LibraryPublicPage() {
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export function LibraryPublicPage({ initialCategoryId = '' }: { initialCategoryId?: string }) {
   const [categories, setCategories] = useState<LibraryCategory[]>([]);
   const [documents, setDocuments] = useState<LibraryDocument[]>([]);
   const [query, setQuery] = useState('');
-  const [categoryId, setCategoryId] = useState('');
+  const [categoryId, setCategoryId] = useState(uuidPattern.test(initialCategoryId) ? initialCategoryId : '');
   const [cursor, setCursor] = useState<LibraryCursor | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -36,8 +39,8 @@ export function LibraryPublicPage() {
       setCursor(rows.length > LIBRARY_PAGE_SIZE && last ? { publishedAt: last.publishedAt, id: last.id } : null);
       setHasMore(rows.length > LIBRARY_PAGE_SIZE);
       setError('');
-    } catch (cause) {
-      if (requestId === latestRequestId.current) setError(cause instanceof Error ? cause.message : 'Không thể tải thư viện.');
+    } catch {
+      if (requestId === latestRequestId.current) setError('Không thể tải thư viện. Vui lòng thử lại.');
     } finally {
       if (requestId === latestRequestId.current) setLoading(false);
     }
@@ -53,14 +56,18 @@ export function LibraryPublicPage() {
 
   return <main className="page library-public-page">
     <header className="library-hero"><p className="eyebrow">THƯ VIỆN PHẬT HỌC</p><h1>Thư viện</h1><p>Tra cứu và đọc các tài liệu được chia sẻ.</p></header>
-    <Card className="library-search-panel">
-      <Label className="form-field">Tìm tài liệu<Input aria-label="Tìm theo tên tài liệu hoặc tác giả" type="search" placeholder="Nhập tên sách hoặc tác giả" value={query} onChange={(event) => setQuery(event.target.value)} /></Label>
-      <Label className="form-field">Đầu mục<select aria-label="Lọc theo đầu mục" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}><option value="">Tất cả đầu mục</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></Label>
-    </Card>
-    {error && <p className="notice" role="alert">{error} <Button variant="catalog" size="sm" onClick={() => void load(false)}>Thử lại</Button></p>}
-    {loading && documents.length === 0 ? <p className="empty-panel" role="status">Đang tải tài liệu…</p> : documents.length === 0 ? <Card className="empty-panel">Chưa có tài liệu phù hợp.</Card> : <section className="library-document-grid" aria-label="Danh sách tài liệu">
-      {documents.map((document) => <Card className="library-document-card" key={document.id}><p className="eyebrow">{document.categoryName}</p><h2><Link href={`/thu-vien/${document.id}`}>{document.title}</Link></h2><p>{document.author ? `Tác giả: ${document.author}` : 'Chưa cập nhật tác giả'}</p><Link className="library-read-link" href={`/thu-vien/${document.id}`}>Đọc tài liệu</Link></Card>)}
-    </section>}
-    {hasMore && <div className="library-load-more"><Button variant="catalog" disabled={loading || !cursor} onClick={() => void load(true)}>{loading ? 'Đang tải…' : 'Xem thêm'}</Button></div>}
+    <div className="library-browse-layout library-public-layout">
+      <LibraryCategoryNavigation categories={categories} selectedCategoryId={categoryId} onSelect={setCategoryId} />
+      <section className="library-browse-content">
+        <Card className="library-search-panel library-public-search-panel">
+          <Label className="form-field">Tìm tài liệu<Input aria-label="Tìm theo tên tài liệu hoặc tác giả" type="search" placeholder="Nhập tên sách hoặc tác giả" value={query} onChange={(event) => setQuery(event.target.value)} /></Label>
+        </Card>
+        {error && <p className="notice" role="alert">{error} <Button variant="catalog" size="sm" onClick={() => void load(false)}>Thử lại</Button></p>}
+        {loading && documents.length === 0 ? <p className="empty-panel" role="status">Đang tải tài liệu…</p> : documents.length === 0 ? <Card className="empty-panel">Chưa có tài liệu phù hợp.</Card> : <section className="library-document-grid" aria-label="Danh sách tài liệu">
+          {documents.map((document) => <Card className="library-document-card" key={document.id}><p className="eyebrow">{document.categoryName}</p><h2><Link href={`/thu-vien/${document.id}`}>{document.title}</Link></h2><p>{document.author ? `Tác giả: ${document.author}` : 'Chưa cập nhật tác giả'}</p><Link className="library-read-link" href={`/thu-vien/${document.id}`}>Đọc tài liệu</Link></Card>)}
+        </section>}
+        {hasMore && <div className="library-load-more"><Button variant="catalog" disabled={loading || !cursor} onClick={() => void load(true)}>{loading ? 'Đang tải…' : 'Xem thêm'}</Button></div>}
+      </section>
+    </div>
   </main>;
 }

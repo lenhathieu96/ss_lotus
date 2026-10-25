@@ -2,14 +2,15 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { LibraryDetailPage } from './library-detail-page';
 
-const { getLibraryDocument, getLibraryDownloadUrl, publicLibraryDocumentUrl } = vi.hoisted(() => ({ getLibraryDocument: vi.fn(), getLibraryDownloadUrl: vi.fn(), publicLibraryDocumentUrl: vi.fn(() => 'https://example.test/public.pdf') }));
-vi.mock('../library-repository', () => ({ getLibraryDocument, getLibraryDownloadUrl, publicLibraryDocumentUrl }));
+const { getLibraryDocument, getLibraryDownloadUrl, listLibraryCategories, publicLibraryDocumentUrl } = vi.hoisted(() => ({ getLibraryDocument: vi.fn(), getLibraryDownloadUrl: vi.fn(), listLibraryCategories: vi.fn(), publicLibraryDocumentUrl: vi.fn(() => 'https://example.test/public.pdf') }));
+vi.mock('../library-repository', () => ({ getLibraryDocument, getLibraryDownloadUrl, listLibraryCategories, publicLibraryDocumentUrl }));
 vi.mock('../components/library-pdf-reader', () => ({ LibraryPdfReader: ({ pdfUrl, title }: { pdfUrl: string; title: string }) => <p>{`Reader: ${title} (${pdfUrl})`}</p> }));
 
 describe('LibraryDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     getLibraryDownloadUrl.mockResolvedValue('https://example.test/download');
+    listLibraryCategories.mockResolvedValue([{ id: 'sut-hoc', name: 'Sử học', position: 0 }]);
     publicLibraryDocumentUrl.mockReturnValue('https://example.test/public.pdf');
   });
 
@@ -23,6 +24,8 @@ describe('LibraryDetailPage', () => {
     getLibraryDocument.mockResolvedValue({ id: '123e4567-e89b-42d3-a456-426614174000', categoryId: 'sut-hoc', categoryName: 'Sử học', title: 'Đại Việt sử ký', author: 'Ngô Sĩ Liên', publishedAt: '2026-09-27T00:00:00Z' });
     render(<LibraryDetailPage documentId="123e4567-e89b-42d3-a456-426614174000" />);
     expect(await screen.findByText('Reader: Đại Việt sử ký (https://example.test/public.pdf)')).toBeVisible();
+    expect(screen.getByRole('navigation', { name: 'Duyệt theo đầu mục' })).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Sử học' })).toHaveAttribute('href', '/thu-vien?category=sut-hoc');
     expect(screen.getByRole('button', { name: 'Tải PDF' })).toBeEnabled();
     expect(getLibraryDownloadUrl).not.toHaveBeenCalled();
   });

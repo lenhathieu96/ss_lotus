@@ -41,7 +41,7 @@ Hương linh death dates use a separate yearless `LunarDayMonth` contract: `day`
 - `/households/[householdId]`: household-wide Cầu an, living members grouped by family/address, linked Hương linh, and their Cầu siêu actions/history.
 - `/huong-linh`: active-pagoda search, create/import, association management, lunar date of death, and Cầu siêu history/actions.
 - Legacy `/prayer-for-wellbeing`, `/memorial-prayer`, and `/memorial-prayer/deceased-persons` routes redirect into household or Hương linh context.
-- `/thu-vien` and `/thu-vien/[documentId]`: public PDF catalog, search, preview, download, and stable share links. The catalog exposes only published metadata through public RPCs.
+- `/thu-vien` and `/thu-vien/[documentId]`: public PDF catalog, search, preview, download, and stable share links. The catalog exposes only published metadata through public RPCs; category navigation may enter the catalog with a `?category=<categoryId>` query.
 - `/admin/thu-vien`: admin-only category and document management. The Function verifies bearer tokens and the `admin_users` table before invoking service-role-only lifecycle RPCs.
 
 ## PDF library storage boundary

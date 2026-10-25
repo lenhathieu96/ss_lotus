@@ -31,14 +31,17 @@ export type LibraryUploadTicket = Readonly<{
   expiresAt: string;
 }>;
 
-export function normalizeLibraryQuery(value: string): string {
+export function normalizeLibraryText(value: string): string {
   return value
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[đĐ]/g, 'd')
     .trim()
-    .toLocaleLowerCase('vi-VN')
-    .slice(0, 120);
+    .toLocaleLowerCase('vi-VN');
+}
+
+export function normalizeLibraryQuery(value: string): string {
+  return normalizeLibraryText(value).slice(0, 120);
 }
 
 export function defaultLibraryTitle(fileName: string): string {

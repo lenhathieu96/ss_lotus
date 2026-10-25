@@ -40,3 +40,13 @@ Use primitive-provided semantics and keyboard handling rather than rebuilding ov
 ## Responsive behavior
 
 Preserve the existing 768px shell breakpoint and 780px catalog/workflow breakpoint. Mobile layout changes should reorganize available space without changing routes, data payloads, Lunar date rules, or browser-side Supabase authentication.
+
+## Application navigation
+
+The application sidebar is available on all non-login screens. It may collapse to an icon rail on desktop and must retain descriptive accessible names and tooltips for each navigation item. At 768px and below, the sidebar remains a menu drawer with the existing mobile navigation; do not force a collapsed rail onto small screens.
+
+## Library browsing
+
+The admin library opens with published books grouped in category order, a category filter with published counts, and search across title, author, and filename (including Vietnamese queries without accents). Book titles and the Xem action open the existing public reader. Desktop uses category navigation beside the books; at 780px and below, a compact category select keeps books near the top of the page.
+
+Upload, category editing, and upload maintenance live in the collapsed Quản lý thư viện section. Công cụ quản lý opens that section; its summary shows the number of unpublished records needing attention. Keep the PDF size/retry guidance beside upload tools rather than above the catalog. Preserve all existing lifecycle safeguards and permissions.
