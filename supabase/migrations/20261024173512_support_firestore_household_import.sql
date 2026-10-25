@@ -1,0 +1,2 @@
+-- Historical no-op: this version was applied before Firestore import support
+-- was retired. It remains only so Supabase migration history can be verified.

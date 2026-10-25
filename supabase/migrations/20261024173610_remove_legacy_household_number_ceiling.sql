@@ -1,0 +1,2 @@
+-- Historical no-op: this version is retained solely to match applied history.
+-- The Firestore import workflow is intentionally not present in this repository.
