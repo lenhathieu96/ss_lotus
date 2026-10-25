@@ -1,17 +1,21 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthenticatedDashboard } from './authenticated-dashboard';
 
 let authStateChangeListener: ((session: unknown) => void) | undefined;
 
-const mocks = vi.hoisted(() => ({
-  getSession: vi.fn(),
-  onAuthStateChange: vi.fn(),
-  replace: vi.fn(),
-  unsubscribe: vi.fn(),
-}));
+const mocks = vi.hoisted(() => {
+  const replace = vi.fn();
+  return {
+    getSession: vi.fn(),
+    onAuthStateChange: vi.fn(),
+    replace,
+    router: { replace },
+    unsubscribe: vi.fn(),
+  };
+});
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ replace: mocks.replace }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => mocks.router }));
 vi.mock('@features/pagodas/pagoda-access-context', () => ({
   PagodaAccessProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -57,7 +61,7 @@ describe('AuthenticatedDashboard', () => {
     render(<AuthenticatedDashboard><p>Protected dashboard</p></AuthenticatedDashboard>);
 
     expect(await screen.findByText('Protected dashboard')).toBeVisible();
-    authStateChangeListener?.(null);
+    await act(async () => authStateChangeListener?.(null));
 
     await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith('/login'));
     await waitFor(() => expect(screen.queryByText('Protected dashboard')).not.toBeInTheDocument());

@@ -20,17 +20,18 @@ export function loadPdfJsAdapter(): Promise<PdfJsAdapter> {
     return Promise.reject(new Error('Trình đọc PDF chỉ hoạt động trong trình duyệt.'));
   }
 
-  adapterPromise ??= Promise.all([
-    import('pdfjs-dist/build/pdf.mjs'),
-    import('pdfjs-dist/web/pdf_viewer.mjs'),
-  ]).then(([core, viewer]) => {
+  adapterPromise ??= import('pdfjs-dist/build/pdf.mjs').then(async (core) => {
     // Next emits this module as a client asset. Keeping worker and viewer at the
-    // same pinned package version prevents PDF.js version-skew failures.
+    // same pinned package version prevents PDF.js version-skew failures. The
+    // viewer reads globalThis.pdfjsLib while it evaluates, and the core module
+    // initializes that global as a side effect, so these imports must remain
+    // ordered rather than running inside Promise.all.
     core.GlobalWorkerOptions.workerSrc = new URL(
       'pdfjs-dist/build/pdf.worker.min.mjs',
       import.meta.url,
     ).toString();
 
+    const viewer = await import('pdfjs-dist/web/pdf_viewer.mjs');
     return { core, viewer };
   });
 

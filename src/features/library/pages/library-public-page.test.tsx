@@ -29,6 +29,24 @@ describe('LibraryPublicPage', () => {
     await waitFor(() => expect(searchLibraryDocuments).toHaveBeenLastCalledWith(expect.objectContaining({ query: 'phật học' })));
   });
 
+  it('offers category navigation beside the public catalog', async () => {
+    const user = userEvent.setup();
+    render(<LibraryPublicPage />);
+
+    await screen.findByRole('link', { name: 'Đại Việt sử ký' });
+    await user.click(screen.getByRole('button', { name: 'Sử học' }));
+
+    await waitFor(() => expect(searchLibraryDocuments).toHaveBeenLastCalledWith(expect.objectContaining({ categoryId: 'cat-history' })));
+    expect(screen.getByRole('navigation', { name: 'Duyệt theo đầu mục' })).toBeInTheDocument();
+  });
+
+  it('ignores an invalid category from the URL before it reaches the library query', async () => {
+    render(<LibraryPublicPage initialCategoryId="not-a-uuid" />);
+
+    await screen.findByRole('link', { name: 'Đại Việt sử ký' });
+    expect(searchLibraryDocuments).toHaveBeenLastCalledWith(expect.objectContaining({ categoryId: '' }));
+  });
+
   it('ignores a slower response from an outdated query', async () => {
     const pending: Record<string, (rows: { id: string; categoryId: string; categoryName: string; title: string; author: string; publishedAt: string }[]) => void> = {};
     searchLibraryDocuments.mockImplementation(({ query }: { query: string }) => new Promise((resolve) => {

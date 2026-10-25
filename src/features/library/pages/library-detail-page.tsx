@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@components/ui/button';
 import { Card } from '@components/ui/card';
-import { LibraryDocument } from '../library-repository';
-import { getLibraryDocument, publicLibraryDocumentUrl } from '../library-repository';
+import { LibraryCategory, LibraryDocument } from '../library-repository';
+import { getLibraryDocument, listLibraryCategories, publicLibraryDocumentUrl } from '../library-repository';
+import { LibraryCategoryNavigation } from '../components/library-category-navigation';
 import { LibraryPdfReader } from '../components/library-pdf-reader';
 import { LibraryDownloadButton } from '../components/library-download-button';
 
@@ -13,6 +14,7 @@ const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}
 
 export function LibraryDetailPage({ documentId }: { documentId: string }) {
   const [document, setDocument] = useState<LibraryDocument | null>(null);
+  const [categories, setCategories] = useState<LibraryCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [unavailable, setUnavailable] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -21,6 +23,7 @@ export function LibraryDetailPage({ documentId }: { documentId: string }) {
   useEffect(() => {
     if (!uuidPattern.test(documentId)) { setUnavailable(true); setLoading(false); return; }
     let active = true;
+    void listLibraryCategories().then((rows) => { if (active) setCategories(rows); }).catch(() => { if (active) setCategories([]); });
     void getLibraryDocument(documentId).then((record) => {
       if (!active) return;
       setDocument(record);
@@ -59,11 +62,16 @@ export function LibraryDetailPage({ documentId }: { documentId: string }) {
   }
 
   return <main className="page library-detail-page">
-    <Link href="/thu-vien" className="library-back-link">← Thư viện</Link>
-    <header className="library-detail-heading"><div><p className="eyebrow">{document.categoryName}</p><h1>{document.title}</h1><p>{document.author ? `Tác giả: ${document.author}` : 'Chưa cập nhật tác giả'}</p></div><div><Button variant="catalog" onClick={() => void copyLink()}>{copied ? 'Đã sao chép liên kết' : 'Chia sẻ'}</Button><LibraryDownloadButton documentId={document.id} /></div></header>
-    {shareError && <p className="notice" role="alert">{shareError}</p>}
-    {previewUrl
-      ? <LibraryPdfReader documentId={document.id} onPdfUnavailable={handlePdfUnavailable} pdfUrl={previewUrl} title={document.title} />
-      : <Card className="library-reader-configuration" role="alert"><h2>Chưa thể mở trình đọc trực tuyến</h2><p>{readerConfigurationError}</p><LibraryDownloadButton documentId={document.id} /></Card>}
+    <div className="library-detail-layout">
+      <LibraryCategoryNavigation categories={categories} selectedCategoryId={document.categoryId} getHref={(categoryId) => categoryId ? `/thu-vien?category=${encodeURIComponent(categoryId)}` : '/thu-vien'} />
+      <section className="library-detail-content">
+        <Link href="/thu-vien" className="library-back-link">← Thư viện</Link>
+        <header className="library-detail-heading"><div><p className="eyebrow">{document.categoryName}</p><h1>{document.title}</h1><p>{document.author ? `Tác giả: ${document.author}` : 'Chưa cập nhật tác giả'}</p></div><div><Button variant="catalog" onClick={() => void copyLink()}>{copied ? 'Đã sao chép liên kết' : 'Chia sẻ'}</Button><LibraryDownloadButton documentId={document.id} /></div></header>
+        {shareError && <p className="notice" role="alert">{shareError}</p>}
+        {previewUrl
+          ? <LibraryPdfReader documentId={document.id} onPdfUnavailable={handlePdfUnavailable} pdfUrl={previewUrl} title={document.title} />
+          : <Card className="library-reader-configuration" role="alert"><h2>Chưa thể mở trình đọc trực tuyến</h2><p>{readerConfigurationError}</p><LibraryDownloadButton documentId={document.id} /></Card>}
+      </section>
+    </div>
   </main>;
 }

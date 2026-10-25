@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DashboardShell } from './dashboard-shell';
@@ -40,5 +40,27 @@ describe('DashboardShell', () => {
 
     await waitFor(() => expect(mocks.signOut).toHaveBeenCalledOnce());
     expect(mocks.push).toHaveBeenCalledWith('/login');
+  });
+
+  it('collapses and expands the desktop navigation', async () => {
+    const user = userEvent.setup();
+    render(<DashboardShell><p>Dashboard content</p></DashboardShell>);
+
+    await user.click(screen.getByRole('button', { name: 'Thu gọn điều hướng' }));
+    expect(screen.getByRole('button', { name: 'Mở rộng điều hướng' })).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Mở rộng điều hướng' }));
+    expect(screen.getByRole('button', { name: 'Thu gọn điều hướng' })).toBeVisible();
+  });
+
+  it('keeps the primary sections available in the public library shell', () => {
+    render(<DashboardShell publicLibrary><p>Library content</p></DashboardShell>);
+    const primaryNavigation = within(screen.getByLabelText('Điều hướng chính'));
+
+    expect(primaryNavigation.getByRole('button', { name: 'Thu gọn điều hướng' })).toBeVisible();
+    expect(primaryNavigation.getByRole('link', { name: 'Tổng quan' })).toHaveAttribute('href', '/overview');
+    expect(primaryNavigation.getByRole('link', { name: 'Hộ gia đình' })).toHaveAttribute('href', '/households');
+    expect(primaryNavigation.getByRole('link', { name: 'Thư viện' })).toHaveAttribute('href', '/thu-vien');
+    expect(screen.getByLabelText('Điều hướng di động')).toHaveClass('has-five-items');
   });
 });

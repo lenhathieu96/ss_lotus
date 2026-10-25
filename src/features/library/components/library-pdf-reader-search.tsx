@@ -50,7 +50,7 @@ export const LibraryPdfReaderSearch = forwardRef<HTMLInputElement, LibraryPdfRea
         <Button type="submit" size="sm" variant="outline">Tìm</Button>
         <Button type="button" size="sm" variant="ghost" onClick={() => onFind(query, { findAgain: true, findPrevious: true })} disabled={!query.trim()} aria-label="Kết quả trước">↑</Button>
         <Button type="button" size="sm" variant="ghost" onClick={() => onFind(query, { findAgain: true })} disabled={!query.trim()} aria-label="Kết quả tiếp theo">↓</Button>
-        <Button type="button" size="sm" variant="ghost" onClick={onClear} disabled={!query && findState === 'idle'}>Xóa</Button>
+        <Button type="button" size="sm" variant="outline" onClick={onClear} disabled={!query && findState === 'idle'}>Xóa</Button>
       </div>
       <output className="library-reader-find-status" aria-live="polite">{resultMessage}</output>
     </form>;
