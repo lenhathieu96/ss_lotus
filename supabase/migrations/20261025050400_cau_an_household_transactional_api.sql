@@ -170,8 +170,8 @@ begin
     left join public.members m on m.pagoda_id = f.pagoda_id and m.family_id = f.id and m.archived_at is null
   where h.pagoda_id = p_pagoda_id and (
     h.business_number::text = btrim(p_query) or h.legacy_number::text = btrim(p_query) or f.business_number::text = btrim(p_query)
-    or unaccent(lower(f.address)) like '%' || unaccent(lower(btrim(p_query))) || '%'
-    or exists (select 1 from public.members sm where sm.pagoda_id = p_pagoda_id and sm.family_id = f.id and sm.archived_at is null and (unaccent(lower(sm.full_name)) like '%' || unaccent(lower(btrim(p_query))) || '%' or unaccent(lower(coalesce(sm.dharma_name, ''))) like '%' || unaccent(lower(btrim(p_query))) || '%'))
+    or public.unaccent(lower(f.address)) like '%' || public.unaccent(lower(btrim(p_query))) || '%'
+    or exists (select 1 from public.members sm where sm.pagoda_id = p_pagoda_id and sm.family_id = f.id and sm.archived_at is null and (public.unaccent(lower(sm.full_name)) like '%' || public.unaccent(lower(btrim(p_query))) || '%' or public.unaccent(lower(coalesce(sm.dharma_name, ''))) like '%' || public.unaccent(lower(btrim(p_query))) || '%'))
   ) group by h.id, h.business_number, h.legacy_number order by h.business_number limit least(greatest(coalesce(p_limit, 50), 1), 50);
 end;
 $$;
