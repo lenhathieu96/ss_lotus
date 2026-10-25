@@ -59,7 +59,7 @@ describe('DashboardShell', () => {
 
     expect(primaryNavigation.getByRole('button', { name: 'Thu gọn điều hướng' })).toBeVisible();
     expect(primaryNavigation.getByRole('link', { name: 'Tổng quan' })).toHaveAttribute('href', '/overview');
-    expect(primaryNavigation.getByRole('link', { name: 'Hộ gia đình' })).toHaveAttribute('href', '/households');
+    expect(primaryNavigation.getByRole('link', { name: 'Cầu An' })).toHaveAttribute('href', '/households');
     expect(primaryNavigation.getByRole('link', { name: 'Thư viện' })).toHaveAttribute('href', '/thu-vien');
     expect(screen.getByLabelText('Điều hướng di động')).toHaveClass('has-five-items');
   });
