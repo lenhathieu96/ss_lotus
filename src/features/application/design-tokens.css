@@ -18,31 +18,42 @@
   --space-8: 40px;
   --space-9: 48px;
 
-  /* Palette */
-  --background: #f6f7f5;
-  --foreground: #27332e;
+  /* Green and white lead the UI; the approved logo retains its full gradient. */
+  --brand-green: #53b175;
+  --brand-teal: #5b897d;
+  --brand-purple: #69428b;
+  --brand-gradient: linear-gradient(160deg, var(--brand-green), var(--brand-teal) 50%, var(--brand-purple));
+  --background: #f6faf7;
+  --foreground: #29352f;
   --card: #ffffff;
-  --card-foreground: #27332e;
+  --card-foreground: var(--foreground);
   --popover: #ffffff;
-  --popover-foreground: #27332e;
-  --primary: #356b56;
+  --popover-foreground: var(--foreground);
+  --primary: #287a4b;
+  --primary-hover: #21653e;
   --primary-foreground: #ffffff;
-  --secondary: #edf4ef;
-  --secondary-foreground: #285640;
-  --muted: #f5f8f6;
-  --muted-foreground: #68726d;
-  --accent: #edf4ef;
-  --accent-foreground: #285640;
+  --secondary: #eaf6ee;
+  --secondary-foreground: #27623d;
+  --muted: #f2f7f3;
+  --muted-foreground: #626c68;
+  --accent: #e3f3e9;
+  --accent-foreground: var(--primary);
   --destructive: #8c3f39;
-  --border: #e3e9e5;
-  --input: #d7ddd8;
-  --ring: #356b56;
-  --gold: #a07138;
-  --deep-green: #173b30;
-  --field-foreground: #3a4941;
-  --catalog-border: #e7e0d7;
-  --catalog-foreground: #533d20;
-  --catalog-muted: #786f65;
+  --border: #dfe6e2;
+  --input: #ccd8d1;
+  --ring: var(--primary);
+  --heading-foreground: #204c34;
+  --field-foreground: #37473f;
+  --catalog-border: var(--border);
+  --catalog-foreground: var(--primary);
+  --catalog-muted: var(--muted-foreground);
+  --sidebar-foreground: #ffffff;
+  --sidebar-muted: #d5e9df;
+  --sidebar-green: #21573c;
+  --sidebar-background: linear-gradient(165deg, var(--sidebar-green), var(--primary-hover));
+  --sidebar-active: #ffffff1f;
+  --surface-border-strong: #c6dbcd;
+  --overlay: #193d2999;
 
   /* Foundation */
   --font-family-sans: Mulish, system-ui, sans-serif;
