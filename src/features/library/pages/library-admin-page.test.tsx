@@ -60,18 +60,47 @@ describe('LibraryAdminPage', () => {
     expect(screen.getByRole('link', { name: title })).toBeInTheDocument();
   });
 
-  it('searches without Vietnamese accents and keeps upload tools collapsed', async () => {
+  it('preserves search while opening management tasks separately', async () => {
     const user = userEvent.setup();
     render(<LibraryAdminPage />);
     await screen.findByRole('link', { name: 'Xem' });
-    expect(screen.getByRole('button', { name: 'Import nhiều PDF' })).not.toBeVisible();
+    expect(screen.queryByRole('button', { name: /Import nhiều PDF/ })).not.toBeInTheDocument();
     await user.type(screen.getByRole('searchbox', { name: 'Tìm trong thư viện' }), 'tai lieu cong khai');
     expect(screen.getByRole('link', { name: 'Tài liệu công khai' })).toBeInTheDocument();
     await user.clear(screen.getByRole('searchbox'));
     await user.type(screen.getByRole('searchbox'), 'khong ton tai');
     expect(screen.getByText('Không tìm thấy tài liệu')).toBeInTheDocument();
-    await user.click(screen.getByText(/Quản lý thư viện/));
-    expect(screen.getByRole('button', { name: 'Import nhiều PDF' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: /Công cụ quản lý/ }));
+    expect(screen.getByRole('dialog', { name: 'Công cụ quản lý' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Kiểm tra và dàn xếp' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Lượt tải cần xử lý/ }));
     expect(screen.getByRole('button', { name: 'Kiểm tra và dàn xếp' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Đóng công cụ' }));
+    expect(screen.getByRole('searchbox')).toHaveValue('khong ton tai');
+    expect(screen.getByText('Không tìm thấy tài liệu')).toBeVisible();
+  });
+
+  it('opens categories without leaving the catalog and returns to the tool chooser', async () => {
+    const user = userEvent.setup();
+    render(<LibraryAdminPage />);
+    await screen.findByRole('link', { name: 'Xem' });
+    await user.click(screen.getByRole('button', { name: /Công cụ quản lý/ }));
+    await user.click(screen.getByRole('button', { name: /Quản lý đầu mục/ }));
+    expect(screen.getByRole('dialog', { name: 'Quản lý đầu mục' })).toBeVisible();
+    await user.type(screen.getByRole('textbox', { name: 'Thêm đầu mục' }), 'Phật học');
+    await user.click(screen.getByRole('button', { name: /^Thêm$/ }));
+    expect(repository.createLibraryCategory).toHaveBeenCalledWith('Phật học');
+    await user.click(screen.getByRole('button', { name: 'Quay lại công cụ quản lý' }));
+    expect(screen.getByRole('dialog', { name: 'Công cụ quản lý' })).toBeVisible();
+  });
+
+  it('replaces the chooser with the batch upload dialog', async () => {
+    const user = userEvent.setup();
+    render(<LibraryAdminPage />);
+    await screen.findByRole('link', { name: 'Xem' });
+    await user.click(screen.getByRole('button', { name: /Công cụ quản lý/ }));
+    await user.click(screen.getByRole('button', { name: /Import nhiều PDF/ }));
+    expect(screen.getByRole('dialog', { name: 'Import nhiều tài liệu PDF' })).toBeVisible();
+    expect(screen.queryByRole('dialog', { name: 'Công cụ quản lý' })).not.toBeInTheDocument();
   });
 });

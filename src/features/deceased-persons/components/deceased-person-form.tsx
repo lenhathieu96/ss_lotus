@@ -26,6 +26,11 @@ const empty = (): DeceasedPerson => ({
   code: "", fullName: "", dharmaName: "", dateOfDeath: { day: 0, month: 0, isLeap: false }, createdBy: "", householdReference: "", familyReference: "",
 });
 
+function isBusinessNumber(value: string): boolean {
+  const parsed = Number(value);
+  return /^\d{1,10}$/.test(value) && Number.isInteger(parsed) && parsed >= 1 && parsed <= 2_147_483_647;
+}
+
 export function DeceasedPersonForm({ codes, onAdd, onClose, focusReturnTarget }: { codes: string[]; onAdd: (person: DeceasedPerson) => Promise<void>; onClose: () => void; focusReturnTarget: () => HTMLElement | null; }) {
   const firstInputRef = useRef<HTMLInputElement>(null);
   const focusReturnTargetRef = useRef(focusReturnTarget);
@@ -43,7 +48,7 @@ export function DeceasedPersonForm({ codes, onAdd, onClose, focusReturnTarget }:
     const missing = fields.find(([key, , required]) => required && !person[key]);
     if (missing) return setError(`${missing[1]} là bắt buộc.`);
     if (!isValidLunarDayMonth(person.dateOfDeath)) return setError("Ngày mất âm lịch là bắt buộc.");
-    if ((person.householdReference && !/^\d{1,4}$/.test(person.householdReference)) || (person.familyReference && !/^\d{1,4}$/.test(person.familyReference))) return setError("Mã hộ và mã gia đình phải từ 1 đến 4 chữ số.");
+    if ((person.householdReference && !isBusinessNumber(person.householdReference)) || (person.familyReference && !isBusinessNumber(person.familyReference))) return setError("Mã hộ và mã gia đình không hợp lệ.");
     if (!!person.householdReference !== !!person.familyReference) return setError("Mã hộ và mã gia đình phải nhập cùng nhau.");
     if (codes.includes(person.code)) return setError("Mã số đã tồn tại.");
     setSaving(true); setError("");

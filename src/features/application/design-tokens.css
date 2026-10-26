@@ -1,0 +1,84 @@
+/*
+ * SS Lotus design tokens.
+ *
+ * This is the value source for the application.  `theme.css` only bridges
+ * these values to Tailwind and owns application composition.  Keep geometry
+ * that belongs to a feature (PDF page sizes, grid columns, dock offsets) in
+ * that feature rather than promoting it to this shared scale.
+ */
+:root {
+  /* Primitive spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+
+  /* Palette */
+  --background: #f6f7f5;
+  --foreground: #27332e;
+  --card: #ffffff;
+  --card-foreground: #27332e;
+  --popover: #ffffff;
+  --popover-foreground: #27332e;
+  --primary: #356b56;
+  --primary-foreground: #ffffff;
+  --secondary: #edf4ef;
+  --secondary-foreground: #285640;
+  --muted: #f5f8f6;
+  --muted-foreground: #68726d;
+  --accent: #edf4ef;
+  --accent-foreground: #285640;
+  --destructive: #8c3f39;
+  --border: #e3e9e5;
+  --input: #d7ddd8;
+  --ring: #356b56;
+  --gold: #a07138;
+  --deep-green: #173b30;
+  --field-foreground: #3a4941;
+  --catalog-border: #e7e0d7;
+  --catalog-foreground: #533d20;
+  --catalog-muted: #786f65;
+
+  /* Foundation */
+  --font-family-sans: Mulish, system-ui, sans-serif;
+  --radius-compact: 8px;
+  --radius-control: 10px;
+  --radius-panel: 16px;
+  --shadow-panel: 0 8px 28px #1d33231c;
+  --shadow-floating: 0 -8px 24px #19352a12;
+  --shadow-overlay: 0 12px 35px #19352a26;
+  --layer-navigation: 5;
+  --layer-sticky: 10;
+  --layer-dock: 20;
+  --layer-drawer: 40;
+  --layer-overlay: 50;
+
+  /* Semantic spacing and controls */
+  --field-label-gap: var(--space-2);
+  --field-group-gap: var(--space-4);
+  --action-gap: var(--space-2);
+  --panel-padding: var(--space-6);
+  --section-gap: var(--space-7);
+  --page-padding: var(--space-8);
+  --dialog-padding: var(--space-6);
+  --dialog-footer-padding-y: var(--space-4);
+  --dialog-footer-padding-x: var(--space-6);
+  --control-height: 44px;
+  --search-control-height: 56px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --panel-padding: var(--space-4);
+    --section-gap: var(--space-6);
+    --page-padding: var(--space-4);
+    --dialog-padding: var(--space-4);
+    --dialog-footer-padding-y: var(--space-3);
+    --dialog-footer-padding-x: var(--space-4);
+  }
+}

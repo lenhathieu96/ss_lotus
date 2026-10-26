@@ -1,0 +1,101 @@
+/* Scoped Cầu An composition follows the approved household prototype. */
+.app-shell:has(.household-page),.app-shell:has(.household-detail-page) { height:100dvh; min-height:0; overflow:hidden; }
+.app-shell:has(.household-page) > .workspace,.app-shell:has(.household-detail-page) > .workspace { display:flex; flex-direction:column; overflow:hidden; }
+.app-shell:has(.household-page) .topbar,.app-shell:has(.household-detail-page) .topbar { flex:none; }
+.app-shell:has(.household-page) main,.app-shell:has(.household-detail-page) main { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; }
+.household-page .household-search-panel { background:#edf4ef; border-color:#cddfd2; padding:var(--panel-padding); margin:0 0 var(--space-5); }
+.household-search-line { display:flex; gap:var(--field-group-gap); align-items:stretch; }
+.household-search-panel form > label { margin-bottom:var(--field-label-gap); line-height:1.5; }
+.household-page .household-search-panel form { display:block; }
+.household-input-icon { position:relative; flex:1; min-width:0; }
+.household-input-icon > svg { position:absolute; left:16px; top:50%; transform:translateY(-50%); width:20px; color:#687b70; }
+.household-input-icon input { padding-inline:46px; height:var(--search-control-height); background:white; font-size:16px; }
+.household-clear-query { position:absolute; right:8px; top:8px; width:40px; height:40px; }
+.household-search-line > button { min-height:var(--search-control-height); padding-inline:28px; }
+.household-search-hints { display:flex; justify-content:space-between; gap:var(--field-label-gap); margin-top:var(--field-label-gap); color:var(--muted-foreground); font-size:13px; }
+.household-search-create-row { display:flex; justify-content:space-between; align-items:center; gap:var(--field-group-gap); border-top:1px solid #d6e3d9; margin-top:22px; padding-top:var(--field-group-gap); }
+.household-search-create-row p { font-size:13px; }
+.household-search-create-row button { text-decoration:none; color:var(--primary); }
+.household-season-note { display:flex; justify-content:space-between; gap:var(--field-group-gap); font-size:12px; color:var(--muted-foreground); margin:18px 0 var(--section-gap); }
+.household-season-note strong { color:var(--primary); }
+.household-list-heading { display:flex; justify-content:space-between; align-items:center; margin:var(--panel-padding) 0 var(--field-group-gap); }
+.household-list-heading h2 { font-size:21px; margin:0 0 4px; }
+.household-list-heading p,.household-list-heading > span { font-size:13px; color:var(--muted-foreground); }
+.household-results-table { border:1px solid var(--border); border-radius:14px; background:white; overflow:hidden; }
+.household-table-header,.household-result-row { display:grid; grid-template-columns:110px minmax(0,1.4fr) minmax(0,1fr) 44px; gap:20px; align-items:center; padding:20px 24px; }
+.household-table-header { background:#f0f4ef; color:#6b776f; font-size:11px; font-weight:800; letter-spacing:.08em; }
+.household-result-row { width:100%; text-align:left; border-bottom:1px solid var(--border); text-decoration:none; color:var(--foreground); min-height:100px; }
+.household-result-row:hover { background:#f5f8f4; }
+.household-code { display:flex; align-items:center; gap:8px; color:var(--primary); font-size:20px; font-weight:800; }
+.household-code svg { width:18px; }
+.household-address-block,.household-names { display:grid; gap:5px; min-width:0; }
+.household-open-result svg { width:20px; }
+.household-result-row small { color:var(--muted-foreground); font-size:12px; }
+.household-table-footer { display:flex; justify-content:space-between; gap:12px; color:var(--muted-foreground); padding:14px 24px; font-size:12px; }
+.household-table-footer > span:last-child { display:inline-flex; align-items:center; gap:var(--action-gap); }
+.household-table-footer > span:last-child > svg { flex:none; width:16px; height:16px; }
+.household-search-empty { padding:var(--space-9) var(--panel-padding); text-align:center; color:var(--muted-foreground); }
+.household-back-to-search { display:inline-flex; align-items:center; gap:8px; color:var(--primary); text-decoration:none; margin-bottom:18px; font-size:14px; }
+.household-create-layout { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:var(--panel-padding); }
+.household-summary { padding:var(--panel-padding); border:1px solid var(--border); border-radius:14px; background:white; align-self:start; }
+.household-summary h2 { margin:8px 0 20px; font-size:20px; }
+.household-summary-counts { display:grid; grid-template-columns:1fr 1fr; padding:16px 0; border-block:1px solid var(--border); }
+.household-summary-counts > div { display:grid; gap:6px; }.household-summary-counts strong { font-size:30px; color:var(--primary); }.household-summary-counts span { font-size:13px; color:var(--muted-foreground); }
+.household-summary-number { display:flex; gap:12px; margin:22px 0; font-size:13px; }.household-summary-number svg { width:22px; flex:none; color:var(--primary); }
+.household-summary-note { font-size:12px; }
+.household-editor-intro { display:flex; gap:14px; align-items:center; margin:24px 0; }.household-editor-intro > span { background:#edf4ef; border:1px solid #cddfd2; color:var(--primary); border-radius:50%; padding:12px; }.household-editor-intro h2 { font-size:21px; margin:0; }
+.household-back-link { display:inline-block; margin-bottom:20px; color:var(--primary); text-decoration:none; }
+.family-workspace-heading h2 { margin:6px 0; font-size:24px; }.family-workspace-heading > p:last-child { font-size:13px; }
+.family-card-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.family-card-heading .family-count { display:grid; place-items:center; background:#e5eee3; color:var(--primary); border-radius:10px; min-width:40px; height:40px; font-size:20px; }
+.family-select-all { display:flex; align-items:center; gap:10px; min-height:44px; margin-top:12px; font-size:13px; }
+.member-select,.family-select-all input { width:18px; height:18px; accent-color:var(--primary); flex:none; }
+.member-info { flex:1; min-width:0; }.member-info > strong { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.member-details { display:flex; flex-wrap:wrap; gap:4px 12px; font-size:12px; color:var(--muted-foreground); margin-top:5px; }
+.household-detail-page .member-details span { display:inline; flex:none; }
+.household-detail-page .member-head-badge { display:inline; flex:none; color:var(--primary); background:#edf4ef; padding:2px 6px; border-radius:5px; font-size:10px; }
+.household-detail-page .member-row.is-selected { background:#edf4ef; }
+.family-dropzone { display:flex; align-items:center; justify-content:center; gap:8px; min-height:52px; margin:12px; border:1px dashed #c3d4c4; border-radius:9px; color:var(--muted-foreground); font-size:12px; }
+.family-dropzone svg { width:18px; }.family-card.is-drop-target { outline:2px solid var(--primary); }.family-card.is-drop-target .family-dropzone { background:#edf4ef; }
+.household-dock-edit-actions,.household-dock-commit-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.family-operation-dialog { display:flex; flex-direction:column; padding:0; gap:0; max-height:calc(100dvh - 32px); overflow:hidden; }
+.family-operation-dialog [data-slot=dialog-header] { padding:24px; border-bottom:1px solid var(--border); }
+.family-operation-form { display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+.family-operation-fields { display:grid; gap:var(--field-group-gap); padding:var(--dialog-padding); overflow-y:auto; }.family-operation-fields label { display:grid; gap:var(--field-label-gap); }
+.family-operation-fields select { height:var(--control-height); padding:var(--field-label-gap); background:white; border:1px solid var(--input); border-radius:var(--radius-compact); width:100%; }
+.family-operation-form [data-slot=dialog-footer] { padding:var(--dialog-footer-padding-y) var(--dialog-footer-padding-x); border-top:1px solid var(--border); }
+.family-operation-selection { background:#edf4ef; border-radius:10px; padding:16px 28px; font-size:14px; }
+.household-detail-page .household-detail-header { background:#edf4ef; border:1px solid var(--border); border-radius:14px; padding:20px 24px; margin-bottom:28px; }
+.household-detail-page .household-detail-header h1 { font-size:23px; }
+.household-detail-page .household-detail-families { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; align-items:start; }
+.household-detail-page .family-card { border:1px solid #d4dfd4; border-radius:14px; background:white; }
+.household-detail-page .family-card header { display:block; border-left:0; padding:20px 22px 12px; background:#f8faf6; }
+.household-detail-page .family-card header p { color:#886236; letter-spacing:.14em; }
+.household-detail-page .family-card h3 { font-size:18px; margin-top:8px; }
+.household-detail-page .member-row { min-height:82px; gap:10px; padding:12px; }
+.household-detail-page .member-row strong { font-size:15px; }
+.household-detail-page .member-row small { font-size:12px; }
+.household-detail-page .household-action-dock { left:274px; right:24px; bottom:18px; border:1px solid #c5d6c8; border-radius:var(--radius-panel); display:block; padding:var(--field-group-gap) var(--space-5); box-shadow:0 8px 32px #173b3020; }
+.sidebar-collapsed .household-detail-page .household-action-dock { left:80px; }
+.household-action-dock-status { padding-bottom:12px; border-bottom:1px solid var(--border); }
+.household-action-dock-actions { padding-top:12px; justify-content:space-between; }
+.page.household-detail-page { padding-bottom:230px; }
+.wellbeing-dialog[data-slot=dialog-content] [data-slot=dialog-header] { padding:var(--dialog-padding); border-bottom:1px solid var(--border); }
+.wellbeing-dialog-body { padding:var(--dialog-padding); }
+.wellbeing-dialog-body > h3 { font-size:20px; margin:8px 0; }
+.wellbeing-dialog-body > p { color:var(--muted-foreground); font-size:14px; margin-bottom:20px; }
+.wellbeing-days { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; margin-bottom:28px; }
+.wellbeing-day-option { display:flex; flex-direction:column; height:auto; min-height:76px; gap:4px; }
+.wellbeing-day-option strong { font-size:23px; }.wellbeing-day-option span { font-size:12px; }
+.wellbeing-slot-grid .wellbeing-slot { min-height:100px; padding:var(--field-group-gap); }
+@media(max-width:1000px) { .household-detail-page .household-detail-families { grid-template-columns:1fr; }.household-create-layout { grid-template-columns:1fr; } }
+@media(max-width:768px) {
+ .household-page .household-search-panel { padding:20px; }.household-search-line { flex-direction:column; }
+ .household-search-create-row,.household-season-note { align-items:flex-start; flex-direction:column; }
+ .household-search-hints > :last-child { display:none; }
+ .household-table-header { display:none; }.household-result-row { grid-template-columns:70px minmax(0,1fr); gap:12px; padding:18px; }.household-names { grid-column:2; }.household-open-result { display:none; }
+ .household-detail-page .household-action-dock,.sidebar-collapsed .household-detail-page .household-action-dock { left:10px; right:10px; bottom:74px; padding:12px; }
+ .page.household-detail-page { padding-bottom:360px; }.household-action-dock-actions { justify-content:flex-start; gap:8px; }
+ .household-detail-page .household-detail-header { align-items:flex-start; flex-direction:column; padding:18px; }
+ .wellbeing-dialog-body { padding:16px; }.wellbeing-days { gap:6px; }.wellbeing-day-option { min-height:64px; padding:6px; }
+}
