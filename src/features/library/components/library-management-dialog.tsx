@@ -17,13 +17,13 @@ export function LibraryManagementDialog({ onClose, onSingleUpload, onBatchUpload
   uploads: ReactNode;
 }) {
   const [view, setView] = useState<ManagementView>('home');
-  const title = view === 'categories' ? 'Quản lý đầu mục' : view === 'uploads' ? 'Lượt tải cần xử lý' : 'Công cụ quản lý';
+  const title = view === 'categories' ? 'Quản lý đầu mục' : view === 'uploads' ? 'Lượt tải cần xử lý' : 'Quản lý thư viện';
 
   return <Dialog open onOpenChange={(open) => { if (!open && !busy) onClose(); }}>
     <DialogContent className="library-management-dialog" showCloseButton={false}>
       <DialogHeader>
         <div className="library-management-heading">
-          {view !== 'home' && <Button variant="ghost" size="icon" disabled={busy} aria-label="Quay lại công cụ quản lý" onClick={() => setView('home')}><ArrowLeft aria-hidden="true" /></Button>}
+          {view !== 'home' && <Button variant="ghost" size="icon" disabled={busy} aria-label="Quay lại quản lý thư viện" onClick={() => setView('home')}><ArrowLeft aria-hidden="true" /></Button>}
           <div><DialogTitle>{title}</DialogTitle><DialogDescription>{view === 'home' ? 'Chọn công việc bạn muốn thực hiện.' : view === 'categories' ? 'Thêm, đổi tên và sắp xếp các đầu mục tài liệu.' : 'Kiểm tra các lượt tải chưa hoàn tất và trạng thái xóa.'}</DialogDescription></div>
         </div>
       </DialogHeader>
@@ -38,7 +38,7 @@ export function LibraryManagementDialog({ onClose, onSingleUpload, onBatchUpload
           <p className="library-management-hint">Mỗi tệp PDF có dung lượng tối đa 100 MB.</p>
         </> : view === 'categories' ? categories : pendingCount ? uploads : <p className="empty-panel" role="status">Tất cả lượt tải đã được xử lý.</p>}
       </div>
-      <div className="library-management-footer"><Button variant="secondary" disabled={busy} onClick={onClose}>{busy ? 'Đang xử lý…' : 'Đóng công cụ'}</Button></div>
+      <div className="library-management-footer"><Button variant="secondary" disabled={busy} onClick={onClose}>{busy ? 'Đang xử lý…' : 'Đóng'}</Button></div>
     </DialogContent>
   </Dialog>;
 }

@@ -45,16 +45,6 @@ describe('DashboardShell', () => {
     expect(mocks.refresh).toHaveBeenCalledOnce();
   });
 
-  it('collapses and expands the desktop navigation', async () => {
-    const user = userEvent.setup();
-    render(<DashboardShell><p>Dashboard content</p></DashboardShell>);
-
-    await user.click(screen.getByRole('button', { name: 'Thu gọn điều hướng' }));
-    expect(screen.getByRole('button', { name: 'Mở rộng điều hướng' })).toBeVisible();
-
-    await user.click(screen.getByRole('button', { name: 'Mở rộng điều hướng' }));
-    expect(screen.getByRole('button', { name: 'Thu gọn điều hướng' })).toBeVisible();
-  });
 
   it('shows the currently managed pagoda name without the lunar-year subtitle', () => {
     render(<DashboardShell><p>Dashboard content</p></DashboardShell>);
@@ -69,7 +59,7 @@ describe('DashboardShell', () => {
     render(<DashboardShell publicLibrary><p>Library content</p></DashboardShell>);
     const primaryNavigation = within(screen.getByLabelText('Điều hướng chính'));
 
-    expect(primaryNavigation.getByRole('button', { name: 'Thu gọn điều hướng' })).toBeVisible();
+    expect(primaryNavigation.queryByRole('button', { name: 'Thu gọn điều hướng' })).not.toBeInTheDocument();
     expect(primaryNavigation.getByRole('link', { name: 'Tổng quan' })).toHaveAttribute('href', '/overview');
     expect(primaryNavigation.getByRole('link', { name: 'Cầu An' })).toHaveAttribute('href', '/households');
     expect(primaryNavigation.getByRole('link', { name: 'Thư viện' })).toHaveAttribute('href', '/thu-vien');

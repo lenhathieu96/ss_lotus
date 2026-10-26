@@ -70,12 +70,12 @@ describe('LibraryAdminPage', () => {
     await user.clear(screen.getByRole('searchbox'));
     await user.type(screen.getByRole('searchbox'), 'khong ton tai');
     expect(screen.getByText('Không tìm thấy tài liệu')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /Công cụ quản lý/ }));
-    expect(screen.getByRole('dialog', { name: 'Công cụ quản lý' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: /Quản lý thư viện/ }));
+    expect(screen.getByRole('dialog', { name: 'Quản lý thư viện' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Kiểm tra và dàn xếp' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Lượt tải cần xử lý/ }));
     expect(screen.getByRole('button', { name: 'Kiểm tra và dàn xếp' })).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Đóng công cụ' }));
+    await user.click(screen.getByRole('button', { name: 'Đóng' }));
     expect(screen.getByRole('searchbox')).toHaveValue('khong ton tai');
     expect(screen.getByText('Không tìm thấy tài liệu')).toBeVisible();
   });
@@ -84,23 +84,23 @@ describe('LibraryAdminPage', () => {
     const user = userEvent.setup();
     render(<LibraryAdminPage />);
     await screen.findByRole('link', { name: 'Xem' });
-    await user.click(screen.getByRole('button', { name: /Công cụ quản lý/ }));
+    await user.click(screen.getByRole('button', { name: /Quản lý thư viện/ }));
     await user.click(screen.getByRole('button', { name: /Quản lý đầu mục/ }));
     expect(screen.getByRole('dialog', { name: 'Quản lý đầu mục' })).toBeVisible();
     await user.type(screen.getByRole('textbox', { name: 'Thêm đầu mục' }), 'Phật học');
     await user.click(screen.getByRole('button', { name: /^Thêm$/ }));
     expect(repository.createLibraryCategory).toHaveBeenCalledWith('Phật học');
-    await user.click(screen.getByRole('button', { name: 'Quay lại công cụ quản lý' }));
-    expect(screen.getByRole('dialog', { name: 'Công cụ quản lý' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Quay lại quản lý thư viện' }));
+    expect(screen.getByRole('dialog', { name: 'Quản lý thư viện' })).toBeVisible();
   });
 
   it('replaces the chooser with the batch upload dialog', async () => {
     const user = userEvent.setup();
     render(<LibraryAdminPage />);
     await screen.findByRole('link', { name: 'Xem' });
-    await user.click(screen.getByRole('button', { name: /Công cụ quản lý/ }));
+    await user.click(screen.getByRole('button', { name: /Quản lý thư viện/ }));
     await user.click(screen.getByRole('button', { name: /Import nhiều PDF/ }));
     expect(screen.getByRole('dialog', { name: 'Import nhiều tài liệu PDF' })).toBeVisible();
-    expect(screen.queryByRole('dialog', { name: 'Công cụ quản lý' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'Quản lý thư viện' })).not.toBeInTheDocument();
   });
 });

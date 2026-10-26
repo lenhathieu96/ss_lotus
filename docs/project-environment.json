@@ -1,0 +1,20 @@
+{
+  "project_type": "web",
+  "is_react_native": false,
+  "framework": "Next.js 16 App Router / React 19 / TypeScript",
+  "build": "npm run build",
+  "test": "npm test",
+  "startup": "npm run dev",
+  "bundler": "Turbopack",
+  "env_resolution": "Next.js NEXT_PUBLIC_* configuration; local .env became available during session (contents not inspected)",
+  "qa": "Argent Chromium CDP; login and public library verified; authenticated dashboard requires an authorized session",
+  "key_packages": [
+    "next",
+    "react",
+    "tailwindcss",
+    "@supabase/ssr",
+    "vitest"
+  ],
+  "inspected_at": "2026-10-26",
+  "source": "argent-environment-inspector subagent"
+}

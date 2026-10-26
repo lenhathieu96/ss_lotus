@@ -70,9 +70,9 @@ export function LibraryAdminPage() {
 
   return <section className="page library-admin-page">
     <h1 className="sr-only">Khám phá thư viện</h1>
-    <div className="library-browse-toolbar"><div className="library-browse-summary"><span><BookOpen size={16} aria-hidden="true" /> {documents.filter((document) => document.status === 'published').length} tài liệu</span><span>{categories.length} đầu mục</span></div><Button ref={managementTrigger} variant="catalog" onClick={() => setManagementOpen(true)}><Settings2 size={16} aria-hidden="true" /> Công cụ quản lý{pendingCount > 0 && <span className="library-pending-count">{pendingCount}<span className="sr-only"> lượt cần xử lý</span></span>}</Button></div>
+    <div className="library-browse-toolbar"><div className="library-browse-summary"><span><BookOpen size={16} aria-hidden="true" /> {documents.filter((document) => document.status === 'published').length} tài liệu</span><span>{categories.length} đầu mục</span></div></div>
     {error && <p role="alert" className="notice">{error} <Button variant="catalog" onClick={() => void reload()}>Thử lại</Button></p>}
-    <LibraryAdminCatalog categories={categories} documents={documents} loading={loading} onEdit={setEditing} onDelete={(document) => void deleteDocument(document)} />
+    <LibraryAdminCatalog searchAction={<Button ref={managementTrigger} variant="catalog" onClick={() => setManagementOpen(true)}><Settings2 size={16} aria-hidden="true" /> Quản lý thư viện{pendingCount > 0 && <span className="library-pending-count">{pendingCount}<span className="sr-only"> lượt cần xử lý</span></span>}</Button>} categories={categories} documents={documents} loading={loading} onEdit={setEditing} onDelete={(document) => void deleteDocument(document)} />
     {managementOpen && <LibraryManagementDialog onClose={() => setManagementOpen(false)} busy={managementBusy} pendingCount={pendingCount}
       onSingleUpload={() => { setManagementOpen(false); setSingleOpen(true); }}
       onBatchUpload={() => { setManagementOpen(false); setBatchOpen(true); }}

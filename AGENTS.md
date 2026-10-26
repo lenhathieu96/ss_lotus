@@ -45,6 +45,7 @@ npm run test:scripts
 - Keep `src/app` limited to framework adapters; screen composition and styles belong to `src/features`. Feature repositories implement provider behavior directly; `src/data/network` holds only the shared browser client.
 - Library mutations and signed-download lookup call the Supabase `library-lifecycle` Function. Do not add Next API routes or put privileged clients in frontend source.
 - Components using hooks, browser APIs, drag/drop, Supabase browser auth, or `FileReader` require `'use client'` at their client boundary.
+- Drawer/Sheet forms must keep action buttons in a footer anchored to the bottom of the drawer. Keep the header and footer outside the scrolling body; only the content area scrolls (`min-height: 0` in the flex/grid layout). Preserve bottom safe-area padding on mobile and keep submit buttons associated with their form.
 - Use `next/link` and `next/navigation`; do not add React Router.
 - Public browser environment values use only `NEXT_PUBLIC_*` names. Never expose database URLs, service-role keys, or other server secrets.
 - Preserve the current browser-only Supabase login unless a task explicitly adds server-side auth.

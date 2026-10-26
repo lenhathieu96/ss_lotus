@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { BookOpen, Search } from 'lucide-react';
 import { Button } from '@components/ui/button';
@@ -8,7 +8,8 @@ import { Input } from '@components/ui/input';
 import { Label } from '@components/ui/label';
 import { LibraryAdminDocument, LibraryCategory, normalizeLibraryQuery, normalizeLibraryText } from '../library-repository';
 
-export function LibraryAdminCatalog({ categories, documents, loading, onEdit, onDelete }: {
+export function LibraryAdminCatalog({ categories, documents, loading, onEdit, onDelete, searchAction }: {
+  searchAction?: ReactNode;
   categories: LibraryCategory[];
   documents: LibraryAdminDocument[];
   loading: boolean;
@@ -52,9 +53,9 @@ export function LibraryAdminCatalog({ categories, documents, loading, onEdit, on
       <p className="library-sidebar-hint">Chọn đầu mục để khám phá sách và tài liệu.</p>
     </aside>
       <div className="library-browse-toolbar">
-        <Label className="library-browse-search" htmlFor="library-book-search">Tìm trong thư viện
+        <div className="library-search-actions"><Label className="library-browse-search" htmlFor="library-book-search">Tìm trong thư viện
           <span><Search size={20} aria-hidden="true" /><Input id="library-book-search" type="search" placeholder="Tên sách, tác giả hoặc tên tệp…" value={query} onChange={(event) => setQuery(event.target.value)} /></span>
-        </Label>
+        </Label>{searchAction}</div>
         <div><h2>{selectedName || 'Tất cả tài liệu'}</h2><p role="status">{loading ? 'Đang tải tài liệu…' : `${visible.length} tài liệu${search ? ' phù hợp' : ' có thể đọc'}`}</p></div>
         {(query || selectedId) && <Button variant="ghost" onClick={() => { setQuery(''); setCategoryId(''); }}>Xóa bộ lọc</Button>}
       </div>
