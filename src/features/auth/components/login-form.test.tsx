@@ -5,10 +5,11 @@ import { LoginForm } from './login-form';
 
 const mocks = vi.hoisted(() => ({
   replace: vi.fn(),
+  refresh: vi.fn(),
   signIn: vi.fn(),
 }));
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ replace: mocks.replace }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ replace: mocks.replace, refresh: mocks.refresh }) }));
 vi.mock('../auth-repository', () => ({
   authRepository: { configurationError: null, signIn: mocks.signIn },
   usernameToAuthEmail: (username: string) => /^[a-z0-9][a-z0-9._-]{2,31}$/.test(username.trim().toLowerCase()) ? `${username.trim().toLowerCase()}@ss-lotus.local` : null,
@@ -33,6 +34,7 @@ describe('LoginForm', () => {
       password: 'test-password',
     }));
     expect(mocks.replace).toHaveBeenCalledWith('/households');
+    expect(mocks.refresh).toHaveBeenCalledOnce();
   });
 
   it('rejects an invalid username before it calls the auth repository', async () => {

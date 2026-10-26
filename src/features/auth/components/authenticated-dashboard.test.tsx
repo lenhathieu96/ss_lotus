@@ -6,11 +6,13 @@ let authStateChangeListener: ((session: unknown) => void) | undefined;
 
 const mocks = vi.hoisted(() => {
   const replace = vi.fn();
+  const refresh = vi.fn();
   return {
     getSession: vi.fn(),
     onAuthStateChange: vi.fn(),
     replace,
-    router: { replace },
+    refresh,
+    router: { replace, refresh },
     unsubscribe: vi.fn(),
   };
 });
@@ -27,6 +29,13 @@ vi.mock('../auth-repository', () => ({
 }));
 
 describe('AuthenticatedDashboard', () => {
+  const initialBootstrap = {
+    kind: 'ready' as const,
+    userId: 'test-user',
+    pagodas: [{ id: 'pagoda-1', slug: 'test', name: 'Test Pagoda' }],
+    activePagoda: { id: 'pagoda-1', slug: 'test', name: 'Test Pagoda' },
+    isLibraryAdmin: false,
+  };
   beforeEach(() => {
     vi.clearAllMocks();
     authStateChangeListener = undefined;
@@ -36,34 +45,27 @@ describe('AuthenticatedDashboard', () => {
     });
   });
 
-  it('redirects to login without a Supabase session', async () => {
-    mocks.getSession.mockResolvedValue(null);
-
-    render(<AuthenticatedDashboard><p>Protected dashboard</p></AuthenticatedDashboard>);
-
-    expect(screen.getByRole('status')).toHaveTextContent('Đang kiểm tra phiên đăng nhập…');
-    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith('/login'));
-    expect(screen.queryByText('Protected dashboard')).not.toBeInTheDocument();
+  it('renders from the server bootstrap without a client startup session request', async () => {
+    render(<AuthenticatedDashboard initialBootstrap={initialBootstrap}><p>Protected dashboard</p></AuthenticatedDashboard>);
+    expect(await screen.findByText('Protected dashboard')).toBeVisible();
+    expect(mocks.getSession).not.toHaveBeenCalled();
   });
 
   it('renders dashboard content with a Supabase session', async () => {
-    mocks.getSession.mockResolvedValue({ userId: 'test-user' });
-
-    render(<AuthenticatedDashboard><p>Protected dashboard</p></AuthenticatedDashboard>);
+    render(<AuthenticatedDashboard initialBootstrap={initialBootstrap}><p>Protected dashboard</p></AuthenticatedDashboard>);
 
     expect(await screen.findByText('Protected dashboard')).toBeVisible();
     expect(mocks.replace).not.toHaveBeenCalled();
   });
 
   it('redirects when the Supabase session ends after loading the dashboard', async () => {
-    mocks.getSession.mockResolvedValue({ userId: 'test-user' });
-
-    render(<AuthenticatedDashboard><p>Protected dashboard</p></AuthenticatedDashboard>);
+    render(<AuthenticatedDashboard initialBootstrap={initialBootstrap}><p>Protected dashboard</p></AuthenticatedDashboard>);
 
     expect(await screen.findByText('Protected dashboard')).toBeVisible();
     await act(async () => authStateChangeListener?.(null));
 
     await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith('/login'));
+    expect(mocks.refresh).toHaveBeenCalledOnce();
     await waitFor(() => expect(screen.queryByText('Protected dashboard')).not.toBeInTheDocument());
   });
 });

@@ -9,7 +9,8 @@ import { Button } from '@components/ui/button';
 import { isLibraryAdmin } from '@features/library/library-repository';
 import { authRepository } from '@features/auth/auth-repository';
 import { PagodaSwitcher } from '@features/pagodas/pagoda-switcher';
-import { clearActivePagodaId } from '@features/pagodas/pagoda-client';
+import { clearActivePagodaId, removeStoredActivePagodaId } from '@features/pagodas/pagoda-client';
+import { useDashboardAccess } from '@features/auth/components/dashboard-access-context';
 
 const navigation = [
   { to: '/overview', label: 'Tổng quan', icon: Home },
@@ -27,21 +28,23 @@ export function DashboardShell({ children, publicLibrary = false }: { children: 
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [libraryAdmin, setLibraryAdmin] = useState(false);
+  const dashboardAccess = useDashboardAccess();
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
     if (publicLibrary) return;
     let active = true;
+    let retryTimer: number | null = null;
     async function refreshCapability() {
-      const session = await authRepository.getSession();
-      if (!session) {
-        setLibraryAdmin(false);
-        return;
+      try {
+        const allowed = await isLibraryAdmin();
+        if (active) setLibraryAdmin(allowed);
+      } catch {
+        // A transient provider error preserves the last server-confirmed menu.
       }
-      try { setLibraryAdmin(await isLibraryAdmin()); }
-      catch { setLibraryAdmin(false); }
     }
+    setLibraryAdmin(dashboardAccess?.isLibraryAdmin ?? false);
     const unsubscribe = authRepository.subscribeToSession((session) => {
       if (!session) {
         setLibraryAdmin(false);
@@ -49,14 +52,32 @@ export function DashboardShell({ children, publicLibrary = false }: { children: 
         window.setTimeout(() => { if (active) void refreshCapability(); }, 0);
       }
     });
-    void refreshCapability();
-    return () => { active = false; unsubscribe(); };
-  }, [publicLibrary]);
+    const revalidate = () => {
+      if (retryTimer) window.clearTimeout(retryTimer);
+      retryTimer = window.setTimeout(() => { void refreshCapability(); }, 150);
+    };
+    const onVisibility = () => { if (document.visibilityState === 'visible') revalidate(); };
+    const onRevoked = () => { if (active) setLibraryAdmin(false); };
+    window.addEventListener('focus', revalidate);
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('ss-lotus:library-admin-revoked', onRevoked);
+    return () => {
+      active = false;
+      unsubscribe();
+      if (retryTimer) window.clearTimeout(retryTimer);
+      window.removeEventListener('focus', revalidate);
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('ss-lotus:library-admin-revoked', onRevoked);
+    };
+  }, [dashboardAccess?.isLibraryAdmin, publicLibrary]);
 
   async function signOut() {
-    clearActivePagodaId();
     await authRepository.signOut();
-    router.push('/login');
+    if (dashboardAccess) removeStoredActivePagodaId(dashboardAccess.userId);
+    clearActivePagodaId(dashboardAccess?.userId);
+    setLibraryAdmin(false);
+    router.replace('/login');
+    router.refresh();
   }
 
   const lunarYear = fromSolarDate(getVietnamToday()).year;

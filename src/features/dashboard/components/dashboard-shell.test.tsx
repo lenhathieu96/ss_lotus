@@ -7,13 +7,14 @@ const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
   subscribeToSession: vi.fn(),
   signOut: vi.fn(),
-  push: vi.fn(),
+  replace: vi.fn(),
+  refresh: vi.fn(),
   isLibraryAdmin: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/households',
-  useRouter: () => ({ push: mocks.push }),
+  useRouter: () => ({ replace: mocks.replace, refresh: mocks.refresh }),
 }));
 vi.mock('@features/auth/auth-repository', () => ({ authRepository: {
   getSession: mocks.getSession,
@@ -39,7 +40,8 @@ describe('DashboardShell', () => {
     await user.click(screen.getByRole('button', { name: 'Đăng xuất' }));
 
     await waitFor(() => expect(mocks.signOut).toHaveBeenCalledOnce());
-    expect(mocks.push).toHaveBeenCalledWith('/login');
+    expect(mocks.replace).toHaveBeenCalledWith('/login');
+    expect(mocks.refresh).toHaveBeenCalledOnce();
   });
 
   it('collapses and expands the desktop navigation', async () => {

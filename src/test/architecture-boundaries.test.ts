@@ -70,7 +70,7 @@ describe('application architecture boundaries', () => {
 
   it('keeps each consolidated feature to its agreed root production and test modules', () => {
     const expected = new Map([
-      ['auth', ['auth-repository.ts', 'auth-repository.test.ts']],
+      ['auth', ['auth-repository.ts', 'auth-repository.test.ts', 'server-auth-bootstrap.ts', 'server-auth-bootstrap.test.ts']],
       ['calendar', ['lunar-date-domain.ts', 'lunar-date-domain.test.ts']],
       ['households', ['household-repository.ts', 'household-repository.test.ts']],
       ['prayer', ['prayer-repository.ts', 'prayer-repository.test.ts']],
