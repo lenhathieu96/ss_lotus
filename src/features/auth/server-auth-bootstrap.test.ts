@@ -16,7 +16,7 @@ describe('server auth bootstrap', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
-    mocks.getClaims.mockResolvedValue({ data: { claims: { sub: 'user-1' } }, error: null });
+    mocks.getClaims.mockResolvedValue({ data: { claims: { sub: 'user-1', email: 'admin@ss-lotus.local' } }, error: null });
     mocks.get.mockReturnValue(undefined);
     mocks.rpc.mockImplementation((name: string) => {
       if (name === 'list_my_pagodas') return Promise.resolve({ data: [{ id: 'pagoda-1', slug: 'one', name: 'One' }], error: null });
@@ -27,7 +27,7 @@ describe('server auth bootstrap', () => {
   it('returns only the verified user access needed to hydrate the dashboard', async () => {
     const { loadServerAuthBootstrap } = await import('./server-auth-bootstrap');
     await expect(loadServerAuthBootstrap()).resolves.toEqual({
-      kind: 'ready', userId: 'user-1',
+      kind: 'ready', userId: 'user-1', username: 'admin',
       pagodas: [{ id: 'pagoda-1', slug: 'one', name: 'One' }],
       activePagoda: { id: 'pagoda-1', slug: 'one', name: 'One' },
       isLibraryAdmin: true,

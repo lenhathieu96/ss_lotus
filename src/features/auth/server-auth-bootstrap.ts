@@ -10,6 +10,7 @@ import type { PagodaAccess } from '@features/pagodas/pagoda-client';
 export type ReadyAuthBootstrap = Readonly<{
   kind: 'ready';
   userId: string;
+  username: string;
   pagodas: PagodaAccess[];
   activePagoda: PagodaAccess;
   isLibraryAdmin: boolean;
@@ -22,6 +23,12 @@ export type ServerAuthBootstrap = ReadyAuthBootstrap
 
 function selectActivePagoda(pagodas: PagodaAccess[], preferredId: string | null): PagodaAccess | null {
   return pagodas.find((pagoda) => pagoda.id === preferredId) ?? pagodas[0] ?? null;
+}
+
+function usernameFromClaims(claims: Record<string, unknown>): string {
+  const email = claims.email;
+  if (typeof email !== 'string') return 'Tài khoản';
+  return email.split('@', 1)[0] || 'Tài khoản';
 }
 
 /**
@@ -58,5 +65,5 @@ export const loadServerAuthBootstrap = cache(async (): Promise<ServerAuthBootstr
   const activePagoda = selectActivePagoda(pagodas, preferredId);
   if (!activePagoda) return { kind: 'empty-access' };
 
-  return { kind: 'ready', userId, pagodas, activePagoda, isLibraryAdmin: adminData === true };
+  return { kind: 'ready', userId, username: usernameFromClaims(claims), pagodas, activePagoda, isLibraryAdmin: adminData === true };
 });

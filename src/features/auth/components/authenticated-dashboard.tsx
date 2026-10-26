@@ -47,7 +47,7 @@ export function AuthenticatedDashboard({ children, initialBootstrap }: Authentic
     };
   }, [router]);
 
-  if (session) return <DashboardAccessProvider access={{ userId: initialBootstrap.userId, isLibraryAdmin: initialBootstrap.isLibraryAdmin }}><PagodaAccessProvider key={session.userId} userId={session.userId} initialAccess={{ pagodas: initialBootstrap.pagodas, activePagoda: initialBootstrap.activePagoda }}>{children}</PagodaAccessProvider></DashboardAccessProvider>;
+  if (session) return <DashboardAccessProvider access={{ userId: initialBootstrap.userId, username: initialBootstrap.username, isLibraryAdmin: initialBootstrap.isLibraryAdmin }}><PagodaAccessProvider key={session.userId} userId={session.userId} initialAccess={{ pagodas: initialBootstrap.pagodas, activePagoda: initialBootstrap.activePagoda }}>{children}</PagodaAccessProvider></DashboardAccessProvider>;
 
   return null;
 }

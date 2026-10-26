@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react';
 
-type DashboardAccess = Readonly<{ userId: string; isLibraryAdmin: boolean }>;
+type DashboardAccess = Readonly<{ userId: string; username: string; isLibraryAdmin: boolean }>;
 
 const DashboardAccessContext = createContext<DashboardAccess | null>(null);
 

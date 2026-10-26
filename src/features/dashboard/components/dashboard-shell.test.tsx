@@ -22,7 +22,8 @@ vi.mock('@features/auth/auth-repository', () => ({ authRepository: {
   signOut: mocks.signOut,
 } }));
 vi.mock('@features/library/library-repository', () => ({ isLibraryAdmin: mocks.isLibraryAdmin }));
-vi.mock('@features/pagodas/pagoda-switcher', () => ({ PagodaSwitcher: () => <div>Pagoda switcher</div> }));
+vi.mock('@features/pagodas/pagoda-access-context', () => ({ usePagodaAccess: () => ({ activePagoda: { name: 'Chùa Từ Ân' } }) }));
+vi.mock('@features/auth/components/dashboard-access-context', () => ({ useDashboardAccess: () => ({ userId: 'admin-1', username: 'admin', isLibraryAdmin: false }) }));
 
 describe('DashboardShell', () => {
   beforeEach(() => {
@@ -53,6 +54,15 @@ describe('DashboardShell', () => {
 
     await user.click(screen.getByRole('button', { name: 'Mở rộng điều hướng' }));
     expect(screen.getByRole('button', { name: 'Thu gọn điều hướng' })).toBeVisible();
+  });
+
+  it('shows the currently managed pagoda name without the lunar-year subtitle', () => {
+    render(<DashboardShell><p>Dashboard content</p></DashboardShell>);
+
+    expect(screen.getByText('Chùa Từ Ân')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'admin' })).toBeVisible();
+    expect(screen.queryByText(/Năm lễ âm lịch/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Chùa đang quản trị')).not.toBeInTheDocument();
   });
 
   it('keeps the primary sections available in the public library shell', () => {

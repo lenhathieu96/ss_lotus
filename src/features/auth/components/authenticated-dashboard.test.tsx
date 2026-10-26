@@ -32,6 +32,7 @@ describe('AuthenticatedDashboard', () => {
   const initialBootstrap = {
     kind: 'ready' as const,
     userId: 'test-user',
+    username: 'test-admin',
     pagodas: [{ id: 'pagoda-1', slug: 'test', name: 'Test Pagoda' }],
     activePagoda: { id: 'pagoda-1', slug: 'test', name: 'Test Pagoda' },
     isLibraryAdmin: false,
