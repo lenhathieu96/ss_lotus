@@ -146,8 +146,8 @@ export function parseDeceasedPersonCsv(content: string, existingCodes: string[] 
     if (!person.fullName) errors.push(`Dòng ${rowNumber}: Họ tên là bắt buộc.`);
     if (!isValidLunarDayMonth(person.dateOfDeath)) errors.push(`Dòng ${rowNumber}: Ngày mất âm lịch không hợp lệ; dùng dd/mm và ghi tháng nhuận ở cột thang_nhuan.`);
     if (!person.createdBy) errors.push(`Dòng ${rowNumber}: Người lập là bắt buộc.`);
-    if (person.householdReference && !/^\d{1,4}$/.test(person.householdReference)) errors.push(`Dòng ${rowNumber}: Mã hộ phải từ 1 đến 4 chữ số.`);
-    if (person.familyReference && !/^\d{1,4}$/.test(person.familyReference)) errors.push(`Dòng ${rowNumber}: Mã gia đình phải từ 1 đến 4 chữ số.`);
+    if (person.householdReference && !isBusinessNumber(person.householdReference)) errors.push(`Dòng ${rowNumber}: Mã hộ không hợp lệ.`);
+    if (person.familyReference && !isBusinessNumber(person.familyReference)) errors.push(`Dòng ${rowNumber}: Mã gia đình không hợp lệ.`);
     if (!!person.householdReference !== !!person.familyReference) errors.push(`Dòng ${rowNumber}: Mã hộ và mã gia đình phải nhập cùng nhau.`);
     return { rowNumber, person, errors };
   });
@@ -165,8 +165,13 @@ function requireClient() {
 }
 
 function requireBusinessNumber(value: string, label: string): number {
-  if (!/^\d{1,4}$/.test(value)) throw new Error(`${label} phải là mã số từ 1 đến 4 chữ số.`);
+  if (!isBusinessNumber(value)) throw new Error(`${label} không hợp lệ.`);
   return Number(value);
+}
+
+function isBusinessNumber(value: string): boolean {
+  const parsed = Number(value);
+  return /^\d{1,10}$/.test(value) && Number.isInteger(parsed) && parsed >= 1 && parsed <= 2_147_483_647;
 }
 
 function readLunarDayMonth(row: Record<string, unknown>): LunarDayMonth {
@@ -235,10 +240,10 @@ export async function createDeceasedPerson(person: DeceasedPerson): Promise<void
 
 export async function importDeceasedPeople(people: DeceasedPerson[]): Promise<void> {
   people.forEach((person) => {
-    const hasInvalidHousehold = person.householdReference && !/^\d{1,4}$/.test(person.householdReference);
-    const hasInvalidFamily = person.familyReference && !/^\d{1,4}$/.test(person.familyReference);
+    const hasInvalidHousehold = person.householdReference && !isBusinessNumber(person.householdReference);
+    const hasInvalidFamily = person.familyReference && !isBusinessNumber(person.familyReference);
     if (hasInvalidHousehold || hasInvalidFamily) {
-      throw new Error('Mã hộ và mã gia đình phải từ 1 đến 4 chữ số.');
+      throw new Error('Mã hộ và mã gia đình không hợp lệ.');
     }
     if (!!person.householdReference !== !!person.familyReference) throw new Error('Mã hộ và mã gia đình phải nhập cùng nhau.');
   });

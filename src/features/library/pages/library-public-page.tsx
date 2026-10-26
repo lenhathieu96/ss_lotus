@@ -55,13 +55,15 @@ export function LibraryPublicPage({ initialCategoryId = '' }: { initialCategoryI
   }, [categoryId, query]);
 
   return <main className="page library-public-page">
-    <header className="library-hero"><p className="eyebrow">THƯ VIỆN PHẬT HỌC</p><h1>Thư viện</h1><p>Tra cứu và đọc các tài liệu được chia sẻ.</p></header>
-    <div className="library-browse-layout library-public-layout">
+    <h1 className="sr-only">Thư viện</h1>
+    <div className="library-browse-layout library-public-layout library-filter-layout">
+      <div className="library-filter-bar" aria-label="Bộ lọc thư viện">
       <LibraryCategoryNavigation categories={categories} selectedCategoryId={categoryId} onSelect={setCategoryId} />
-      <section className="library-browse-content">
         <Card className="library-search-panel library-public-search-panel">
           <Label className="form-field">Tìm tài liệu<Input aria-label="Tìm theo tên tài liệu hoặc tác giả" type="search" placeholder="Nhập tên sách hoặc tác giả" value={query} onChange={(event) => setQuery(event.target.value)} /></Label>
         </Card>
+      </div>
+      <section className="library-browse-content">
         {error && <p className="notice" role="alert">{error} <Button variant="catalog" size="sm" onClick={() => void load(false)}>Thử lại</Button></p>}
         {loading && documents.length === 0 ? <p className="empty-panel" role="status">Đang tải tài liệu…</p> : documents.length === 0 ? <Card className="empty-panel">Chưa có tài liệu phù hợp.</Card> : <section className="library-document-grid" aria-label="Danh sách tài liệu">
           {documents.map((document) => <Card className="library-document-card" key={document.id}><p className="eyebrow">{document.categoryName}</p><h2><Link href={`/thu-vien/${document.id}`}>{document.title}</Link></h2><p>{document.author ? `Tác giả: ${document.author}` : 'Chưa cập nhật tác giả'}</p><Link className="library-read-link" href={`/thu-vien/${document.id}`}>Đọc tài liệu</Link></Card>)}

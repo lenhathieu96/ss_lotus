@@ -18,6 +18,7 @@ export function WellbeingBookingDialog({ booking, onClose, onSubmit }: Wellbeing
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const groupedSlots = useMemo(() => {
     const groups = new Map<number, WellbeingSlot[]>();
     for (const slot of slots) groups.set(slot.lunarDay, [...(groups.get(slot.lunarDay) ?? []), slot]);
@@ -47,7 +48,11 @@ export function WellbeingBookingDialog({ booking, onClose, onSubmit }: Wellbeing
     <DialogHeader><DialogTitle>{booking ? 'Đổi lịch Cầu An' : 'Đặt lịch Cầu An'}</DialogTitle><p>{booking ? `Lịch hiện tại: ${ceremonyPeriodLabels[booking.period]} · ${booking.solarDate}` : 'Mỗi hộ được đặt một lịch trong mùa gần nhất.'}</p></DialogHeader>
     <section className="wellbeing-dialog-body" aria-busy={loading}>
       {loading && <p role="status">Đang tải 15 ngày Cầu An…</p>}
-      {!loading && groupedSlots.map(([day, daySlots]) => <section className="wellbeing-day" key={day}><h3>Mùng {String(day).padStart(2, '0')} tháng Giêng</h3><div className="wellbeing-slot-grid">{daySlots.map((slot) => {
+      {!loading && <><h3>1. Chọn ngày âm lịch</h3><p>Từ mùng 1 đến 15 tháng Giêng</p><div className="wellbeing-days" aria-label="Ngày tháng Giêng">{groupedSlots.map(([day, daySlots]) => {
+        const currentDay = selectedDay ?? slots.find((slot) => slot.id === selectedSlotId)?.lunarDay;
+        return <Button key={day} type="button" className="wellbeing-day-option" variant={currentDay === day ? 'default' : 'outline'} aria-pressed={currentDay === day} disabled={saving || daySlots.every((slot) => slot.isPast && slot.id !== booking?.slotId)} onClick={() => { setSelectedDay(day); setSelectedSlotId(''); }}><strong>{String(day).padStart(2, '0')}</strong><span>Tháng 1 ÂL</span></Button>;
+      })}</div><h3>2. Chọn khóa</h3><p>Mỗi khóa nhận tối đa 200 hộ.</p></>}
+      {!loading && groupedSlots.filter(([day]) => day === (selectedDay ?? slots.find((slot) => slot.id === selectedSlotId)?.lunarDay)).map(([day, daySlots]) => <section className="wellbeing-day" key={day}><div className="wellbeing-slot-grid">{daySlots.map((slot) => {
         const isCurrent = slot.id === booking?.slotId;
         const disabled = !isCurrent && (slot.isPast || slot.remaining === 0);
         return <Button key={slot.id} type="button" variant={slot.id === selectedSlotId ? 'default' : 'secondary'} className="wellbeing-slot" disabled={disabled || saving} aria-pressed={slot.id === selectedSlotId} onClick={() => setSelectedSlotId(slot.id)}>

@@ -6,6 +6,7 @@ describe('OverviewPage', () => {
   it('renders the overview page', () => {
     render(<OverviewPage />);
 
-    expect(screen.getByRole('heading', { name: 'Không gian quản trị lễ' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Tổng quan' })).toBeInTheDocument();
+    expect(screen.getByText('Hộ gia đình')).toBeVisible();
   });
 });
